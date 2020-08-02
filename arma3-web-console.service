@@ -1,0 +1,23 @@
+[Unit]
+Description=arma3-web-console service
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=git -C /home/steam/taw-am1 pull && ../taw-am1/update.sh && /usr/bin/node app.js
+WorkingDirectory=/home/steam/arma-server-web-admin
+Restart=on-failure
+
+LimitNOFILE=infinity
+LimitCORE=infinity
+StandardInput=null
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+SyslogIdentifier=arma3-web-console
+PIDFile=/var/run/arma3-web-console.pid
+User=steam
+Group=steam
+[Install]
+WantedBy=multi-user.target

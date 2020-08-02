@@ -1,0 +1,38 @@
+Per week:
+	7 days * 24 hours = 168 hrs
+	Sunday event: 4.5hrs of large server
+	Wednesday event: 3.5 of large server
+	Large server hours: 4.5 + 3.5 = 9
+	Small server hours: 168 - 9 = 159
+	
+Per month (4 weeks):
+	Large server hours: 9 * 4 = 36
+	Small server hours: 159 * 4 = 636
+	
+Current setup:
+	EC2 t3.medium (2x CPU @ 2.5GHz + boost, 4GB mem): 636 hrs * $0.0416/hr = $26.46
+	EC2 z1d.3xlarge (12x CPU @ 4.0GHz + boost, 96GB mem): 36 hrs * $1.116/hr = $40.18
+	EBS (disk drive): 120GB * $0.10/GB = $12.00
+	Data transfer (estimate): 100GB * $0.09/GB = $9.00
+	TOTAL: $87.64
+	
+Setup we can afford:
+	EC2 t3.large (2x CPU @ 2.5GHz + boost, 8GB mem): 636 hrs * $0.0832/hr = $52.91
+	EC2 z1d.3xlarge (2x CPU @ 2.5GHz + boost, 4GB mem): 36 hrs * $1.116/hr = $40.18
+	EBS (disk drive): 120GB * $0.10/GB = $10.00
+	Data transfer (estimate): 100GB * $0.09/GB = $9.00
+	TOTAL: $114.09
+	
+Desired setup:
+	EC2 c5.xlarge (4x CPU @ 3.4GHz + boost, 8GB mem): 636 hrs * $0.17/hr = $108.12
+	EC2 z1d.3xlarge (2x CPU @ 2.5GHz + boost, 4GB mem): 36 hrs * $1.116/hr = $40.18
+	EBS (disk drive): 120GB * $0.10/GB = $10.00
+	Data transfer (estimate): 100GB * $0.09/GB = $9.00
+	TOTAL: $167.30
+	
+	
+There are a couple other options to reduce cost:
+
+  1) Shut down the server overnight when it's unlikely to be used (e.g. 03:00 - 09:00 EST), which would reduce the "small" size cost by ~25%
+  
+  2) Commit to a 1-year term of the small server size, which would reduce its cost by ~35% (note: this is not combinable with option 1)
