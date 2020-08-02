@@ -61,7 +61,7 @@ get_steam_creds () {
    read steam_username
    printf "Steam password: "
    read -s steam_password
-   printf "$steam_username\n$steam_password" >> $steam_creds_file
+   printf "$steam_username\n$steam_password" > $steam_creds_file
 }
 
 # A function that attempts to load stored Steam credentials if they exist, and
@@ -95,7 +95,7 @@ get_web_panel_creds () {
    read web_panel_username
    printf "Web panel password: "
    read -s web_panel_password
-   printf "$web_panel_username\n$web_panel_password" >> $web_panel_creds_file
+   printf "$web_panel_username\n$web_panel_password" > $web_panel_creds_file
 }
 
 trim() {
