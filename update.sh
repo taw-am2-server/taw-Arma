@@ -427,6 +427,6 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
    done
 done
 
-#TODO: kick on data mismatch
 #TODO: create list of patches to require (add patch cfg name to mods file)
 #TODO: add support for client-only required mods (don't load on server)
+#TODO: ensure web console config options (verifysignatures, patching) set correct values in server.cfg file
