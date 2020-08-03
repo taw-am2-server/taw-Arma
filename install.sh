@@ -35,7 +35,7 @@ cp /home/steam/taw-am1/arma3-web-console.service /etc/systemd/system/
 chmod 644 /etc/systemd/system/arma3-web-console.service
 
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -u steam /home/steam/taw-am1/update.sh
+sudo -u steam /home/steam/taw-am1/update.sh -swv
 
 # Install dependencies for the web console
 cd /home/steam/taw-am1/arma-server-web-admin

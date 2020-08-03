@@ -39,7 +39,7 @@ while getopts ":swv" opt; do
       force_new_steam_creds=true
       ;;
     w) # force new credentials for the web panel
-      force_new_steam_creds=true
+      force_new_web_panel_creds=true
       ;;
     v) # validate ARMA/mod files that have been downloaded
       force_validate="validate"
