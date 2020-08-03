@@ -58,9 +58,9 @@ done
 # A function for getting Steam username/password from the command line
 get_steam_creds () {
    printf "Steam username: "
-   read steam_username
+   read steam_username </dev/tty
    printf "Steam password: "
-   read -s steam_password
+   read -s steam_password </dev/tty
    printf "$steam_username\n$steam_password" > $steam_creds_file
 }
 
@@ -92,9 +92,9 @@ load_steam_creds () {
 # A function for getting web panel username/password from the command line
 get_web_panel_creds () {
    printf "Web panel username: "
-   read web_panel_username
+   read web_panel_username </dev/tty
    printf "Web panel password: "
-   read -s web_panel_password
+   read -s web_panel_password </dev/tty
    printf "$web_panel_username\n$web_panel_password" > $web_panel_creds_file
 }
 
