@@ -293,7 +293,7 @@ if [ ${#download_mod_ids[@]} -gt 0 ]; then
    code=0
    for mod_id in "${download_mod_ids[@]}"; do
       # Prepare the command for doing the download
-      mod_cmd="$mod_validate_cmd +workshop_download_item 107410 $mod_id validate +quit"
+      mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
       # Try it multiple times until max attempts are reached or it finishes successfully
       for (( i=0; i<$mod_download_attempts; i++ )); do
          eval "$mod_cmd"
