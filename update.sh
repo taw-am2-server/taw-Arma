@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 # exit when any command fails
 set -e
@@ -265,6 +265,7 @@ if [ ${#validate_mod_ids[@]} -gt 0 ]; then
    done
    # Run the command
    eval "$mod_validate_cmd +quit"
+   echo "\nSuccessfully verified existing mods"
 fi
 
 # This section downloads new mods by attempting each one separately, and attempting it multiple times

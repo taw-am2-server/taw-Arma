@@ -34,7 +34,7 @@ resource "aws_instance" "arma_server_linux" {
   ]
   root_block_device {
     volume_type           = "gp2"
-    volume_size           = "200"
+    volume_size           = local.instance_ssd_size
     delete_on_termination = false
   }
   tags = {

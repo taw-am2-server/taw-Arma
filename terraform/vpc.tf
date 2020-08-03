@@ -8,10 +8,10 @@ resource "aws_vpc" "main" {
 // Provision all public subnets
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.main.id
-  availability_zone = "us-east-1a"
+  availability_zone = "${local.primary_region}a"
   cidr_block        = "10.10.0.0/20"
   tags = {
-    Name = "us-east-1a (Public)"
+    Name = "${local.primary_region}a (Public)"
   }
 }
 

@@ -7,6 +7,6 @@ terraform {
 
 provider "aws" {
   region      = local.primary_region
-  profile     = "taw_admin"
+  profile     = "taw_am1_admin"
   max_retries = 10
 }
