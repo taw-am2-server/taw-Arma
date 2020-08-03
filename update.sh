@@ -61,7 +61,14 @@ get_steam_creds () {
    read steam_username </dev/tty
    printf "Steam password: "
    read -s steam_password </dev/tty
-   printf "$steam_username\n$steam_password" > $steam_creds_file
+   printf "\nSteam password (confirm): "
+   read -s steam_password2 </dev/tty
+   if [ "$steam_password" != "$steam_password2" ]; then
+      echo "Passwords do not match!"
+      get_steam_creds
+   else
+      printf "$steam_username\n$steam_password" > $steam_creds_file
+   fi
 }
 
 # A function that attempts to load stored Steam credentials if they exist, and
@@ -94,8 +101,15 @@ get_web_panel_creds () {
    printf "Web panel username: "
    read web_panel_username </dev/tty
    printf "Web panel password: "
-   read -s web_panel_password </dev/tty
-   printf "$web_panel_username\n$web_panel_password" > $web_panel_creds_file
+   read -s web_panel_password </dev/tty   
+   printf "\nWeb panel password (confirm): "
+   read -s web_panel_password2 </dev/tty
+   if [ "$web_panel_password" != "$web_panel_password2" ]; then
+      echo "Passwords do not match!"
+      get_steam_creds
+   else
+      printf "$web_panel_username\n$web_panel_password" > $web_panel_creds_file
+   fi
 }
 
 trim() {
