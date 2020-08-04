@@ -15,6 +15,13 @@ apt install lib32gcc1 net-tools steamcmd npm nginx python3-certbot-nginx unzip j
 apt upgrade -y
 id -u steam &>/dev/null || useradd -m steam
 
+# Copy the ubuntu user's authorized keys over to the Steam user
+mkdir -p /home/steam/.ssh
+cp /home/ubuntu/.ssh/authorized_keys /home/steam/.ssh/
+chown -R steam:steam /home/steam/.ssh
+chmod 755 /home/steam/.ssh
+chmod 644 /home/steam/.ssh/authorized_keys
+
 # Configure ARMA profile directory
 sudo -u steam mkdir -p /home/steam/arma-profiles
 user_home="/home/steam"

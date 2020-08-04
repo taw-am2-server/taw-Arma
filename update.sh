@@ -55,6 +55,10 @@ while getopts ":swv" opt; do
   esac
 done
 
+trim() {
+   echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+}
+
 # A function for getting Steam username/password from the command line
 get_steam_creds () {
    printf "Steam username: "
@@ -114,10 +118,6 @@ get_web_panel_creds () {
    fi
 }
 
-trim() {
-   echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
-}
-
 # A function that attempts to load stored web panel credentials if they exist, and
 # asks for new ones to be entered if they don't (or if the '-w' switch was used)
 load_web_panel_creds () {
@@ -141,6 +141,22 @@ load_web_panel_creds () {
          web_panel_password=${web_panel_vars[1]}
       fi
    fi
+}
+
+run_steam_cmd() { # run_steam_cmd command attempts
+   # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
+   for (( i=0; i<$2; i++ )); do
+      result=`$1`
+      # Track the exit code
+      code=$?
+      # Break the loop if the command was successful
+      if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
+         set -e
+         return 0
+      fi
+   done
+   echo "Steamcmd failed: $result"
+   return 1
 }
 
 # Write the web panel config.js file, adding in the saved credentials
@@ -248,20 +264,9 @@ base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
-code=0
 set +e
-# On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
-for (( i=0; i<$arma_download_attempts; i++ )); do
-   eval "$arma_update_cmd"
-   # Track the exit code
-   code=$?
-   # Break the loop if the command was successful
-   if [ $code == 0 ]; then
-      break
-   fi
-done
-# Check the final exit code; if non-zero, then all attempts failed, so exit the script
-if [ $code != 0 ]; then
+run_steam_cmd "$arma_update_cmd" $arma_download_attempts
+if [ $? != 0 ]; then
    echo "Failed to download ARMA 3 from Steam" >&2; exit 1
 fi
 set -e
@@ -280,7 +285,13 @@ if [ ${#validate_mod_ids[@]} -gt 0 ]; then
       mod_validate_cmd="$mod_validate_cmd +workshop_download_item 107410 $mod_id $force_validate"
    done
    # Run the command
-   eval "$mod_validate_cmd +quit"
+   mod_validate_cmd="$mod_validate_cmd +quit"
+   set +e
+   run_steam_cmd "$mod_validate_cmd" 1
+   if [ $? != 0 ]; then
+      echo "Failed to download ARMA 3 from Steam" >&2; exit 1
+   fi
+   set -e
    echo "\nSuccessfully verified existing mods"
 fi
 
@@ -288,24 +299,14 @@ fi
 # so that it re-tries after timeouts to continue the download.
 # Only run this section if there are any mods to download
 if [ ${#download_mod_ids[@]} -gt 0 ]; then
-   # Don't exit the script on errors, since we want to catch them and re-try
    set +e
-   code=0
+   # Download each mod
    for mod_id in "${download_mod_ids[@]}"; do
       # Prepare the command for doing the download
       mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
-      # Try it multiple times until max attempts are reached or it finishes successfully
-      for (( i=0; i<$mod_download_attempts; i++ )); do
-         eval "$mod_cmd"
-         # Track the exit code
-         code=$?
-         # Break the loop if the command was successful
-         if [ $code == 0 ]; then
-            break
-         fi
-      done
-      # Check the final exit code; if non-zero, then all attempts failed, so exit the script
-      if [ $code != 0 ]; then
+      # Call the function that runs the command
+      run_steam_cmd "$mod_cmd" $mod_download_attempts
+      if [ $? != 0 ]; then
          echo "Failed to download all mods from Steam" >&2; exit 1
       fi
    done
@@ -444,6 +445,9 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
    done
 done
 
-#TODO: create list of patches to require (add patch cfg name to mods file)
-#TODO: add support for client-only required mods (don't load on server)
-#TODO: ensure web console config options (verifysignatures, patching) set correct values in server.cfg file
+# TODO:
+# - properly re-try downloading ARMA/mods
+# - copy over default profile
+# - create list of patches to require (add patch cfg name to mods file)
+# - add support for client-only required mods (don't load on server)
+# - ensure web console config options (verifysignatures, patching) set correct values in server.cfg file
