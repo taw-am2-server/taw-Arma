@@ -1,0 +1,6 @@
+- copy over default profile
+- create list of patches to require (add patch cfg name to mods file)
+- add support for client-only required mods (don't load on server)
+- ensure web console config options (verifysignatures, patching) set correct values in server.cfg file
+- copy over userconfig files
+- check cba userconfig for all mods

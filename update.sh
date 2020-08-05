@@ -446,10 +446,3 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
       ln -sf "$keys_dir/$f" "$output_file"
    done
 done
-
-# TODO:
-# - properly re-try downloading ARMA/mods
-# - copy over default profile
-# - create list of patches to require (add patch cfg name to mods file)
-# - add support for client-only required mods (don't load on server)
-# - ensure web console config options (verifysignatures, patching) set correct values in server.cfg file
