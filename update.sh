@@ -286,13 +286,14 @@ if [ ${#validate_mod_ids[@]} -gt 0 ]; then
    done
    # Run the command
    mod_validate_cmd="$mod_validate_cmd +quit"
+   echo "Verifying/patching existing mods..."
    set +e
    run_steam_cmd "$mod_validate_cmd" 1
    if [ $? != 0 ]; then
-      echo "Failed to download ARMA 3 from Steam" >&2; exit 1
+      echo "Failed to verify/patch mods" >&2; exit 1
    fi
    set -e
-   echo "\nSuccessfully verified existing mods"
+   echo "Successfully verified existing mods"
 fi
 
 # This section downloads new mods by attempting each one separately, and attempting it multiple times
@@ -302,15 +303,16 @@ if [ ${#download_mod_ids[@]} -gt 0 ]; then
    set +e
    # Download each mod
    for mod_id in "${download_mod_ids[@]}"; do
+      echo "Downloading mod $mod_id..."
       # Prepare the command for doing the download
       mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
       # Call the function that runs the command
       run_steam_cmd "$mod_cmd" $mod_download_attempts
       if [ $? != 0 ]; then
-         echo "Failed to download all mods from Steam" >&2; exit 1
+         echo "Failed to download mod $mod_id from Steam Workshop"; exit 1
       fi
+      echo "Successfully downloaded mod $mod_id from Steam Workshop"
    done
-   echo "\nSuccessfully downloaded mods!"
    # Go back to exiting the script on errors
    set -e
 fi
