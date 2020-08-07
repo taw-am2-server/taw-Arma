@@ -22,6 +22,10 @@ chown -R steam:steam /home/steam/.ssh
 chmod 755 /home/steam/.ssh
 chmod 644 /home/steam/.ssh/authorized_keys
 
+# Create the Nginx root directory
+mkdir /var/www/html/arma
+chown steam:steam /var/www/html/arma
+
 # Configure ARMA profile directory
 sudo -u steam mkdir -p /home/steam/arma-profiles
 user_home="/home/steam"
@@ -53,5 +57,5 @@ systemctl enable arma3-web-console
 systemctl start arma3-web-console
 
 # Set up nginx
-#systemctl enable nginx
-#systemctl start nginx
+systemctl enable nginx
+systemctl start nginx

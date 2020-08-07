@@ -40,6 +40,7 @@
 1374639840, Attachment Switching, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1374639840
 1638341685, Squad Radar, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1638341685
 1987414574, VS ACE Static Line Jump, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1987414574
+1703187116, VET Vehicle Unflip, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1703187116
 
 861133494, JSRS, 2 # https://steamcommunity.com/workshop/filedetails/?id=861133494
 1841917016, JSRS Global Mobilization, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1841917016

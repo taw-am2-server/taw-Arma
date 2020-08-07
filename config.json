@@ -10,7 +10,7 @@
     "-noSound",
     "-world=empty",
     "-profiles=/home/steam/arma-profiles/",
-    "-name=default-taw"
+    "-name=default"
   ],
   "serverMods": [ # Server-side mods to use
   ],
