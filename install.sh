@@ -73,9 +73,9 @@ sudo -u steam npm install
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u steam "$repo_dir/update.sh" -swv
 
-# Enable and start the new service
+# Enable and start the web console service
 systemctl enable arma3-web-console
-systemctl start arma3-web-console
+systemctl restart arma3-web-console
 
 # Set up nginx
 systemctl enable nginx
