@@ -297,6 +297,9 @@ rm -rf "$arma_userconfig_dir"
 # Copy over the new one
 cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 
+# Remove the readme file in the mpmisisons folder (so it doesn't show up on the web console)
+rm -f "$arma_dir/mpmissions/readme.txt"
+
 # Create the base command for downloading a mod
 mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
 
