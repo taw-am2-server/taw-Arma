@@ -1,3 +1,21 @@
+resource "aws_security_group" "http-egress" {
+  name                   = "http_egress"
+  description            = "Allow egress on HTTP port (80)"
+  vpc_id                 = aws_vpc.main.id
+  revoke_rules_on_delete = true
+
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "HTTP Egress"
+  }
+}
+
 resource "aws_security_group" "https-egress" {
   name                   = "https_egress"
   description            = "Allow egress to HTTPS port (443)"
@@ -16,13 +34,13 @@ resource "aws_security_group" "https-egress" {
   }
 }
 
-resource "aws_security_group" "http-egress" {
-  name                   = "http_egress"
-  description            = "Allow egress on HTTP port (80)"
+resource "aws_security_group" "http-ingress" {
+  name                   = "http_ingress"
+  description            = "Allow ingress on HTTP port (80)"
   vpc_id                 = aws_vpc.main.id
   revoke_rules_on_delete = true
 
-  egress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -30,7 +48,7 @@ resource "aws_security_group" "http-egress" {
   }
 
   tags = {
-    Name = "HTTP Egress"
+    Name = "HTTP Ingress"
   }
 }
 

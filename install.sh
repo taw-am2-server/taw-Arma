@@ -4,8 +4,7 @@
 set -e
 
 if [[ ! "$EUID" = 0 ]]; then 
-    echo "This script must be run as root/sudo"
-    exit 1
+    echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
 add-apt-repository multiverse
@@ -21,10 +20,6 @@ cp /home/ubuntu/.ssh/authorized_keys /home/steam/.ssh/
 chown -R steam:steam /home/steam/.ssh
 chmod 755 /home/steam/.ssh
 chmod 644 /home/steam/.ssh/authorized_keys
-
-# Create the Nginx root directory
-mkdir /var/www/html/arma
-chown steam:steam /var/www/html/arma
 
 # Configure ARMA profile directory
 sudo -u steam mkdir -p /home/steam/arma-profiles
@@ -44,6 +39,16 @@ fi
 # Install the service file for the web console
 cp /home/steam/taw-am1/arma3-web-console.service /etc/systemd/system/
 chmod 644 /etc/systemd/system/arma3-web-console.service
+
+# Configure nginx
+# Remove any existing config files
+rm -fr /etc/nginx/sites-enabled/*
+# Symlink the config file
+ln -s /home/steam/nginx.conf /etc/nginx/sites-enabled/arma.conf
+# Set the link owner to root
+chown -h root:root /etc/nginx/sites-enabled/arma.conf
+# Ensure the nginx config file is valid
+nginx -t
 
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u steam /home/steam/taw-am1/update.sh -swv

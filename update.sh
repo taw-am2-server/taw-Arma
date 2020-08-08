@@ -18,9 +18,9 @@ steam_creds_file="$home_dir/.steam_credentials"
 # The file for storing web panel credentials
 web_panel_creds_file="$home_dir/.web_panel_credentials"
 # The filename for the HTML template that can be imported to Steam to specify the modpack
-nginx_dir="/var/www/html/arma"
-workshop_template_file_required="$nginx_dir/taw_am1_required.html"
-workshop_template_file_optional="$nginx_dir/taw_am1_optional.html"
+workshop_template_dir="$home_dir/workshop_templates"
+workshop_template_file_required="$workshop_template_dir/taw_am1_required.html"
+workshop_template_file_optional="$workshop_template_dir/taw_am1_optional.html"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 # Profiles directories
@@ -153,16 +153,22 @@ load_web_panel_creds () {
 run_steam_cmd() { # run_steam_cmd command attempts
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
    for (( i=0; i<$2; i++ )); do
+      if [ $i -eq 0 ]; then
+         echo "Running steamcmd for $3"
+      else
+         echo "Retrying steamcmd for $3"
+      fi
       result=`$1`
       # Track the exit code
       code=$?
       # Break the loop if the command was successful
       if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
          set -e
+         echo "Steamcmd for $3 was successful!"
          return 0
       fi
    done
-   echo "Steamcmd failed: $result"
+   echo "Steamcmd for $3 failed: $result"
    return 1
 }
 
@@ -256,7 +262,11 @@ done < "$script_dir/mods.txt"
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
-# Write the complete workshop template to file
+# Ensure the templates directory exists
+mkdir -p "$workshop_template_dir"
+# Remove old templates
+rm -rf "$workshop_template_dir/*"
+# Write the complete workshop templates to file
 echo "$workshop_template_required" > "$workshop_template_file_required"
 echo "$workshop_template_optional" > "$workshop_template_file_optional"
 
@@ -277,7 +287,9 @@ for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
 done
 
 # Copy the userconfig files
+# Remove the existing userconfig folder
 rm -rf "$arma_userconfig_dir"
+# Copy over the new one
 cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 
 # Call the function for loading Steam credentials
@@ -292,9 +304,9 @@ base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
 set +e
-run_steam_cmd "$arma_update_cmd" $arma_download_attempts
+run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
 if [ $? != 0 ]; then
-   echo "Failed to download ARMA 3 from Steam" >&2; exit 1
+   exit 1
 fi
 set -e
 
@@ -313,14 +325,12 @@ if [ ${#validate_mod_ids[@]} -gt 0 ]; then
    done
    # Run the command
    mod_validate_cmd="$mod_validate_cmd +quit"
-   echo "Verifying/patching existing mods..."
    set +e
-   run_steam_cmd "$mod_validate_cmd" 1
+   run_steam_cmd "$mod_validate_cmd" 1 "validating existing mods"
    if [ $? != 0 ]; then
-      echo "Failed to verify/patch mods" >&2; exit 1
+      exit 1
    fi
    set -e
-   echo "Successfully verified existing mods"
 fi
 
 # This section downloads new mods by attempting each one separately, and attempting it multiple times
@@ -330,15 +340,13 @@ if [ ${#download_mod_ids[@]} -gt 0 ]; then
    set +e
    # Download each mod
    for mod_id in "${download_mod_ids[@]}"; do
-      echo "Downloading mod $mod_id..."
       # Prepare the command for doing the download
       mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
       # Call the function that runs the command
-      run_steam_cmd "$mod_cmd" $mod_download_attempts
+      run_steam_cmd "$mod_cmd" $mod_download_attempts "downloading mod $mod_id"
       if [ $? != 0 ]; then
-         echo "Failed to download mod $mod_id from Steam Workshop"; exit 1
+         exit 1
       fi
-      echo "Successfully downloaded mod $mod_id from Steam Workshop"
    done
    # Go back to exiting the script on errors
    set -e

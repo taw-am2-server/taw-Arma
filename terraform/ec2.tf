@@ -29,6 +29,7 @@ resource "aws_instance" "arma_server_linux" {
     aws_security_group.ssh-ingress.id,
     aws_security_group.https-egress.id,
     aws_security_group.http-egress.id,
+    aws_security_group.http-ingress.id,
     aws_security_group.https-ingress.id,
     aws_security_group.arma-server.id
   ]
@@ -43,7 +44,7 @@ resource "aws_instance" "arma_server_linux" {
   // Don't destroy the server if the AMI has been updated
   lifecycle {
     ignore_changes = [
-      ami, 
+      ami,
       ebs_optimized,
       key_name
     ]
