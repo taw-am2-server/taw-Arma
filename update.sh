@@ -390,34 +390,28 @@ for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
 
-   # Check if this mod ID is also in the server-only mods
-   if [[ " ${server_mod_ids[@]} " =~ " ${mod_id} " ]]; then
-      # If so, don't add it to the client-side mods so it doesn't get double-loaded
-      echo "Skipping client mod $mod_id, it's also a server-side mod"
-   else
-      # Find all "addon" directories within the download directory
-      readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-      # If no "addon" directories were found, that's an error
-      if [ ${#found_dirs[@]} -eq 0 ]; then
-         echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-      fi
-      # If multiple "addon" directories were found, that's an error
-      if [ ${#found_dirs[@]} -gt 1 ]; then
-         echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-      fi
-      # The directory where the mod PBOs were downloaded to
-      addon_dir=${found_dirs[0]}
-      
-      # Loop through all files that are in the mod's addons dir
-      for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-         # The link filename, in lowercase
-         output_file="$client_addons_dir/${f,,}"
-         # Create any sub-directories for the file
-         mkdir -p "$(dirname "$output_file")"
-         # Symlink the file
-         ln -s "$addon_dir/$f" "$output_file"
-      done
+   # Find all "addon" directories within the download directory
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
+   # If no "addon" directories were found, that's an error
+   if [ ${#found_dirs[@]} -eq 0 ]; then
+      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
    fi
+   # If multiple "addon" directories were found, that's an error
+   if [ ${#found_dirs[@]} -gt 1 ]; then
+      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
+   fi
+   # The directory where the mod PBOs were downloaded to
+   addon_dir=${found_dirs[0]}
+   
+   # Loop through all files that are in the mod's addons dir
+   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
+      # The link filename, in lowercase
+      output_file="$client_addons_dir/${f,,}"
+      # Create any sub-directories for the file
+      mkdir -p "$(dirname "$output_file")"
+      # Symlink the file
+      ln -s "$addon_dir/$f" "$output_file"
+   done
 
    # Find all "keys" directories within the download directory
    readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'keys' -print0)
