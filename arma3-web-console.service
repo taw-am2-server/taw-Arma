@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=/home/steam/taw-am1
-ExecStartPre=git pull
+ExecStartPre=git pull --recurse-submodules
 ExecStart=/bin/bash ./run.sh
 Restart=on-failure
 
