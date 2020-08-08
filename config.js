@@ -1,6 +1,6 @@
 module.exports = {
   "game": "arma3_x64", // The executable
-  "path": "../../arma3", // Path to the ARMA install directory
+  "path": "/home/steam/arma3", // Path to the ARMA install directory
   "port": 3000, // Port to accept connections on
   "host": "127.0.0.1", // IP to listen on
   "type": "linux", // Operating system type
