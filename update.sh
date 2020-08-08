@@ -247,10 +247,10 @@ done < "$script_dir/mods.txt"
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_all+=$(<$script_dir/workshop_template_suffix.html)
-# Ensure the templates directory exists
+# Delete the template directory if it exists (to clean it out)
+rm -rf "$workshop_template_dir"
+# Re-create the template directory
 mkdir -p "$workshop_template_dir"
-# Remove old templates
-rm -rf "$workshop_template_dir/*"
 # Write the complete workshop templates to file
 echo "$workshop_template_required" > "$workshop_template_file_required"
 echo "$workshop_template_optional" > "$workshop_template_file_optional"
