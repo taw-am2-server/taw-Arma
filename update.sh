@@ -193,8 +193,8 @@ client_required_mod_ids=()
 client_optional_mod_ids=()
 
 # Load the prefix of the template file
-workshop_template_required=$(<$script_dir/workshop_template_prefix.html)
-workshop_template_optional=$(<$script_dir/workshop_template_prefix.html)
+workshop_template_required=$(<$script_dir/workshop_template_required_prefix.html)
+workshop_template_optional=$(<$script_dir/workshop_template_optional_prefix.html)
 
 # Read the mod file and loop through each line
 line_no=0
