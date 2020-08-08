@@ -18,14 +18,21 @@ steam_creds_file="$home_dir/.steam_credentials"
 # The file for storing web panel credentials
 web_panel_creds_file="$home_dir/.web_panel_credentials"
 # The filename for the HTML template that can be imported to Steam to specify the modpack
-workshop_template_file_required="$home_dir/taw_am1_required.html"
-workshop_template_file_optional="$home_dir/taw_am1_optional.html"
+nginx_dir="/var/www/html/arma"
+workshop_template_file_required="$nginx_dir/taw_am1_required.html"
+workshop_template_file_optional="$nginx_dir/taw_am1_optional.html"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
+# Profiles directories
+repo_profiles_dir="$script_dir/profiles"
+arma_profiles_dir="$home_dir/arma-profiles"
+# Userconfig directories
+repo_userconfig_dir="$script_dir/userconfig"
+arma_userconfig_dir="$arma_dir/userconfig"
 # How many times to try downloading a mod before erroring out (multiple attempts required for large mods due to timeouts)
-mod_download_attempts=5
+mod_download_attempts=6
 # How many times to try downloading ARMA before erroring out (multiple attempts required on slow connections due to timeouts)
-arma_download_attempts=5
+arma_download_attempts=6
 
 # Default values for switches/options
 force_new_steam_creds=false
@@ -252,6 +259,26 @@ workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
 # Write the complete workshop template to file
 echo "$workshop_template_required" > "$workshop_template_file_required"
 echo "$workshop_template_optional" > "$workshop_template_file_optional"
+
+# Copy the ARMA profiles
+for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
+   if [ ${profile_file: -13} != ".Arma3Profile" ]; then
+      echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
+   fi
+   profile_basename=$(basename "$profile_file")
+   profile_name=${profile_basename%.Arma3Profile}
+   if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
+      echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
+   fi
+   # Create the profile directory
+   mkdir -p "$arma_profiles_dir/$profile_name"
+   # Copy over the profile file
+   cp "$profile_file" "$arma_profiles_dir/$profile_name/$profile_basename"
+done
+
+# Copy the userconfig files
+rm -rf "$arma_userconfig_dir"
+cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 
 # Call the function for loading Steam credentials
 load_steam_creds

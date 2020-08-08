@@ -10,7 +10,7 @@
     "-noSound",
     "-world=empty",
     "-profiles=/home/steam/arma-profiles/",
-    "-name=default"
+    "-name=am1"
   ],
   "serverMods": [ # Server-side mods to use
   ],
