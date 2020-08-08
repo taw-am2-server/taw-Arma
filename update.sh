@@ -180,7 +180,8 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 # Read the mod file and loop through each line
 line_no=0
-while read line; do
+# This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
+while read line || [ -n "$line" ]; do
    # Increment the line counter
    line_no=$((line_no+1))
    # Trim whitespace of the ends of the line
