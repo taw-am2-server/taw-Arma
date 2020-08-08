@@ -16,7 +16,7 @@ email="dystroxic@taw.net"
 add-apt-repository multiverse
 dpkg --add-architecture i386
 apt update -y
-apt install lib32gcc1 net-tools steamcmd npm nginx python3-certbot-nginx unzip jq -y
+apt install lib32gcc1 net-tools steamcmd npm apache2-utils nginx python3-certbot-nginx unzip jq -y
 apt upgrade -y
 id -u steam &>/dev/null || useradd -m steam
 
@@ -35,7 +35,8 @@ sudo -u steam mkdir -p "$steam_home/arma-profiles"
 if [ ! -d "$repo_dir" ]; then
     sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
 else
-    cd "$repo_dir" && sudo -u steam git pull --recurse-submodules
+    sudo -u steam git -C "$repo_dir" reset --hard origin/master
+    sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
 
 # Install the service file for the web console

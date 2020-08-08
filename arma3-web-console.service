@@ -5,9 +5,10 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=/home/steam/taw-am1/arma-server-web-admin
-ExecStartPre=git -C .. pull
-ExecStart=/bin/bash ../run.sh
+WorkingDirectory=/home/steam/taw-am1
+ExecStartPre=git reset --hard origin/master
+ExecStartPre=git pull origin master
+ExecStart=/bin/bash ./run.sh
 Restart=on-failure
 
 LimitNOFILE=infinity

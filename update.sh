@@ -177,7 +177,7 @@ filtered_config=$(jq -enf "$script_dir/config.json" | jq ".auth = {username: \"$
 if [ -z "$filtered_config" ]; then
    exit 1
 fi
-echo "module.exports = $filtered_config" > "$home_dir/config.js"
+echo "module.exports = $filtered_config" > "$web_panel_config_file"
 
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
