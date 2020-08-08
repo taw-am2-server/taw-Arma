@@ -10,7 +10,8 @@ module.exports = {
     "-noSound",
     "-world=empty",
     "-profiles=/home/steam/arma-profiles/",
-    "-name=am1"
+    "-name=am1",
+    "-loadMissionToMemory"
   ],
   "serverMods": [ // Server-side mods to use
   ],

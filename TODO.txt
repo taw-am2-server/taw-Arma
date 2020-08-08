@@ -7,3 +7,5 @@
 - multiple web panel users
 - test client filepatching with CBA settings
 - test Battleye
+- fork web console to add custom default difficult
+- Update console submodule to use forked repo; always point to HEAD
