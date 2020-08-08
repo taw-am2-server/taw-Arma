@@ -44,8 +44,6 @@
 2191340131, TAW AM1 Custom, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=2191340131
 
 861133494, JSRS, 2 # https://steamcommunity.com/workshop/filedetails/?id=861133494
-1841917016, JSRS Global Mobilization, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1841917016
 945476727, JSRS RHS AFRF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=945476727
 1180533757, JSRS RHS USAF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1180533757
 1180534892, JSRS RHS GREF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1180534892
-1486541773, JSRS RHS SAF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1486541773
