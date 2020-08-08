@@ -263,12 +263,6 @@ for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
    cp "$profile_file" "$arma_profiles_dir/$profile_name/$profile_basename"
 done
 
-# Copy the userconfig files
-# Remove the existing userconfig folder
-rm -rf "$arma_userconfig_dir"
-# Copy over the new one
-cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
-
 # Copy the web panel config file
 cp "$script_dir/config.js" "$web_panel_config_file"
 
@@ -289,6 +283,12 @@ if [ $? != 0 ]; then
    exit 1
 fi
 set -e
+
+# Copy the userconfig files
+# Remove the existing userconfig folder
+rm -rf "$arma_userconfig_dir"
+# Copy over the new one
+cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 
 # Create the base command for downloading a mod
 mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
