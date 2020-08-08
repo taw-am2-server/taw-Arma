@@ -27,8 +27,6 @@ resource "aws_instance" "arma_server_linux" {
   subnet_id     = aws_subnet.public.id
   vpc_security_group_ids = [
     aws_security_group.ssh-ingress.id,
-    aws_security_group.https-egress.id,
-    aws_security_group.http-egress.id,
     aws_security_group.http-ingress.id,
     aws_security_group.https-ingress.id,
     aws_security_group.arma-server.id
