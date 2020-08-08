@@ -41,7 +41,6 @@
 1638341685, Squad Radar, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1638341685
 1987414574, VS ACE Static Line Jump, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1987414574
 1703187116, VET Vehicle Unflip, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1703187116
-2191340131, TAW AM1 Custom, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=2191340131
 
 861133494, JSRS, 2 # https://steamcommunity.com/workshop/filedetails/?id=861133494
 945476727, JSRS RHS AFRF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=945476727
