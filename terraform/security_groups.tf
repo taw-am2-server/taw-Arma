@@ -99,15 +99,6 @@ resource "aws_security_group" "arma-server" {
     }
   }
 
-  // ARMA Web console
-  ingress {
-    description = "Allow accessing ARMA web console"
-    from_port   = 3000
-    to_port     = 3000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   // Allow all egress
   egress {
     description = "Allow all egress"

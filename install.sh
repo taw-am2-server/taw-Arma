@@ -46,7 +46,7 @@ chmod 644 /etc/systemd/system/arma3-web-console.service
 # Remove any existing config files
 rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
-cp /home/steam/nginx.conf /etc/nginx/sites-enabled/
+cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
 # Set the config file owner to root
 chown -h root:root /etc/nginx/sites-enabled/arma.conf
 # Ensure the nginx config file is valid
