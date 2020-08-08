@@ -135,6 +135,8 @@ load_web_panel_creds () {
 }
 
 run_steam_cmd() { # run_steam_cmd command attempts
+   # Don't exit on errors
+   set +e
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
    for (( i=0; i<$2; i++ )); do
       if [ $i -eq 0 ]; then
@@ -147,12 +149,13 @@ run_steam_cmd() { # run_steam_cmd command attempts
       code=$?
       # Break the loop if the command was successful
       if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
-         set -e
          echo "Steamcmd for $3 was successful!"
+         set -e
          return 0
       fi
    done
    echo "Steamcmd for $3 failed: $result"
+   set -e
    return 1
 }
 
@@ -277,12 +280,10 @@ base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
-set +e
 run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
 if [ $? != 0 ]; then
    exit 1
 fi
-set -e
 
 # Copy the userconfig files
 # Remove the existing userconfig folder
@@ -305,19 +306,16 @@ if [ ${#validate_mod_ids[@]} -gt 0 ]; then
    done
    # Run the command
    mod_validate_cmd="$mod_validate_cmd +quit"
-   set +e
    run_steam_cmd "$mod_validate_cmd" 1 "validating existing mods"
    if [ $? != 0 ]; then
       exit 1
    fi
-   set -e
 fi
 
 # This section downloads new mods by attempting each one separately, and attempting it multiple times
 # so that it re-tries after timeouts to continue the download.
 # Only run this section if there are any mods to download
 if [ ${#download_mod_ids[@]} -gt 0 ]; then
-   set +e
    # Download each mod
    for mod_id in "${download_mod_ids[@]}"; do
       # Prepare the command for doing the download
@@ -328,8 +326,6 @@ if [ ${#download_mod_ids[@]} -gt 0 ]; then
          exit 1
       fi
    done
-   # Go back to exiting the script on errors
-   set -e
 fi
 
 # This section is for re-packaging the server-only workshop mods into a single
