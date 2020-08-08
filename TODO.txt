@@ -1,4 +1,3 @@
-- configure nginx https
 - publish custom TAW mod
 - open firewall ports
 - create list of patches to require (add patch cfg name to mods file), consider using ACE "Check PBOs" (https://ace3mod.com/wiki/framework/checkPBOs-framework.html)

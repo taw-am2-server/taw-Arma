@@ -113,10 +113,12 @@ get_web_panel_creds () {
    printf "Web panel username: "
    read web_panel_username </dev/tty
    code=1
+   set +e
    while [ $code -ne 0 ]; do
       htpasswd -c "$htpasswd_file" "$web_panel_username"
       code=$?
    done
+   set -e
 }
 
 # A function that attempts to load stored web panel credentials if they exist, and
