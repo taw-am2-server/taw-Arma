@@ -1,6 +1,6 @@
 module.exports = {
   "game": "arma3_x64", // The executable
-  "path": "../arma3", // Path to the ARMA install directory
+  "path": "../../arma3", // Path to the ARMA install directory
   "port": 3000, // Port to accept connections on
   "host": "127.0.0.1", // IP to listen on
   "type": "linux", // Operating system type
@@ -22,7 +22,7 @@ module.exports = {
     "username": "",
     "password": ""
   },
-  "prefix": "TAW.net - US - Fox Security Company - Exp - ", // Prefix to add in front of every server name
+  "prefix": "TAW.net - US - AM1 - Exp - ", // Prefix to add in front of every server name
   "suffix": "", // Suffix to add after every server name
   "logFormat": "dev"
 }

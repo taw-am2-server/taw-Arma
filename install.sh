@@ -27,6 +27,15 @@ chown -R steam:steam "$steam_home/.ssh"
 chmod 755 "$steam_home/.ssh"
 chmod 644 "$steam_home/.ssh/authorized_keys"
 
+# Open necessary firewall ports
+ufw allow 80/tcp # HTTP
+ufw allow 443/tcp # HTTPS
+ufw allow 22/tcp # SSH
+# Configure ingress ports for 10 game servers (2302-2306, 2312-2316, 2322-2326, etc.)
+for (( i=0; i<10; i++ )); do
+    ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
+done
+
 # Configure ARMA profile directory
 sudo -u steam mkdir -p "$steam_home/arma-profiles"
 
