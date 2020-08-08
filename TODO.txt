@@ -6,3 +6,4 @@
 - try using ACE movement instead of enhanced movement (https://ace3mod.com/wiki/feature/movement.html)
 - multiple web panel users
 - test client filepatching with CBA settings
+- test Battleye

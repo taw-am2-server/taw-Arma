@@ -17,8 +17,9 @@ mod_install_dir="$workshop_dir/steamapps/workshop/content/107410"
 steam_creds_file="$home_dir/.steam_credentials"
 # The filename for the HTML template that can be imported to Steam to specify the modpack
 workshop_template_dir="$home_dir/workshop_templates"
-workshop_template_file_required="$workshop_template_dir/taw_am1_required.html"
-workshop_template_file_optional="$workshop_template_dir/taw_am1_optional.html"
+workshop_template_file_required="$workshop_template_dir/TAW AM1 (Required).html"
+workshop_template_file_optional="$workshop_template_dir/TAW AM1 (Optional).html"
+workshop_template_file_all="$workshop_template_dir/TAW AM1 (All).html"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 # The .htpasswd file with credentials for accessing the server control panel
@@ -175,6 +176,7 @@ client_optional_mod_ids=()
 # Load the prefix of the template file
 workshop_template_required=$(<$script_dir/workshop_template_required_prefix.html)
 workshop_template_optional=$(<$script_dir/workshop_template_optional_prefix.html)
+workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 # Read the mod file and loop through each line
 line_no=0
@@ -228,11 +230,13 @@ while read line; do
       client_required_mod_ids+=($mod_id)
       # Add the HTML to the workshop template required file
       workshop_template_required+="$workshop_template_section"
+      workshop_template_all+="$workshop_template_section"
    elif [ $mod_type -eq 2 ]; then
       # Optional client mods are not downloaded, just tracked for whitelisting
       client_optional_mod_ids+=($mod_id)
       # Add the HTML to the workshop template required file
       workshop_template_optional+="$workshop_template_section"
+      workshop_template_all+="$workshop_template_section"
    else
       # The mod type was unrecognized
       echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
@@ -242,6 +246,7 @@ done < "$script_dir/mods.txt"
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
+workshop_template_all+=$(<$script_dir/workshop_template_suffix.html)
 # Ensure the templates directory exists
 mkdir -p "$workshop_template_dir"
 # Remove old templates
@@ -249,6 +254,7 @@ rm -rf "$workshop_template_dir/*"
 # Write the complete workshop templates to file
 echo "$workshop_template_required" > "$workshop_template_file_required"
 echo "$workshop_template_optional" > "$workshop_template_file_optional"
+echo "$workshop_template_all" > "$workshop_template_file_all"
 
 # Copy the ARMA profiles
 for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
