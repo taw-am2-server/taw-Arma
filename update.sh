@@ -15,14 +15,14 @@ workshop_dir="$home_dir/workshop_mods"
 mod_install_dir="$workshop_dir/steamapps/workshop/content/107410"
 # The file for storing Steam credentials
 steam_creds_file="$home_dir/.steam_credentials"
-# The file for storing web panel credentials
-web_panel_creds_file="$home_dir/.web_panel_credentials"
 # The filename for the HTML template that can be imported to Steam to specify the modpack
 workshop_template_dir="$home_dir/workshop_templates"
 workshop_template_file_required="$workshop_template_dir/taw_am1_required.html"
 workshop_template_file_optional="$workshop_template_dir/taw_am1_optional.html"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
+# The .htpasswd file with credentials for accessing the server control panel
+htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
 repo_profiles_dir="$script_dir/profiles"
 arma_profiles_dir="$home_dir/arma-profiles"
@@ -89,13 +89,13 @@ load_steam_creds () {
    if $force_new_steam_creds; then
       echo "Forcing new Steam credentials"
       get_steam_creds
-   elif [ ! -f $steam_creds_file ]; then
+   elif [ ! -f "$steam_creds_file" ]; then
       # The credentials file doesn't exist, so require new credentials
       echo "No Steam credentials found, new ones required."
       get_steam_creds
    else
       # Try to read it from the credentials file
-      readarray -t steam_vars < $steam_creds_file
+      readarray -t steam_vars < "$steam_creds_file"
       if [ ${#steam_vars[@]} -ne 2 ]; then
          # The credentials file has an invalid format, so require new credentials
          echo "Invalid Steam credentials found, new ones required."
@@ -112,17 +112,11 @@ load_steam_creds () {
 get_web_panel_creds () {
    printf "Web panel username: "
    read web_panel_username </dev/tty
-   printf "Web panel password: "
-   read -s web_panel_password </dev/tty   
-   printf "\nWeb panel password (confirm): "
-   read -s web_panel_password2 </dev/tty
-   printf "\n"
-   if [ "$web_panel_password" != "$web_panel_password2" ]; then
-      echo "Passwords do not match! Try again."
-      get_web_panel_creds
-   else
-      printf "$web_panel_username\n$web_panel_password" > $web_panel_creds_file
-   fi
+   code=1
+   while [ $code -ne 0 ]; do
+      htpasswd -c "$htpasswd_file" "$web_panel_username"
+      code=$?
+   done
 }
 
 # A function that attempts to load stored web panel credentials if they exist, and
@@ -131,22 +125,10 @@ load_web_panel_creds () {
    if $force_new_web_panel_creds; then
       echo "Forcing new web panel credentials"
       get_web_panel_creds
-   elif [ ! -f $web_panel_creds_file ]; then
+   elif [ ! -f "$htpasswd_file" ]; then
       # The credentials file doesn't exist, so require new credentials
       echo "No web panel credentials found, new ones required."
       get_web_panel_creds
-   else
-      # Try to read it from the credentials file
-      readarray -t web_panel_vars < $web_panel_creds_file
-      if [ ${#web_panel_vars[@]} -ne 2 ]; then
-         # The credentials file has an invalid format, so require new credentials
-         echo "Invalid web panel credentials found, new ones required."
-         get_web_panel_creds
-      else
-         # The credentials file exists and has a valid format, so load the credentials from it
-         web_panel_username=${web_panel_vars[0]}
-         web_panel_password=${web_panel_vars[1]}
-      fi
    fi
 }
 
@@ -171,13 +153,6 @@ run_steam_cmd() { # run_steam_cmd command attempts
    echo "Steamcmd for $3 failed: $result"
    return 1
 }
-
-# Write the web panel config.js file, adding in the saved credentials
-filtered_config=$(jq -enf "$script_dir/config.json" | jq ".auth = {username: \"$web_panel_username\", password: \"$web_panel_password\"}")
-if [ -z "$filtered_config" ]; then
-   exit 1
-fi
-echo "module.exports = $filtered_config" > "$web_panel_config_file"
 
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
@@ -291,6 +266,9 @@ done
 rm -rf "$arma_userconfig_dir"
 # Copy over the new one
 cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
+
+# Copy the web panel config file
+cp "$script_dir/config.js" "$web_panel_config_file"
 
 # Call the function for loading Steam credentials
 load_steam_creds
