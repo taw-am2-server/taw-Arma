@@ -388,7 +388,7 @@ mkdir -p $client_addons_dir
 # Delete all existing symlinked keys in the Arma keys directory
 find "$client_keys_dir" -type l -delete
 
-# Loop through each client-required mod
+# Loop through each client-required mod to link the mod files
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
@@ -415,52 +415,27 @@ for mod_id in "${client_required_mod_ids[@]}"; do
       # Symlink the file
       ln -s "$addon_dir/$f" "$output_file"
    done
-
-   # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d \( -iname 'key' -o -iname 'keys' \) -print0)
-   # If multiple "keys" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple 'keys' directories" >&2; exit 1
-   fi
-   if [ ${#found_dirs[@]} -gt 0 ]; then
-      # The directory where the mod keys were downloaded to
-      keys_dir=${found_dirs[0]}
-      # Loop through all files that are in the mod's keys dir
-      for f in $(find "$keys_dir" -type f -iname '*.bikey' -printf '%P\n'); do
-         # The link filename, in lowercase
-         output_file="$client_keys_dir/${f,,}"
-         # Create any sub-directories for the file
-         mkdir -p "$(dirname "$output_file")"
-         # Symlink the file (overwriting existing links/files of the same name)
-         ln -sf "$keys_dir/$f" "$output_file"
-      done
-   fi
 done
 
-# This section is for adding the keys of optional mods so they can be used by clients if desired
-for mod_id in "${client_optional_mod_ids[@]}"; do
+# All mods that should have their bikeys copied to the Arma key directory
+key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
+# Loop over them to link their bikey files
+for mod_id in "${key_mods[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
 
-   # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d \( -iname 'key' -o -iname 'keys' \) -print0)
-   # If no "keys" directories were found, that's an error
-   if [ ${#found_dirs[@]} -eq 0 ]; then
-      echo "Client optional mod with ID $mod_id has no 'keys' directory" >&2; exit 1
-   fi
+   # Find all "bikey" files within the download directory
+   readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
    # If multiple "keys" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Client optional mod with ID $mod_id has multiple 'keys' directories" >&2; exit 1
+   if [ ${#found_keys[@]} -gt 1 ]; then
+      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
    fi
-   # The directory where the mod keys were downloaded to
-   keys_dir=${found_dirs[0]}
-   # Loop through all files that are in the mod's keys dir
-   for f in $(find "$keys_dir" -type f -iname '*.bikey' -printf '%P\n'); do
+   if [ ${#found_keys[@]} -gt 0 ]; then
+      # The filename without the path
+      key_basename=$(basename "${found_keys[0]}")
       # The link filename, in lowercase
-      output_file="$client_keys_dir/${f,,}"
-      # Create any sub-directories for the file
-      mkdir -p "$(dirname "$output_file")"
+      output_file="$client_keys_dir/${key_basename,,}"
       # Symlink the file (overwriting existing links/files of the same name)
-      ln -sf "$keys_dir/$f" "$output_file"
-   done
+      ln -sf "${found_keys[0]}" "$output_file"
+   fi
 done
