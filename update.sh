@@ -380,7 +380,7 @@ client_mods_dir="$arma_dir/@taw_am1_client"
 # This is the directory where the PBOs are linked to
 client_addons_dir="$client_mods_dir/addons"
 # This is the directory where the keys are linked to
-client_keys_dir="$client_mods_dir/keys"
+client_keys_dir="$arma_dir/keys"
 # Remove the entire client mods directory to ensure it's clean
 rm -rf $client_mods_dir
 # Re-create the directory structure
@@ -428,8 +428,9 @@ for mod_id in "${client_required_mod_ids[@]}"; do
          output_file="$client_keys_dir/${f,,}"
          # Create any sub-directories for the file
          mkdir -p "$(dirname "$output_file")"
-         # Symlink the file
-         ln -s "$keys_dir/$f" "$output_file"
+         # Copy
+         #ln -s "$keys_dir/$f" "$output_file"
+         cp "$keys_dir/$f" "$output_file"
       done
    fi
 done
