@@ -385,6 +385,9 @@ client_keys_dir="$arma_dir/keys"
 rm -rf $client_mods_dir
 # Re-create the directory structure
 mkdir -p $client_addons_dir
+# Delete all existing symlinked keys in the Arma keys directory
+find "$client_keys_dir" -type l -delete
+
 # Loop through each server-only mod
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
@@ -414,7 +417,7 @@ for mod_id in "${client_required_mod_ids[@]}"; do
    done
 
    # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'keys' -print0)
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'key' -o -iname 'keys' -print0)
    # If multiple "keys" directories were found, that's an error
    if [ ${#found_dirs[@]} -gt 1 ]; then
       echo "Client mod with ID $mod_id has multiple 'keys' directories" >&2; exit 1
@@ -428,8 +431,8 @@ for mod_id in "${client_required_mod_ids[@]}"; do
          output_file="$client_keys_dir/${f,,}"
          # Create any sub-directories for the file
          mkdir -p "$(dirname "$output_file")"
-         # Copy the key file
-         cp "$keys_dir/$f" "$output_file"
+         # Symlink the file (overwriting existing links/files of the same name)
+         ln -sf "$keys_dir/$f" "$output_file"
       done
    fi
 done
@@ -440,7 +443,7 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
    mod_dir="$mod_install_dir/$mod_id"
 
    # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'keys' -print0)
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'key' -o -iname 'keys' -print0)
    # If no "keys" directories were found, that's an error
    if [ ${#found_dirs[@]} -eq 0 ]; then
       echo "Client optional mod with ID $mod_id has no 'keys' directory" >&2; exit 1
@@ -457,7 +460,7 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
       output_file="$client_keys_dir/${f,,}"
       # Create any sub-directories for the file
       mkdir -p "$(dirname "$output_file")"
-      # Copy the key file
-      cp "$keys_dir/$f" "$output_file"
+      # Symlink the file (overwriting existing links/files of the same name)
+      ln -sf "$keys_dir/$f" "$output_file"
    done
 done

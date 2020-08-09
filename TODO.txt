@@ -5,4 +5,3 @@
 - multiple web panel users
 - test client filepatching with CBA settings
 - test Battleye
-- last line of mods file not being read?
