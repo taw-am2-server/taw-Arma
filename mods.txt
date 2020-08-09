@@ -22,11 +22,9 @@
 333310405, Enhnced Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=333310405
 2034363662, Enhanced Movement Rework, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=2034363662
 1224892496, GRAD Trenches, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1224892496
-313041182, GPNVG18, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=313041182
 1804716719, Ladder Tweak 2x, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1804716719
 1413218487, Lesh's Towing Mod, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1413218487
 1543390130, MS IFF Strobe, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1543390130
-1834624052, Pike Mini Missile V2, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1834624052
 1311852588, Rested Weapon Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1311852588
 843425103, RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843425103
 843593391, RHS GREF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843593391
@@ -46,3 +44,6 @@
 945476727, JSRS RHS AFRF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=945476727
 1180533757, JSRS RHS USAF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1180533757
 1180534892, JSRS RHS GREF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1180534892
+1908099028, Zeus Cache, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1908099028
+642912021, Zeus Prefabs, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=642912021
+1251859358, Zeus Interiors, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1251859358

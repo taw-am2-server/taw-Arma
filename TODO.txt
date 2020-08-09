@@ -1,7 +1,6 @@
 - create list of patches to require (add patch cfg name to mods file), consider using ACE "Check PBOs" (https://ace3mod.com/wiki/framework/checkPBOs-framework.html)
 - add support for client-only required mods (don't load on server)
-- check cba userconfig for all mods (do new mods get values added?)
+- export cba_settings userconfig for all mods
 - try using ACE movement instead of enhanced movement (https://ace3mod.com/wiki/feature/movement.html)
 - multiple web panel users
-- test client filepatching with CBA settings
 - test Battleye
