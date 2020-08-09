@@ -40,7 +40,7 @@
 843425103, RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843425103
 843593391, RHS GREF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843593391
 843577117, RHS USAF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843577117
-#735566597, Project Opfor, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=735566597
+735566597, Project Opfor, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=735566597
 #1543390130, MS IFF Strobe, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1543390130
 #1314910827, Breaching Charge, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1314910827
 #366425329, FIR AWS, 1 # https://steamcommunity.com/workshop/filedetails/?id=366425329
