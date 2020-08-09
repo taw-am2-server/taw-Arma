@@ -49,6 +49,8 @@
 # Maps
 1978754337, RHS PKL, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1978754337
 583496184, CUP Terrains Core, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=583496184
+1375890861, ACE Compat CUP, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1375890861
+583544987, CUP Terrains Maps, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=583544987
 1981964169, CUP Terrains Maps 2.0, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1981964169
 1537973181, Anizay, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1537973181
 761349672, Clafghan, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=761349672
