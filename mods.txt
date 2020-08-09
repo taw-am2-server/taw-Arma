@@ -1,5 +1,7 @@
 # Steam Workshop ID, folder name, mod name, type
 # Type is SERVER=0, CLIENT_REQ=1, CLIENT_OPT=2
+
+# Server-only
 450814997, CBA A3, 0 # http://steamcommunity.com/sharedfiles/filedetails/?id=450814997
 1396901301, Artillery Illumination, 0 # http://steamcommunity.com/sharedfiles/filedetails/?id=1396901301
 1858075458, LAMBS Danger, 0 # https://steamcommunity.com/sharedfiles/filedetails/?id=1858075458
@@ -8,6 +10,8 @@
 615007497, Advanced Sling Loading, 0 # https://steamcommunity.com/sharedfiles/filedetails/?id=615007497
 721359761, VCOM AI, 0 # https://steamcommunity.com/sharedfiles/filedetails/?id=721359761
 
+# Mechanics
+450814997, CBA A3, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=450814997
 463939057, ACE3, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=463939057
 773131200, ACE Compat RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=773131200
 773125288, ACE Compat RHS USAF, 1, # http://steamcommunity.com/sharedfiles/filedetails/?id=773125288
@@ -15,21 +19,7 @@
 708250744, ACEX, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=708250744
 751965892, ACRE2, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=751965892
 820924072, Backpack on Chest, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=820924072
-450814997, CBA A3, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=450814997
 871504836, cTab, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=871504836
-583496184, CUP Terrains Core, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=583496184
-1981964169, CUP Terrains Maps 2.0, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1981964169
-333310405, Enhnced Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=333310405
-2034363662, Enhanced Movement Rework, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=2034363662
-1224892496, GRAD Trenches, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1224892496
-1804716719, Ladder Tweak 2x, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1804716719
-1413218487, Lesh's Towing Mod, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1413218487
-1543390130, MS IFF Strobe, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1543390130
-1311852588, Rested Weapon Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1311852588
-843425103, RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843425103
-843593391, RHS GREF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843593391
-1978754337, RHS PKL, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1978754337
-843577117, RHS USAF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843577117
 825174634, Suppress, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=825174634
 1808723766, Swim Faster, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1808723766
 1623498241, Turret Enhanced, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1623498241
@@ -39,7 +29,31 @@
 1638341685, Squad Radar, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1638341685
 1987414574, VS ACE Static Line Jump, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1987414574
 1703187116, VET Vehicle Unflip, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1703187116
+333310405, Enhnced Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=333310405
+2034363662, Enhanced Movement Rework, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=2034363662
+1224892496, GRAD Trenches, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1224892496
+1804716719, Ladder Tweak 2x, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1804716719
+1413218487, Lesh's Towing Mod, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1413218487
+1311852588, Rested Weapon Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1311852588
 
+# Assets
+843425103, RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843425103
+843593391, RHS GREF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843593391
+843577117, RHS USAF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843577117
+735566597, Project Opfor, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=735566597
+1543390130, MS IFF Strobe, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1543390130
+1314910827, Breaching Charge, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1314910827
+
+# Maps
+1978754337, RHS PKL, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1978754337
+583496184, CUP Terrains Core, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=583496184
+1981964169, CUP Terrains Maps 2.0, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1981964169
+1537973181, Anizay, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1537973181
+761349672, Clafghan, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=761349672
+1423583812, Pulau, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=1423583812
+648172507, Al Rayak, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=648172507
+
+# Optionals
 861133494, JSRS, 2 # https://steamcommunity.com/workshop/filedetails/?id=861133494
 945476727, JSRS RHS AFRF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=945476727
 1180533757, JSRS RHS USAF, 2 # https://steamcommunity.com/sharedfiles/filedetails/?id=1180533757
