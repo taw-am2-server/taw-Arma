@@ -388,7 +388,7 @@ mkdir -p $client_addons_dir
 # Delete all existing symlinked keys in the Arma keys directory
 find "$client_keys_dir" -type l -delete
 
-# Loop through each server-only mod
+# Loop through each client-required mod
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
@@ -417,7 +417,7 @@ for mod_id in "${client_required_mod_ids[@]}"; do
    done
 
    # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'key' -o -iname 'keys' -print0)
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d \( -iname 'key' -o -iname 'keys' \) -print0)
    # If multiple "keys" directories were found, that's an error
    if [ ${#found_dirs[@]} -gt 1 ]; then
       echo "Client mod with ID $mod_id has multiple 'keys' directories" >&2; exit 1
@@ -443,7 +443,7 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
    mod_dir="$mod_install_dir/$mod_id"
 
    # Find all "keys" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'key' -o -iname 'keys' -print0)
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d \( -iname 'key' -o -iname 'keys' \) -print0)
    # If no "keys" directories were found, that's an error
    if [ ${#found_dirs[@]} -eq 0 ]; then
       echo "Client optional mod with ID $mod_id has no 'keys' directory" >&2; exit 1

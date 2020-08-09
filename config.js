@@ -5,7 +5,7 @@ module.exports = {
   "host": "127.0.0.1", // IP to listen on
   "type": "linux", // Operating system type
   // Additional options that are appended to every server config file
-  "additionalConfigurationOptions": "kickDuplicate=1;\nallowedVoteCmds[] = {};\nallowedLoadFileExtensions[]={\"b64\",\"sqf\",\"cpp\",\"hpp\"};\nallowedPreprocessFileExtensions[]={\"b64\",\"sqf\",\"cpp\",\"hpp\"};\ndoubleIdDetected=\"kick (_this select 0)\";\nonHackedData=\"kick (_this select 0)\";\nonDifferentData=\"kick (_this select 0)\";\nonUnsignedData=\"kick (_this select 0)\";",
+  "additionalConfigurationOptions": "battleyeLicense=1;kickDuplicate=1;\nallowedVoteCmds[] = {};\nallowedLoadFileExtensions[]={\"b64\",\"sqf\",\"cpp\",\"hpp\"};\nallowedPreprocessFileExtensions[]={\"b64\",\"sqf\",\"cpp\",\"hpp\"};\ndoubleIdDetected=\"kick (_this select 0)\";\nonHackedData=\"kick (_this select 0)\";\nonDifferentData=\"kick (_this select 0)\";\nonUnsignedData=\"kick (_this select 0)\";",
   "parameters": [ // Additional command-line startup parameters
     "-noSound",
     "-world=empty",
