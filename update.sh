@@ -423,13 +423,12 @@ for mod_id in "${client_required_mod_ids[@]}"; do
       # The directory where the mod keys were downloaded to
       keys_dir=${found_dirs[0]}
       # Loop through all files that are in the mod's keys dir
-      for f in $(find "$keys_dir" -type f -printf '%P\n'); do
+      for f in $(find "$keys_dir" -type f -iname '*.bikey' -printf '%P\n'); do
          # The link filename, in lowercase
          output_file="$client_keys_dir/${f,,}"
          # Create any sub-directories for the file
          mkdir -p "$(dirname "$output_file")"
-         # Copy
-         #ln -s "$keys_dir/$f" "$output_file"
+         # Copy the key file
          cp "$keys_dir/$f" "$output_file"
       done
    fi
@@ -453,12 +452,12 @@ for mod_id in "${client_optional_mod_ids[@]}"; do
    # The directory where the mod keys were downloaded to
    keys_dir=${found_dirs[0]}
    # Loop through all files that are in the mod's keys dir
-   for f in $(find "$keys_dir" -type f -printf '%P\n'); do
+   for f in $(find "$keys_dir" -type f -iname '*.bikey' -printf '%P\n'); do
       # The link filename, in lowercase
       output_file="$client_keys_dir/${f,,}"
       # Create any sub-directories for the file
       mkdir -p "$(dirname "$output_file")"
-      # Symlink the file (overwriting existing links/files of the same name)
-      ln -sf "$keys_dir/$f" "$output_file"
+      # Copy the key file
+      cp "$keys_dir/$f" "$output_file"
    done
 done
