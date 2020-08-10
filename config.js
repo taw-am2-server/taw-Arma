@@ -9,7 +9,7 @@ module.exports = {
   "parameters": [ // Additional command-line startup parameters
     "-noSound",
     "-world=empty",
-    "-profiles=/home/steam/arma-profiles/",
+    "-profiles=/home/steam/arma-profiles/home",
     "-name=am1",
     "-loadMissionToMemory"
   ],

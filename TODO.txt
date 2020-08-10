@@ -2,4 +2,5 @@
 - multiple web panel users
 - test Battleye
 - test ACE rappelling
-- replace splendid smoke with ACE particles
+- replace splendid smoke with ACE particles (and update cba_settings)
+- add default loadouts (https://ace3mod.com/wiki/framework/arsenal-framework.html)
