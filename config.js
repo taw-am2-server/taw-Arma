@@ -10,7 +10,6 @@ module.exports = {
     "-noSound",
     "-world=empty",
     "-profiles=/home/steam/arma-profiles/home",
-    "-name=am1",
     "-loadMissionToMemory"
   ],
   "serverMods": [ // Server-side mods to use
@@ -23,7 +22,7 @@ module.exports = {
     "username": "",
     "password": ""
   },
-  "prefix": "TAW.net - US - AM1 - Exp - ", // Prefix to add in front of every server name
+  "prefix": "TAW.net - 1st Bn (US) - ", // Prefix to add in front of every server name
   "suffix": "", // Suffix to add after every server name
   "logFormat": "dev"
 }
