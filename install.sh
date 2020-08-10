@@ -13,7 +13,14 @@ repo_dir="$steam_home/taw-am2"
 domain="am2.lselter.co.uk"
 email="tirpitz@taw.net"
 
-add-apt-repository multiverse
+#add-apt-repository multiverse
+echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
+
+echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
+
+echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
+
+
 dpkg --add-architecture i386
 apt update -y
 apt install lib32gcc1 net-tools steamcmd npm apache2-utils nginx python3-certbot-nginx unzip jq -y
