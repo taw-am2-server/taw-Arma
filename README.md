@@ -1,4 +1,4 @@
-# taw-am1
+# taw-am2
 
 To configure the server:
 
