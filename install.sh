@@ -8,10 +8,10 @@ if [[ ! "$EUID" = 0 ]]; then
 fi
 
 steam_home="/home/steam"
-repo_url="https://github.com/Dystroxic/taw-am1.git"
-repo_dir="$steam_home/taw-am1"
-domain="am1.dystroxic.com"
-email="dystroxic@taw.net"
+repo_url="https://github.com/Tirpitz93/taw-am2.git"
+repo_dir="$steam_home/taw-am2"
+domain="am2.lselter.co.uk"
+email="tirpitz@taw.net"
 
 add-apt-repository multiverse
 dpkg --add-architecture i386
