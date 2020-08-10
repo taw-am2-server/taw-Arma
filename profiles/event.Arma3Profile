@@ -29,7 +29,7 @@ class DifficultyPresets
 			cameraShake = 1;		// Camera shake
 
 			/* Multiplayer */
-			scoreTable = 1;			// Score table
+			scoreTable = 0;			// Score table
 			deathMessages = 0;		// Killed by
 			vonID = 0;				// VoN ID
 
