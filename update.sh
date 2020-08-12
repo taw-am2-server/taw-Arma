@@ -410,12 +410,21 @@ for mod_id in "${client_required_mod_ids[@]}"; do
 
    # Loop through all files that are in the mod folder to symlink them
    for f in $(find "$mod_dir" -type f -printf '%P\n'); do
+      file_lowercase="${f,,}"
       # The link filename, in lowercase
-      output_file="$client_mods_path/$mod_id/${f,,}"
+      output_file="$client_mods_path/$mod_id/$file_lowercase"
       # Create any sub-directories for the file
       mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$mod_dir/$f" "$output_file"
+      # If it's the meta.cpp or mod.cpp file, it's special
+      if [ $file_lowercase == "meta.cpp" ] || [ $file_lowercase == "mod.cpp" ]; then
+         # Copy the file (instead of symlink) so we can edit it
+         cp "$mod_dir/$f" "$output_file"
+         # Change the mod name so it takes less space in the packet sent to Steam (to fix issues with mod list in Arma 3 Launcher)
+         sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\"/" "$output_file"
+      else
+         # Otherwise, just symlink the file
+         ln -s "$mod_dir/$f" "$output_file"
+      fi
    done
 done
 
