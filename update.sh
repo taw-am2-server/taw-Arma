@@ -52,9 +52,11 @@ while getopts ":swvn" opt; do
       ;;
     v) # validate ARMA/mod files that have been downloaded
       force_validate="validate"
+      echo "Forcing validation of Arma 3 and Workshop files"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
+      echo "Skipping file checks for existing Arma 3 and Workshop files"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -294,7 +296,7 @@ base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 # Create a command that downloads/updates ARMA 3
 # Only run it if we're not force skipping this step
- if ! $skip_steam_check; then
+ if ! $skip_steam_check ; then
    arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
    run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
    if [ $? != 0 ]; then
@@ -318,7 +320,7 @@ mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
 # Since they're already existing, updates should be small and can be completed
 # in one attempt without timing out.
 # Only run this section if there are any mods to validate and we're not force-skipping the check
-if [ ${#validate_mod_ids[@]} -gt 0 && ! $skip_steam_check ]; then
+if [ ${#validate_mod_ids[@]} -gt 0 ] && ! $skip_steam_check ; then
    mod_validate_cmd="$mod_download_base_cmd"
    # Add a command to download each mod in this array
    for mod_id in "${validate_mod_ids[@]}"; do
@@ -404,6 +406,7 @@ mod_param="-mod="
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
+   mod_param+="$client_mods_dir/$mod_id;"
 
    # Loop through all files that are in the mod folder to symlink them
    for f in $(find "$mod_dir" -type f -printf '%P\n'); do
@@ -413,7 +416,6 @@ for mod_id in "${client_required_mod_ids[@]}"; do
       mkdir -p "$(dirname "$output_file")"
       # Symlink the file
       ln -s "$mod_dir/$f" "$output_file"
-      mod_param+="$client_mods_dir/$mod_id;"
    done
 done
 
@@ -442,7 +444,7 @@ done
 
 # If there's at least one client-side mod to load, add a startup parameter for it
 if [ ${#client_required_mod_ids[@]} -gt 0 ]; then
-   panel_config=$(echo "$panel_config" | jq ".parameters[.parameters| length] |= . + '$mod_dir'")
+   panel_config=$(echo "$panel_config" | jq ".parameters |= . + [\"$mod_param\"]")
 fi
 # Write the web panel config.js file
 echo "module.exports = $panel_config" > "$web_panel_config_file"
