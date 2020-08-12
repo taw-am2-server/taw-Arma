@@ -3,6 +3,7 @@
 - test ACE rappelling
 - add default loadouts (https://ace3mod.com/wiki/framework/arsenal-framework.html)
 - Allow admins to change server CBA settings (https://github.com/CBATeam/CBA_A3/pull/892)
+- override the BIS arsenal functions to eliminate BIS arsenal
 
 On mod updates:
 - remove RHS smoke grenades from arsenals
