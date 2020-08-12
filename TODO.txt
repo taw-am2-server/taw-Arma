@@ -1,5 +1,9 @@
 - multiple web panel users
 - test Battleye
 - test ACE rappelling
-- replace splendid smoke with ACE particles (and update cba_settings)
 - add default loadouts (https://ace3mod.com/wiki/framework/arsenal-framework.html)
+- Allow admins to change server CBA settings (https://github.com/CBATeam/CBA_A3/pull/892)
+
+On mod updates:
+- remove RHS smoke grenades from arsenals
+- remove thermals

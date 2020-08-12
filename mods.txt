@@ -11,6 +11,7 @@
 721359761, VCOM AI, 0 # https://steamcommunity.com/sharedfiles/filedetails/?id=721359761
 
 # Mechanics
+2191340131, TAW AM1 Custom, 1 # https://steamcommunity.com/sharedfiles/filedetails/?id=2191340131
 450814997, CBA A3, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=450814997
 463939057, ACE3, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=463939057
 773131200, ACE Compat RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=773131200
@@ -35,7 +36,6 @@
 1804716719, Ladder Tweak 2x, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1804716719
 1413218487, Lesh's Towing Mod, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1413218487
 1311852588, Rested Weapon Movement, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=1311852588
-770418577, Splendid Smoke, 1 # https://steamcommunity.com/workshop/filedetails/?id=770418577
 
 # Assets
 843425103, RHS AFRF, 1 # http://steamcommunity.com/sharedfiles/filedetails/?id=843425103

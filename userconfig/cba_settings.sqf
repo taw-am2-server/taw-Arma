@@ -686,6 +686,9 @@ force force L_Suppress_intensity = 0.8;
 force force L_Suppress_playerSwabEnabled = true;
 force force L_Suppress_recovery = 1;
 
+// TAW AM1
+force force taw_am1_global_arsenal_blacklist = "[""rhs_mag_m716_yellow"", ""rhs_mag_m715_Green"", ""rhs_mag_m714_White"", ""rhs_mag_m713_Red"", ""rhs_mag_M585_white"", ""rhs_mag_m661_green"", ""rhs_mag_m662_red"",  ""ACE_40mm_Flare_white"",  ""ACE_40mm_Flare_green"",  ""ACE_40mm_Flare_red"",  ""ACE_40mm_Flare_ir"",  ""1Rnd_HE_Grenade_shell"",  ""ACE_M14"",  ""ACE_M84"",  ""HandGrenade"",  ""rhs_mag_an_m8hc"",  ""rhs_mag_m18_green"",  ""rhs_mag_m18_red"",  ""rhs_mag_m18_purple"",  ""rhs_mag_m18_yellow"",  ""rhs_grenade_anm8_mag"",  ""Drone_Range_Mag_dummy"",  ""Drone_Range_Mag"",  ""DemoCharge_Remote_Mag"",  ""optic_tws"",  ""optic_tws_mg"",  ""optic_Nightstalker"",  ""rhsusf_acc_anpas13gv1"",  ""NVGogglesB_blk_F"",  ""NVGogglesB_grn_F"",  ""NVGogglesB_gry_F"",  ""ACE_MX2A""]";
+
 // Turret Enhanced
 force force Fat_Lurch_Grid = true;
 force force Fat_Lurch_GridNum = 6;
