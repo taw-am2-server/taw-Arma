@@ -419,8 +419,8 @@ for mod_id in "${client_required_mod_ids[@]}"; do
       if [ $file_lowercase == "meta.cpp" ] || [ $file_lowercase == "mod.cpp" ]; then
          # Copy the file (instead of symlink) so we can edit it
          cp "$mod_dir/$f" "$output_file"
-         # Change the mod name so it takes less space in the packet sent to Steam (to fix issues with mod list in Arma 3 Launcher)
-         sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\"/" "$output_file"
+         # Change the mod name to be the mod ID so it takes less space in the packet sent to Steam (to fix issues with mod list in Arma 3 Launcher)
+         sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\";/" "$output_file"
       else
          # Otherwise, just symlink the file
          ln -s "$mod_dir/$f" "$output_file"
