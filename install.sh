@@ -3,7 +3,7 @@
 # exit when any command fails
 set -e
 
-if [[ ! "$EUID" = 0 ]]; then 
+if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
@@ -13,9 +13,9 @@ repo_dir="$steam_home/taw-am2"
 domain="am2.lselter.co.uk"
 email="tirpitz@taw.net"
 #get the user (prior to sudo)
-user= pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()'
+user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse
-
+echo "user name is $user_name"
 if lsb_release -i | grep -q 'Debian'; then
    echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
    echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
@@ -34,7 +34,7 @@ id -u steam &>/dev/null || useradd -m steam
 
 # Copy the ubuntu user's authorized keys over to the Steam user
 mkdir -p "$steam_home/.ssh"
-cp /home/$user/.ssh/authorized_keys "$steam_home/.ssh/"
+cp "/home/$user_name/.ssh/authorized_keys" "$steam_home/.ssh/"
 chown -R steam:steam "$steam_home/.ssh"
 chmod 755 "$steam_home/.ssh"
 chmod 644 "$steam_home/.ssh/authorized_keys"
