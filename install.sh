@@ -12,7 +12,7 @@ repo_url="https://github.com/Tirpitz93/taw-am2.git"
 repo_dir="$steam_home/taw-am2"
 domain="am2.lselter.co.uk"
 email="tirpitz@taw.net"
-#get the user (prior to sudo)
+#get the user (the user that called sudo)
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse
 echo "user name is $user_name"
@@ -28,7 +28,7 @@ fi
 
 dpkg --add-architecture i386
 apt update -y
-apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx python3-certbot-nginx unzip jq -y
+apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx ufw python3-certbot-nginx unzip jq -y
 apt upgrade -y
 id -u steam &>/dev/null || useradd -m steam
 
@@ -70,7 +70,7 @@ systemctl daemon-reload
 rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
 #cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
-
+gi
 #template substitution
 sed -e "s/\${domain}/$domain/" "$repo_dir/nginx.conf" > /etc/nginx/sites-enabled/arma.conf
 
