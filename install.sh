@@ -12,13 +12,18 @@ repo_url="https://github.com/Tirpitz93/taw-am2.git"
 repo_dir="$steam_home/taw-am2"
 domain="am2.lselter.co.uk"
 email="tirpitz@taw.net"
-
+#get the user (prior to sudo)
+user= pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()'
 #add-apt-repository multiverse
-echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
 
-echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
-
-echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
+if lsb_release -i | grep -q 'Debian'; then
+   echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
+   echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
+elif lsb_release -i | grep -q 'Ubuntu'; then
+  echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
+  echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
+  echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
+fi
 
 
 dpkg --add-architecture i386
@@ -29,7 +34,7 @@ id -u steam &>/dev/null || useradd -m steam
 
 # Copy the ubuntu user's authorized keys over to the Steam user
 mkdir -p "$steam_home/.ssh"
-cp /home/ubuntu/.ssh/authorized_keys "$steam_home/.ssh/"
+cp /home/$user/.ssh/authorized_keys "$steam_home/.ssh/"
 chown -R steam:steam "$steam_home/.ssh"
 chmod 755 "$steam_home/.ssh"
 chmod 644 "$steam_home/.ssh/authorized_keys"
@@ -65,6 +70,10 @@ systemctl daemon-reload
 rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
 cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
+
+#template substitution
+sed -e "s/\${domain}/$domain/" /etc/nginx/sites-enabled/arma.conf
+
 # Set the config file owner to root
 chown -h root:root /etc/nginx/sites-enabled/arma.conf
 # Ensure the nginx config file is valid

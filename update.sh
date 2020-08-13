@@ -283,7 +283,7 @@ load_steam_creds
 load_web_panel_creds
 
 # Create the base steamcmd command with the login credentials
-base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+base_steam_cmd="/usr/games/steamcmd +login $steam_username"
 
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
