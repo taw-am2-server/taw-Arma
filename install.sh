@@ -69,10 +69,10 @@ systemctl daemon-reload
 # Remove any existing config files
 rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
-cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
+#cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
 
 #template substitution
-sed -e "s/\${domain}/$domain/" /etc/nginx/sites-enabled/arma.conf > /etc/nginx/sites-enabled/arma.conf
+sed -e "s/\${domain}/$domain/" "$repo_dir/nginx.conf" > /etc/nginx/sites-enabled/arma.conf
 
 # Set the config file owner to root
 chown -h root:root /etc/nginx/sites-enabled/arma.conf
