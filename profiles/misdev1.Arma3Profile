@@ -58,12 +58,12 @@ class DifficultyPresets
 singleVoice=0;
 maxSamplesPlayed=96;
 blood=1;
-gamma=1;﻿
+gamma=1;
 brightness=1;
 activeKeys[]={};
 sceneComplexity=400000;
 shadowZDistance=100;
-viewDistance=3400;﻿
+viewDistance=3400;
 preferredObjectViewDistance=2000;
 terrainGrid=25;
 volumeCD=10;

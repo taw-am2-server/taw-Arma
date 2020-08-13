@@ -28,7 +28,7 @@ fi
 
 dpkg --add-architecture i386
 apt update -y
-apt install lib32gcc1 net-tools steamcmd npm apache2-utils nginx python3-certbot-nginx unzip jq -y
+apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx python3-certbot-nginx unzip jq -y
 apt upgrade -y
 id -u steam &>/dev/null || useradd -m steam
 

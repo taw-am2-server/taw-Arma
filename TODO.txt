@@ -1,5 +1,13 @@
-- try using ACE movement instead of enhanced movement (https://ace3mod.com/wiki/feature/movement.html)
+- patch strobes to have longer lifespan
 - multiple web panel users
 - test Battleye
 - test ACE rappelling
-- replace splendid smoke with ACE particles
+- add default loadouts (https://ace3mod.com/wiki/framework/arsenal-framework.html)
+- Allow admins to change server CBA settings (https://github.com/CBATeam/CBA_A3/pull/892)
+- override the BIS arsenal functions to eliminate BIS arsenal
+- auto-generate CBA_settings PBO whitelist for ACE PBO check
+- blacklist vanilla mags?
+
+On mod updates:
+- remove RHS smoke grenades from arsenals
+- remove thermals

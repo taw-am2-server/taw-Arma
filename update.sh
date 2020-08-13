@@ -26,7 +26,7 @@ web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
 repo_profiles_dir="$script_dir/profiles"
-arma_profiles_dir="$home_dir/arma-profiles"
+arma_profiles_dir="$home_dir/arma-profiles/home"
 # Userconfig directories
 repo_userconfig_dir="$script_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
@@ -39,9 +39,10 @@ arma_download_attempts=6
 force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
+skip_steam_check=false
 
 # Read switches from the command line
-while getopts ":swv" opt; do
+while getopts ":swvn" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -51,6 +52,11 @@ while getopts ":swv" opt; do
       ;;
     v) # validate ARMA/mod files that have been downloaded
       force_validate="validate"
+      echo "Forcing validation of Arma 3 and Workshop files"
+      ;;
+    n) # skip Steam file checks for Arma and existing mods
+      skip_steam_check=true
+      echo "Skipping file checks for existing Arma 3 and Workshop files"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -178,6 +184,12 @@ workshop_template_required=$(<$script_dir/workshop_template_required_prefix.html
 workshop_template_optional=$(<$script_dir/workshop_template_optional_prefix.html)
 workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
+# Load the web panel config JSON
+panel_config=$(jq -enf "$script_dir/config.json")
+if [ -z "$panel_config" ]; then
+   echo "Error: failed to parse web panel config.json" >&2; exit 1
+fi
+
 # Read the mod file and loop through each line
 line_no=0
 # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
@@ -273,9 +285,6 @@ for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
    cp "$profile_file" "$arma_profiles_dir/$profile_name/$profile_basename"
 done
 
-# Copy the web panel config file
-cp "$script_dir/config.js" "$web_panel_config_file"
-
 # Call the function for loading Steam credentials
 load_steam_creds
 
@@ -286,10 +295,13 @@ load_web_panel_creds
 base_steam_cmd="/usr/games/steamcmd +login $steam_username"
 
 # Create a command that downloads/updates ARMA 3
-arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
-run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
-if [ $? != 0 ]; then
-   exit 1
+# Only run it if we're not force skipping this step
+ if ! $skip_steam_check ; then
+   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
+   run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
+   if [ $? != 0 ]; then
+      exit 1
+   fi
 fi
 
 # Copy the userconfig files
@@ -307,8 +319,8 @@ mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
 # This section compiles a single command for validating all existing mods
 # Since they're already existing, updates should be small and can be completed
 # in one attempt without timing out.
-# Only run this section if there are any mods to validate
-if [ ${#validate_mod_ids[@]} -gt 0 ]; then
+# Only run this section if there are any mods to validate and we're not force-skipping the check
+if [ ${#validate_mod_ids[@]} -gt 0 ] && ! $skip_steam_check ; then
    mod_validate_cmd="$mod_download_base_cmd"
    # Add a command to download each mod in this array
    for mod_id in "${validate_mod_ids[@]}"; do
@@ -340,9 +352,9 @@ fi
 
 # This section is for re-packaging the server-only workshop mods into a single
 # mod folder. The server config then points to this folder to load server-side mods.
-server_mods_dir="$arma_dir/server_mods"
+server_mods_dir="$arma_dir/mods_server"
 # This is the directory where the PBOs are linked to
-server_addons_dir="$server_mods_dir/@taw_am1_server/addons"
+server_addons_dir="$server_mods_dir/addons"
 # Remove the entire server_mods directory to ensure it's clean
 rm -rf $server_mods_dir
 # Re-create the directory structure
@@ -376,44 +388,46 @@ done
 
 # This section is for re-packaging the client-and-server workshop mods into a single
 # mod folder. The web control panel can then select this merged pack.
-client_mods_dir="$arma_dir/@taw_am1_client"
-# This is the directory where the PBOs are linked to
-client_addons_dir="$client_mods_dir/addons"
+client_mods_dir="mods_client"
+client_mods_path="$arma_dir/$client_mods_dir"
 # This is the directory where the keys are linked to
 client_keys_dir="$arma_dir/keys"
 # Remove the entire client mods directory to ensure it's clean
-rm -rf $client_mods_dir
+rm -rf $client_mods_path
 # Re-create the directory structure
-mkdir -p $client_addons_dir
+mkdir -p $client_mods_path
 # Delete all existing symlinked keys in the Arma keys directory
 find "$client_keys_dir" -type l -delete
+
+# Create the mod startup parameter
+mod_param="-mod="
 
 # Loop through each client-required mod to link the mod files
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
+   mod_param+="$client_mods_dir/$mod_id;"
 
-   # Find all "addon" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-   # If no "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -eq 0 ]; then
-      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-   fi
-   # If multiple "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-   fi
-   # The directory where the mod PBOs were downloaded to
-   addon_dir=${found_dirs[0]}
-   
-   # Loop through all files that are in the mod's addons dir
-   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
+   # Loop through all files that are in the mod folder to symlink them
+   for f in $(find "$mod_dir" -type f -printf '%P\n'); do
+      file_lowercase="${f,,}"
       # The link filename, in lowercase
-      output_file="$client_addons_dir/${f,,}"
+      output_file="$client_mods_path/$mod_id/$file_lowercase"
       # Create any sub-directories for the file
       mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$addon_dir/$f" "$output_file"
+      # If it's the meta.cpp or mod.cpp file, it's special
+      if [ $file_lowercase == "meta.cpp" ] || [ $file_lowercase == "mod.cpp" ]; then
+         # Copy the file (instead of symlink) so we can edit it
+         cp "$mod_dir/$f" "$output_file"
+         # Try converting from UTF-8 with a silent fail (won't do anything if input wasn't UTF-8)
+         # This is to handle the occational mod that uses CRLF line endings
+         dos2unix "$output_file"
+         # Change the mod name to be the mod ID so it takes less space in the packet sent to Steam (to fix issues with mod list in Arma 3 Launcher)
+         sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\";/" "$output_file"
+      else
+         # Otherwise, just symlink the file
+         ln -s "$mod_dir/$f" "$output_file"
+      fi
    done
 done
 
@@ -439,3 +453,10 @@ for mod_id in "${key_mods[@]}"; do
       ln -sf "${found_keys[0]}" "$output_file"
    fi
 done
+
+# If there's at least one client-side mod to load, add a startup parameter for it
+if [ ${#client_required_mod_ids[@]} -gt 0 ]; then
+   panel_config=$(echo "$panel_config" | jq ".parameters |= . + [\"$mod_param\"]")
+fi
+# Write the web panel config.js file
+echo "module.exports = $panel_config" > "$web_panel_config_file"
