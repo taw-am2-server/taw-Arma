@@ -13,11 +13,12 @@
 set -e
 
 # Get the directory where this file is located
-script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # The home directory for the user that launches the server
 home_dir="/home/steam"
 #battalion config directory
 config_dir="/home/steam/config"
+
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
 # The directory where Workshop mods should be downloaded to
@@ -54,7 +55,9 @@ force_validate=""
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 pushd "$config_dir"
+
 git fetch --all
+
 git reset --hard origin/master
 popd
 
@@ -264,7 +267,7 @@ line_no=0
 #   fi
 #done < "$script_dir/mods.txt"
 for modlist in $config_dir/*.html; do
-    python3 process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "$base_steam_cmd  +workshop_download_item 107410 $@ validate +exit" _ {}
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 10 -I {} bash -c "$base_steam_cmd  +workshop_download_item 107410 $@ validate +exit" _ {}
 done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
