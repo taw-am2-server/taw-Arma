@@ -3,12 +3,14 @@
 
 
 """
+
 try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
     from bs4 import BeautifulSoup
 import re
 import sys
+import argparse
 
 modIDRe = "(\?id=)([0-9]+)"
 def loadMods(file):
@@ -26,13 +28,19 @@ def loadMods(file):
     for mod in modlistHTML:
         try:
             _idStr = mod.find("a", attrs={'data-type':'Link'}).text
-            print(re.findall(modIDRe, _idStr)[0][1], "'", mod.find("td", attrs={"data-type":"DisplayName"}).text, "'")
+            print(re.findall(modIDRe, _idStr)[0][1])
             modlist.append({"name": mod.find("td", attrs={"data-type":"DisplayName"}).text, "ID":re.findall(modIDRe, _idStr)[0][1]})
         except:
             pass
     return modlist
 
 if __name__ =="__main__":
+    argParser = argparse.ArgumentParser(description='Process Arma 3 modlists')
+    argParser.add_argument("-n", "--names", type=bool,
+                        help='Output names in addition to ids')
+    args = argParser.parse_args()
+    print(args)
     _modlistFileName = sys.argv [1]
+
     modlist = loadMods(_modlistFileName)
 

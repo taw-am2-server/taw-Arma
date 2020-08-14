@@ -226,14 +226,18 @@ load_web_panel_creds
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 echo "\n\n\n testing...."
-echo $base_steam_cmd
+#echo $base_steam_cmd
 
 
 for modlist in $config_dir/*.html; do
-    modcmd="'$base_steam_cmd +workshop_download_item 107410 {} validate +exit'"
-    echo $modcmd
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 2 -I  {} bash -c "run_steam_cmd $modcmd  '3' 'downloading mod id {}'"
+    modcmd="'$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit'"
+    #echo $modcmd
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
+    echo ""
+
+
 done
+exit 1
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
 run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
