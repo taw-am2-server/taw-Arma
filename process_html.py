@@ -36,7 +36,7 @@ def loadMods(file):
 
 if __name__ =="__main__":
     argParser = argparse.ArgumentParser(description='Process Arma 3 modlists')
-    argParser.add_argument("-n", "--names", type=bool,
+    argParser.add_argument("-n", "--names", type=bool, nargs="?",
                         help='Output names in addition to ids')
     args = argParser.parse_args()
     print(args)
