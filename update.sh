@@ -234,10 +234,13 @@ for modlist in $config_dir/*.html; do
     #echo $modcmd
     python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
     name=$(basename "$modlist" ".html")
-    [[ -d "$arma_dir/$name" ]] && rm -r "${arma_dir:?}/${name:?}"
-    mkdir "$arma_dir/$name"
-    pushd "$arma_dir/$name"
-    python3 "$script_dir/process_html.py" "$modlist" -n | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/@@{}"
+    [[ -d "$arma_dir/@$name" ]] && rm -r "${arma_dir:?}/${name:?}"
+    mkdir "$arma_dir/@$name"
+    pushd "$arma_dir/@$name_mods"
+    python3 "$script_dir/process_html.py" "$modlist" -n | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
+    pushd $arma_dir
+    python3 "$script_dir/process_html.py" "$modlist" -n | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
+    popd
     popd
 
 done
