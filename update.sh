@@ -230,7 +230,7 @@ echo $base_steam_cmd
 
 
 for modlist in $config_dir/*.html; do
-    modcmd="\'$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit\'"
+    modcmd="'$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit'"
     echo $modcmd
     python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c run_steam_cmd "$modcmd"  "3" "downloading mod  {mod}"
 done
