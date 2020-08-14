@@ -102,6 +102,10 @@ get_steam_creds () {
    else
       printf "$steam_username\n$steam_password" > $steam_creds_file
       #run steamcmd once interactively to allow the user to ender steamguard code
+      printf  "\n\n\\n\n\n=============================================================================================
+      Logging in to steam interactively in order to set steamguard code if required.
+      Type 'exit' when complete or you see the 'steam>' prompt
+      ===========================================================================================================\n\n\n"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
 }
@@ -227,14 +231,12 @@ load_web_panel_creds
 
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
-echo "\n\n\n testing...."
-#echo $base_steam_cmd
 
 #process html files
 for modlist in $config_dir/*.html; do
     #build steamcmd command
     modcmd="'$base_steam_cmd +force_install_dir $workshop_dir +workshop_download_item 107410 {mod} validate +exit'"
-    #load ids from html file
+    #load mod ids from html file
     python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  $mod_download_attempts 'downloading mod id {mod}'"
 
     #get the modlist filename
@@ -245,9 +247,9 @@ for modlist in $config_dir/*.html; do
     mkdir "$modlist_dir"
     pushd "$modlist_dir"
     #create symlinks in the <arma_dir>/@<modlistname>/<modName> and <arma_dir>/@<modName>
-    python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
+    python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
     pushd "$arma_dir"
-    python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
+    python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
     popd
     popd
 done
