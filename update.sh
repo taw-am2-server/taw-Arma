@@ -215,7 +215,7 @@ for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
 done
 
 # Copy the web panel config file
-cp "$script_dir/config.js" "$web_panel_config_file"
+cp "$script_dir/config.json" "$web_panel_config_file"
 
 # Call the function for loading Steam credentials
 load_steam_creds
