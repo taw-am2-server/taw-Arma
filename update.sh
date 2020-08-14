@@ -223,7 +223,7 @@ load_steam_creds
 # Call the function for loading web panel credentials
 load_web_panel_creds
 
-base_steam_cmd= "/usr/games/steamcmd +login $steam_username $steam_password"
+base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 echo "\n\n\n testing...."
 echo $base_steam_cmd
