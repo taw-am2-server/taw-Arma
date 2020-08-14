@@ -24,7 +24,7 @@ if [ "$batt" == '1' ]
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 COnfig"
-      git clone "https://github.com/Tirpitz93/AM2_config" ../
+      git clone "https://github.com/Tirpitz93/AM2_config" ../config
 else
   echo "invalid selection"
   exit 1
