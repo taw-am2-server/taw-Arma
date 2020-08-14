@@ -106,7 +106,7 @@ git clone $repo_url "$repo_dir/../config"
 source ../config/config.sh
 
 # Install the service file for the web console (replacing template fields as we go)
-sed -e "s/\${repo_dir}/$repo_dir/"  "$repo_dir/arma3-web-console.service" >/etc/systemd/system/arma3-web-console.service
+sed -e "s#\${repo_dir}#$repo_dir#"  "$repo_dir/arma3-web-console.service" >/etc/systemd/system/arma3-web-console.service
 
 chmod 644 /etc/systemd/system/arma3-web-console.service
 systemctl daemon-reload
@@ -118,7 +118,7 @@ rm -fr /etc/nginx/sites-enabled/*
 #cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
 gi
 #install nginx config with template substitution
-sed -e "s/\${domain}/$domain/" "$repo_dir/nginx.conf" >/etc/nginx/sites-enabled/arma.conf
+sed -e "s#\${domain}#$domain#" "$repo_dir/nginx.conf" >/etc/nginx/sites-enabled/arma.conf
 
 # Set the config file owner to root
 chown -h root:root /etc/nginx/sites-enabled/arma.conf
@@ -140,7 +140,7 @@ sudo -u steam "$repo_dir/update.sh" -swv
 #write out current crontab
 sudo -u steam crontab -l > mycron
 #echo new cron into cron file
-sed -e "s/\${repo_dir}/$repo_dir/" "$repo_dir/update.cron.template" >>mycron
+sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" >>mycron
 #install new cron file
 sudo -u steam crontab mycron
 rm mycron
