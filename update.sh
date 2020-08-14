@@ -102,7 +102,7 @@ get_steam_creds () {
    else
       printf "$steam_username\n$steam_password" > $steam_creds_file
       #run steamcmd once interactively to allow the user to ender steamguard code
-      $base_steam_cmd
+      /usr/games/steamcmd +login $steam_username $steam_password
    fi
 }
 
@@ -235,12 +235,12 @@ for modlist in $config_dir/*.html; do
     #build steamcmd command
     modcmd="'$base_steam_cmd +force_install_dir $workshop_dir +workshop_download_item 107410 {mod} validate +exit'"
     #load ids from html file
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  $mod_download_attempts 'downloading mod id {mod}'"
 
     #get the modlist filename
     name=$(basename "$modlist" ".html")
 
-    modlist_dir="${arma_dir:?}/@${name:?}"
+    modlist_dir="${arma_dir:?}/@_modpack_${name:?}"
     [[ -d "$modlist_dir" ]] && rm -r "$modlist_dir"
     mkdir "$modlist_dir"
     pushd "$modlist_dir"
