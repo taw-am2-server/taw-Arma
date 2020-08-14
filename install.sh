@@ -27,7 +27,7 @@ elif [ "$batt" == "2" ]
       echo "loading AM2 COnfig"
 else
   echo "invalid selection"
-  jumpto batt_select
+  jumpto $batt_select
 fi
 
 exit 0
