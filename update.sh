@@ -208,72 +208,72 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 # Read the mod file and loop through each line
 #line_no=0
 # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
-#while read line || [ -n "$line" ]; do
-#   # Increment the line counter
-#   line_no=$((line_no+1))
-#   # Trim whitespace of the ends of the line
-#   line_trimmed="$(trim "$line")"
-#   IFS='#' read -ra comment <<< "$line_trimmed"
-#   # If the line was empty or just had a comment, skip it
-#   if [ -z "${comment[0]}" ]; then
-#      continue
-#   fi
-#   # Split the part before any comments on commas
-#   IFS=',' read -ra parts <<< "${comment[0]}"
-#   # Parse the line into its fields, trimming whitespace from each
-#   mod_id="$(trim "${parts[0]}")"
-#   mod_name="$(trim "${parts[1]}")"
-#   mod_type="$(trim "${parts[2]}")"
-#   # Ensure that the mod ID is a number (digits only)
-#   if ! [[ $mod_id =~ $number_regex ]] ; then
-#      echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
-#   fi
-#   # Create the string that would represent this mod in the workshop template file
-#   workshop_template_section="
-#            <tr data-type='ModContainer'>
-#               <td data-type='DisplayName'>$mod_name</td>
-#               <td>
-#                  <span class='from-steam'>Steam</span>
-#               </td>
-#               <td>
-#                  <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
-#               </td>
-#            </tr>"
-#
-#   if [ -d "$mod_install_dir/$mod_id" ]; then
-#      # If the install directory for this mod exists, then it's been successfully downloaded
-#      # in the past so we just need to validate it
-#      validate_mod_ids+=($mod_id)
-#   else
-#      # If it doesn't exist, it needs to be downloaded
-#      download_mod_ids+=($mod_id)
-#   fi
-#   # Check if it's a server-only mod
-#   if [ $mod_type -eq 0 ]; then
-#      # Add it to the list of server mods
-#      server_mod_ids+=($mod_id)
-#   # Check if it's a client required mod
-#   elif [ $mod_type -eq 1 ]; then
-#      # Add it to the list of client-required mods
-#      client_required_mod_ids+=($mod_id)
-#      # Add the HTML to the workshop template required file
-#      workshop_template_required+="$workshop_template_section"
-#      workshop_template_all+="$workshop_template_section"
-#   elif [ $mod_type -eq 2 ]; then
-#      # Optional client mods are not downloaded, just tracked for whitelisting
-#      client_optional_mod_ids+=($mod_id)
-#      # Add the HTML to the workshop template required file
-#      workshop_template_optional+="$workshop_template_section"
-#      workshop_template_all+="$workshop_template_section"
-#   else
-#      # The mod type was unrecognized
-#      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
-#   fi
-#done < "$script_dir/mods.txt"
+while read line || [ -n "$line" ]; do
+   # Increment the line counter
+   line_no=$((line_no+1))
+   # Trim whitespace of the ends of the line
+   line_trimmed="$(trim "$line")"
+   IFS='#' read -ra comment <<< "$line_trimmed"
+   # If the line was empty or just had a comment, skip it
+   if [ -z "${comment[0]}" ]; then
+      continue
+   fi
+   # Split the part before any comments on commas
+   IFS=',' read -ra parts <<< "${comment[0]}"
+   # Parse the line into its fields, trimming whitespace from each
+   mod_id="$(trim "${parts[0]}")"
+   mod_name="$(trim "${parts[1]}")"
+   mod_type="$(trim "${parts[2]}")"
+   # Ensure that the mod ID is a number (digits only)
+   if ! [[ $mod_id =~ $number_regex ]] ; then
+      echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
+   fi
+   # Create the string that would represent this mod in the workshop template file
+   workshop_template_section="
+            <tr data-type='ModContainer'>
+               <td data-type='DisplayName'>$mod_name</td>
+               <td>
+                  <span class='from-steam'>Steam</span>
+               </td>
+               <td>
+                  <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
+               </td>
+            </tr>"
+
+   if [ -d "$mod_install_dir/$mod_id" ]; then
+      # If the install directory for this mod exists, then it's been successfully downloaded
+      # in the past so we just need to validate it
+      validate_mod_ids+=($mod_id)
+   else
+      # If it doesn't exist, it needs to be downloaded
+      download_mod_ids+=($mod_id)
+   fi
+   # Check if it's a server-only mod
+   if [ $mod_type -eq 0 ]; then
+      # Add it to the list of server mods
+      server_mod_ids+=($mod_id)
+   # Check if it's a client required mod
+   elif [ $mod_type -eq 1 ]; then
+      # Add it to the list of client-required mods
+      client_required_mod_ids+=($mod_id)
+      # Add the HTML to the workshop template required file
+      workshop_template_required+="$workshop_template_section"
+      workshop_template_all+="$workshop_template_section"
+   elif [ $mod_type -eq 2 ]; then
+      # Optional client mods are not downloaded, just tracked for whitelisting
+      client_optional_mod_ids+=($mod_id)
+      # Add the HTML to the workshop template required file
+      workshop_template_optional+="$workshop_template_section"
+      workshop_template_all+="$workshop_template_section"
+   else
+      # The mod type was unrecognized
+      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
+   fi
+done < "$script_dir/mods.txt"
 
 
 for modlist in $config_dir/*.html; do
-    modcmd="\"$base_steam_cmd +workshop_download_item 107410 {mod} validate +quit\""
+    modcmd="$base_steam_cmd +workshop_download_item 107410 {mod} validate +quit"
     echo $modcmd
     python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $modcmd  '3' 'downloading mod  {mod}'"
 done
@@ -315,7 +315,7 @@ load_steam_creds
 # Call the function for loading web panel credentials
 load_web_panel_creds
 
-base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+base_steam_cmd= "/usr/games/steamcmd +login $steam_username $steam_password"
 
 echo $base_steam_cmd
 
