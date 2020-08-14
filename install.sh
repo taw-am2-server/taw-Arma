@@ -1,5 +1,11 @@
 #!/bin/bash
-
+function jumpto
+{
+    label=$1
+    cmd=$(sed -n "/$label:/{:a;n;p;ba};" $0 | grep -v ':$')
+    eval "$cmd"
+    exit
+}
 # exit when any command fails
 set -e
 
@@ -21,7 +27,7 @@ elif [ "$batt" == "2" ]
       echo "loading AM2 COnfig"
 else
   echo "invalid selection"
-  goto batt_select
+  jumpto batt_select
 fi
 
 exit 0
