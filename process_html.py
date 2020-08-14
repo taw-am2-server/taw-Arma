@@ -13,7 +13,7 @@ import sys
 import argparse
 
 modIDRe = "(\?id=)([0-9]+)"
-def loadMods(file, names=False):
+def loadMods(file, names=False, at=True):
     """
     take mod html and writes ids to stdout, returns a list of dicts with `name` and `id`
     :param file: Path to HTML file to load
@@ -29,7 +29,8 @@ def loadMods(file, names=False):
         try:
             _idStr = mod.find("a", attrs={'data-type':'Link'}).text
             if names:
-                print(re.findall(modIDRe, _idStr)[0][1], '"'+str(mod.find("td", attrs={"data-type":"DisplayName"}).text.strip())+'"')
+                spacer = '"@' if at else '"'
+                print(re.findall(modIDRe, _idStr)[0][1], spacer+str(mod.find("td", attrs={"data-type":"DisplayName"}).text.strip())+'"')
             else:
                 print(re.findall(modIDRe, _idStr)[0][1])
             modlist.append({"name": mod.find("td", attrs={"data-type":"DisplayName"}).text, "ID":re.findall(modIDRe, _idStr)[0][1]})
@@ -42,10 +43,12 @@ if __name__ =="__main__":
     argParser.add_argument("fileList", type=str, nargs="?",
                         help='HTML file to be processed')
     argParser.add_argument("-n", "--names", type=bool, nargs="?", const=True, default=False,
-                        help='Output names in addition to ids')
+                           help='Output names in addition to ids')
+    argParser.add_argument("-a", "--at", type=bool, nargs="?", const=True, default=False,
+                        help='prepend "@" to names')
     args = argParser.parse_args()
 
     # _modlistFileName = sys.argv [1]
 
-    modlist = loadMods(args.fileList, args.names)
+    modlist = loadMods(args.fileList, args.names, args.at)
 
