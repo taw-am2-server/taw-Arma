@@ -54,8 +54,8 @@ force_validate=""
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 pushd "$config_dir"
-git fetch --all
-git reset --hard origin/master
+sudo -u steam git fetch --all
+sudo -u steam git reset --hard origin/master
 popd
 
 # Read switches from the command line
@@ -180,9 +180,6 @@ run_steam_cmd() { # run_steam_cmd command attempts
 export -f run_steam_cmd
 
 
-
-
-exit 1
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
 # Mods to validate (have already been downloaded, just need to be checked for updates)
