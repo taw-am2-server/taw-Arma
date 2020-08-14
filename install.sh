@@ -102,7 +102,7 @@ else
 fi
 pushd "$repo_dir"
 
-git clone $repo_url "$repo_dir/../config"
+sudo -u steam git clone $repo_url "$repo_dir/../config"
 source ../config/config.sh
 
 # Install the service file for the web console (replacing template fields as we go)
