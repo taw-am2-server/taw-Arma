@@ -236,9 +236,9 @@ for modlist in $config_dir/*.html; do
     name=$(basename "$modlist" ".html")
     [[ -d "$arma_dir/@$name" ]] && rm -r "${arma_dir:?}/${name:?}"
     mkdir "$arma_dir/@$name"
-    pushd "$arma_dir/@$name_mods"
+    pushd "$arma_dir/@$name"
     python3 "$script_dir/process_html.py" "$modlist" -n | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
-    pushd $arma_dir
+    pushd "$arma_dir"
     python3 "$script_dir/process_html.py" "$modlist" -n | xargs -d "\n" -n 2 -I  {} bash -c "ln -s $mod_install_dir/{}"
     popd
     popd
