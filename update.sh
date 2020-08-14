@@ -232,7 +232,7 @@ echo "\n\n\n testing...."
 for modlist in $config_dir/*.html; do
     modcmd="'$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit'"
     #echo $modcmd
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "sudo -u steam run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
     name=$(basename "$modlist" ".html")
     [[ -d "$arma_dir/$name" ]] && rm -r "${arma_dir:?}/${name:?}"
     mkdir "$arma_dir/$name"
