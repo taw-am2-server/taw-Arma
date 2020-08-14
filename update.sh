@@ -4,6 +4,7 @@
 #todo: download mods
 #todo: create new symlinks in mod direcctor
 #todo: add --purge -p option to clean up old mods not in current html modlists
+#todo: if executatble in config directory install this over the standard one
 #done: add template to systemctl unit file
 
 #navigate to config directory update the config and return.
@@ -175,7 +176,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
    set -e
    return 1
 }
-rxport -f run_steam_cmd
+export -f run_steam_cmd
 python3 TAW-Arma/process_html.py config/battalion.html | xargs -n 1 -P 10 -I {} bash -c 'run_steam_cmd "$@"' _ {}
 exit 1
 # Regex for checking if a string is all digits
