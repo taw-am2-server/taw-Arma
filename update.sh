@@ -164,7 +164,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
    echo $3
 
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
-   for (( i=0; i<$2; i++ )); do
+   for (( i=0; i<2; i++ )); do
       if [ $i -eq 0 ]; then
          echo "Running steamcmd for $3"
       else
