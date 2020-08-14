@@ -116,7 +116,6 @@ systemctl daemon-reload
 rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
 #cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
-gi
 #install nginx config with template substitution
 sed -e "s#\${domain}#$domain#" "$repo_dir/nginx.conf" >/etc/nginx/sites-enabled/arma.conf
 
