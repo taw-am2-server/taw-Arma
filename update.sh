@@ -232,7 +232,7 @@ echo $base_steam_cmd
 for modlist in $config_dir/*.html; do
     modcmd="$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit"
     echo $modcmd
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c run_steam_cmd "$modcmd"  "3" "downloading mod  {mod}"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c "run_steam_cmd "$modcmd"  "3" "downloading mod  {mod}" "
 done
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
