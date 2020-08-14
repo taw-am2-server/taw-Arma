@@ -96,7 +96,7 @@ sudo -u steam mkdir -p "$steam_home/arma-profiles"
 if [ ! -d "$repo_dir" ]; then
     sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
 else
-    sudo -u steam git -C "$repo_dir" git fetch --all
+    sudo -u steam git -C "$repo_dir" fetch --all
     sudo -u steam git -C "$repo_dir" reset --hard origin/master
     sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
