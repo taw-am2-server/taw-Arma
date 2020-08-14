@@ -1,11 +1,5 @@
 #!/bin/bash
-function jumpto
-{
-    label=$1
-    cmd=$(sed -n "/$label:/{:a;n;p;ba};" $0 | grep -v ':$')
-    eval "$cmd"
-    exit
-}
+
 # exit when any command fails
 set -e
 
@@ -18,26 +12,26 @@ echo "For which battalion would you like to set up this server?
 2] AM2"
 
 read -p "Please enter 1 for AM1 or 2 for AM2" -n 3 batt
-
+#remove config directory
 rm -r ../config
 if [ "$batt" == '1' ]
  then
   echo "Loading AM1 config"
+
+
 elif [ "$batt" == "2" ]
  then
-      echo "loading AM2 COnfig"
+      echo "loading AM2 Config"
+      repo_url="https://github.com/Tirpitz93/AM2_config"
 
-      git clone "https://github.com/Tirpitz93/AM2_config" ../config
-      source ../config/config.sh
-      echo $email
       exit 1
 else
   echo "invalid selection"
   exit 1
 fi
-
-#load config script from first parameter
-
+git clone $repo_url ../config
+source ../config/config.sh
+exit 1
 #get the user (the user that called sudo)
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse

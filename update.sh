@@ -5,7 +5,11 @@
 #todo: create new symlinks in mod direcctor
 #todo: add --purge -p option to clean up old mods not in current html modlists
 #todo: add systemctl unit file
-
+#navigate to config directory update the config and return.
+pushd ../config
+git fetch --all
+git reset --hard origin/master
+popd
 
 # exit when any command fails
 set -e
