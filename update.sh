@@ -52,7 +52,7 @@ force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
 # Create the base steamcmd command with the login credentials
-base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+
 
 pushd "$config_dir"
 
@@ -306,7 +306,7 @@ load_steam_creds
 
 # Call the function for loading web panel credentials
 load_web_panel_creds
-
+base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 
 # Create a command that downloads/updates ARMA 3
