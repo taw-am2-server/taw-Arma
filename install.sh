@@ -24,15 +24,13 @@ if [ "$batt" == '1' ]
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 COnfig"
+      git clone "https://github.com/Tirpitz93/AM2_config" ../
 else
   echo "invalid selection"
   exit 1
 fi
 
-
-
 #load config script from first parameter
-source $1
 
 #get the user (the user that called sudo)
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
