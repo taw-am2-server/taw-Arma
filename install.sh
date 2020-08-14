@@ -18,12 +18,15 @@ echo "For which battalion would you like to set up this server?
 2] AM2"
 
 read -p "Please enter 1 for AM1 or 2 for AM2" -n 3 batt
+
+rm -r ../config
 if [ "$batt" == '1' ]
  then
   echo "Loading AM1 config"
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 COnfig"
+
       git clone "https://github.com/Tirpitz93/AM2_config" ../config
       source ../config/config.sh
       echo $email
