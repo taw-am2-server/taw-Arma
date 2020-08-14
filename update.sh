@@ -267,7 +267,7 @@ line_no=0
 #   fi
 #done < "$script_dir/mods.txt"
 for modlist in $config_dir/*.html; do
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I mod bash -c "$base_steam_cmd  +workshop_download_item 107410 mod validate +exit" _ mod
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I mod bash -c "run_steam_cmd $base_steam_cmd +workshop_download_item 107410 mod validate +exit"
 done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
