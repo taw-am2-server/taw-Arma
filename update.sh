@@ -50,7 +50,8 @@ arma_download_attempts=6
 force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
-
+# Create the base steamcmd command with the login credentials
+base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 pushd "$config_dir"
 git fetch --all
@@ -177,7 +178,12 @@ run_steam_cmd() { # run_steam_cmd command attempts
    return 1
 }
 export -f run_steam_cmd
-python3 TAW-Arma/process_html.py config/battalion.html | xargs -n 1 -P 10 -I {} bash -c 'run_steam_cmd "$@"' _ {}
+
+
+for modlist in $config_dir/*.html; do
+    python3 TAW-Arma/process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "$base_steam_cmd  +workshop_download_item 107410 $@ validate +exit" _ {}
+done
+
 exit 1
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
@@ -301,8 +307,7 @@ load_steam_creds
 # Call the function for loading web panel credentials
 load_web_panel_creds
 
-# Create the base steamcmd command with the login credentials
-base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+
 
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
