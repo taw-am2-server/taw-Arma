@@ -7,6 +7,25 @@ if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
+:batt_select
+echo "For which battalion would you like to set up this server?
+1] AM1
+2] AM2"
+
+read -p "Please enter 1 for AM1 or 2 for AM2" -n 3 batt
+if [ "$batt" == '1' ]
+ then
+  echo "Loading AM1 config"
+elif [ "$batt" == "2" ]
+ then
+      echo "loading AM2 COnfig"
+else
+  echo "invalid selection"
+  goto batt_select
+fi
+
+exit 0
+
 #load config script from first parameter
 source $1
 
