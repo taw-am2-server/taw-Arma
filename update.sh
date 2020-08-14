@@ -184,17 +184,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
    return 1
 }
 export -f run_steam_cmd
-echo "\n\n\n testing...."
-echo $base_steam_cmd
-echo $steam_username
-echo $steam_password
 
-
-for modlist in $config_dir/*.html; do
-    modcmd="$base_steam_cmd +workshop_download_item 107410 {mod} validate +quit"
-    echo $modcmd
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $modcmd  '3' 'downloading mod  {mod}'"
-done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
@@ -235,8 +225,17 @@ load_web_panel_creds
 
 base_steam_cmd= "/usr/games/steamcmd +login $steam_username $steam_password"
 
+echo "\n\n\n testing...."
 echo $base_steam_cmd
+echo $steam_username
+echo $steam_password
 
+
+for modlist in $config_dir/*.html; do
+    modcmd="$base_steam_cmd +workshop_download_item 107410 {mod} validate +quit"
+    echo $modcmd
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $modcmd  '3' 'downloading mod  {mod}'"
+done
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
 run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
