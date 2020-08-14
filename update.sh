@@ -164,7 +164,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
    echo $3
 
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
-   for (( i=0; i<4; i++ )); do
+   for (( i=0; i<$2; i++ )); do
       if [ $i -eq 0 ]; then
          echo "Running steamcmd for $3"
       else
@@ -273,7 +273,8 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 
 for modlist in $config_dir/*.html; do
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $base_steam_cmd +workshop_download_item 107410 {mod} validate +quit '3' 'downloading mod  {mod}'"
+    modcmd="$base_steam_cmd +workshop_download_item 107410 {mod} validate +quit"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $modcmd  '3' 'downloading mod  {mod}'"
 done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
