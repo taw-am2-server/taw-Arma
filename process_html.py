@@ -45,7 +45,6 @@ if __name__ =="__main__":
                         help='Output names in addition to ids')
     args = argParser.parse_args()
 
-    print(args)
     # _modlistFileName = sys.argv [1]
 
     modlist = loadMods(args.fileList, args.names)
