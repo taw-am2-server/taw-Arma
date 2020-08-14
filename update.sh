@@ -181,7 +181,7 @@ export -f run_steam_cmd
 
 
 for modlist in $config_dir/*.html; do
-    python3 process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "$base_steam_cmd  +workshop_download_item 107410 $@ validate +exit" _ {}
+    python3 process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "/usr/games/steamcmd +login loenjaselter  +workshop_download_item 107410 $@ validate +exit" _ {}
 done
 
 exit 1
