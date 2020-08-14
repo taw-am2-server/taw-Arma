@@ -233,8 +233,11 @@ for modlist in $config_dir/*.html; do
     modcmd="'$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit'"
     #echo $modcmd
     python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  '6' 'downloading mod id {mod}'"
-    echo ""
-
+    name=$(basename "modlist" ".html")
+    [[ -d "$arma_dir/$name" ]] && rm -r "${arma_dir:?}/${name:?}"
+    mkdir "$arma_dir/$name"
+    pushd "$arma_dir/$name"
+    python3 "$script_dir/process_html.py" "$modlist" -n | xargs -n 1 -I  {mod} bash -c "ln -s $mod_install_dir/{}"
 
 done
 exit 1
