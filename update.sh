@@ -314,8 +314,10 @@ load_steam_creds
 
 # Call the function for loading web panel credentials
 load_web_panel_creds
+
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
+echo $base_steam_cmd
 
 # Create a command that downloads/updates ARMA 3
 arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
