@@ -273,7 +273,7 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 
 for modlist in $config_dir/*.html; do
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  run_steam_cmd "$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit" "3" "downloading mod  {mod}"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  "run_steam_cmd $base_steam_cmd +workshop_download_item 107410 {mod} validate +exit '3' 'downloading mod  {mod}'"
 done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
