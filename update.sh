@@ -54,8 +54,8 @@ force_validate=""
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 pushd "$config_dir"
-sudo -u steam git fetch --all
-sudo -u steam git reset --hard origin/master
+git fetch --all
+git reset --hard origin/master
 popd
 
 # Read switches from the command line
