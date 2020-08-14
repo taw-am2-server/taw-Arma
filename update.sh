@@ -1,4 +1,11 @@
 #!/bin/bash
+#todo: reorganize to use html modlist:
+#todo: move exisitng symlinks to `old mod` directory,
+#todo: download mods
+#todo: create new symlinks in mod direcctor
+#todo: add --purge -p option to clean up old mods not in current html modlists
+#todo: add systemctl unit file
+
 
 # exit when any command fails
 set -e

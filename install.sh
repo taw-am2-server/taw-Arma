@@ -7,11 +7,9 @@ if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
-steam_home="/home/steam"
-repo_url="https://github.com/Tirpitz93/taw-am2.git"
-repo_dir="$steam_home/taw-am2"
-domain="am2.lselter.co.uk"
-email="tirpitz@taw.net"
+#load config script from first parameter
+source $1
+
 #get the user (the user that called sudo)
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse
@@ -28,10 +26,13 @@ fi
 
 dpkg --add-architecture i386
 apt update -y
-apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx ufw python3-certbot-nginx unzip jq -y
+apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx ufw python3-certbot-nginx unzip python3-pip
+ jq -y
 apt upgrade -y
 id -u steam &>/dev/null || useradd -m steam
 
+#install python libraries
+pip3 install bs4
 # Copy the ubuntu user's authorized keys over to the Steam user
 mkdir -p "$steam_home/.ssh"
 cp "/home/$user_name/.ssh/authorized_keys" "$steam_home/.ssh/"
@@ -53,12 +54,12 @@ sudo -u steam mkdir -p "$steam_home/arma-profiles"
 
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
-if [ ! -d "$repo_dir" ]; then
-    sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
-else
-    sudo -u steam git -C "$repo_dir" reset --hard origin/master
-    sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
-fi
+#if [ ! -d "$repo_dir" ]; then
+#    sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
+#else
+#    sudo -u steam git -C "$repo_dir" reset --hard origin/master
+#    sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
+#fi
 
 # Install the service file for the web console
 cp "$repo_dir/arma3-web-console.service" /etc/systemd/system/
