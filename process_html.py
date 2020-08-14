@@ -13,7 +13,7 @@ import sys
 import argparse
 
 modIDRe = "(\?id=)([0-9]+)"
-def loadMods(file):
+def loadMods(file, names=False):
     """
     take mod html and writes ids to stdout, returns a list of dicts with `name` and `id`
     :param file: Path to HTML file to load
@@ -36,14 +36,14 @@ def loadMods(file):
 
 if __name__ =="__main__":
     argParser = argparse.ArgumentParser(description='Process Arma 3 modlists')
-    argParser.add_argument("fileList", type=str, nargs="+",
+    argParser.add_argument("fileList", type=str, nargs="?",
                         help='HTML file to be processed')
-    argParser.add_argument("-n", "--names", type=bool, nargs="?",
+    argParser.add_argument("-n", "--names", type=bool, nargs="?", const=True, default=False,
                         help='Output names in addition to ids')
     args = argParser.parse_args()
 
     print(args)
-    _modlistFileName = sys.argv [1]
+    # _modlistFileName = sys.argv [1]
 
-    modlist = loadMods(_modlistFileName)
+    modlist = loadMods(args["fileList"], args["--names"])
 
