@@ -180,9 +180,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
 export -f run_steam_cmd
 
 
-for modlist in $config_dir/*.html; do
-    python3 process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "/usr/games/steamcmd +login loenjaselter  +workshop_download_item 107410 $@ validate +exit" _ {}
-done
+
 
 exit 1
 # Regex for checking if a string is all digits
@@ -268,7 +266,9 @@ line_no=0
 #      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
 #   fi
 #done < "$script_dir/mods.txt"
-
+for modlist in $config_dir/*.html; do
+    python3 process_html.py "$modlist" | xargs -n 1 -P 10 -I {} bash -c "$base_steam_cmd  +workshop_download_item 107410 $@ validate +exit" _ {}
+done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
 workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
