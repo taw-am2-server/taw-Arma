@@ -202,7 +202,7 @@ workshop_template_optional=$(<$script_dir/workshop_template_optional_prefix.html
 workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 # Read the mod file and loop through each line
-line_no=0
+#line_no=0
 # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
 #while read line || [ -n "$line" ]; do
 #   # Increment the line counter
@@ -266,8 +266,10 @@ line_no=0
 #      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
 #   fi
 #done < "$script_dir/mods.txt"
+
+
 for modlist in $config_dir/*.html; do
-    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I mod bash -c run_steam_cmd "$base_steam_cmd " "+workshop_download_item 107410 mod validate +exit"
+    python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -P 1 -I {mod} bash -c  run_steam_cmd "$base_steam_cmd +workshop_download_item 107410 {mod} validate +exit" "3" "downloading mod  {mod}"
 done
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
