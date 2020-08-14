@@ -29,7 +29,7 @@ def loadMods(file, names=False):
         try:
             _idStr = mod.find("a", attrs={'data-type':'Link'}).text
             if names:
-                print(re.findall(modIDRe, _idStr)[0][1], " '",mod.find("td", attrs={"data-type":"DisplayName"}).text, "'")
+                print(re.findall(modIDRe, _idStr)[0][1], str(mod.find("td", attrs={"data-type":"DisplayName"}).tex.strip()), "'")
             else:
                 print(re.findall(modIDRe, _idStr)[0][1])
             modlist.append({"name": mod.find("td", attrs={"data-type":"DisplayName"}).text, "ID":re.findall(modIDRe, _idStr)[0][1]})
