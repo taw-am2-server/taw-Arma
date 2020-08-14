@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#set some basic common variables
+steam_home="/home/steam"
+repo_url="https://github.com/Tirpitz93/TAW-Arma"
+repo_dir="$steam_home/TAW-Arma"
+#get the user (the user that called sudo)
+user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 # exit when any command fails
 set -e
 
@@ -11,38 +17,50 @@ echo "For which battalion would you like to set up this server?
 1] AM1
 2] AM2"
 
-read -p "Please enter 1 for AM1 or 2 for AM2" -n 3 batt
+read -p "Please enter 1 for AM1 or 2 for AM2 " -n 1 batt
 #remove config directory
-rm -r ../config
+if [ -d "../config" ]
+then
+  rm -r ../config
+fi
 if [ "$batt" == '1' ]
  then
   echo "Loading AM1 config"
-
-
+  #todo: add AM1 repo
+  echo "AM1 has not been set up yet"
+  exit 1
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 Config"
       repo_url="https://github.com/Tirpitz93/AM2_config"
 
-      exit 1
 else
   echo "invalid selection"
   exit 1
 fi
-git clone $repo_url ../config
-source ../config/config.sh
-exit 1
-#get the user (the user that called sudo)
-user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
+
+
 #add-apt-repository multiverse
 echo "user name is $user_name"
-if lsb_release -i | grep -q 'Debian'; then
-   echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
-   echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
+if lsb_release -i | grep -q 'Debian'
+then
+  #if linide repo is not present add it
+  if grep -q "deb http://mirrors.linode.com/debian stretch main non-free" /etc/apt/sources.list; then
+    echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
+    echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
+
+  fi
+  # add contrib and non-free repos
+  apt-add-repository contrib
+  apt-add-repository non-free
 elif lsb_release -i | grep -q 'Ubuntu'; then
-  echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
-  echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
-  echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
+  #if multiverse is not present add it
+  if grep -q "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" /etc/apt/sources.list
+  then
+    echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
+    echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
+    echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
+  fi
 fi
 
 
@@ -76,15 +94,21 @@ sudo -u steam mkdir -p "$steam_home/arma-profiles"
 
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
-#if [ ! -d "$repo_dir" ]; then
-#    sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
-#else
-#    sudo -u steam git -C "$repo_dir" reset --hard origin/master
-#    sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
-#fi
+if [ ! -d "$repo_dir" ]; then
+    sudo -u steam git clone --recursive "$repo_url" "$repo_dir"
+else
+    sudo -u steam git -C "$repo_dir" git fetch --all
+    sudo -u steam git -C "$repo_dir" reset --hard origin/master
+    sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
+fi
+pushd "$repo_dir"
 
-# Install the service file for the web console
-cp "$repo_dir/arma3-web-console.service" /etc/systemd/system/
+git clone $repo_url "$repo_dir/../config"
+source ../config/config.sh
+
+# Install the service file for the web console (replacing template fields as we go)
+sed -e "s/\${repo_dir}/$repo_dir/"  "$repo_dir/arma3-web-console.service" > /etc/systemd/system/arma3-web-console.service
+
 chmod 644 /etc/systemd/system/arma3-web-console.service
 systemctl daemon-reload
 
@@ -94,7 +118,7 @@ rm -fr /etc/nginx/sites-enabled/*
 # Copy the config file
 #cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
 gi
-#template substitution
+#install nginx config with template substitution
 sed -e "s/\${domain}/$domain/" "$repo_dir/nginx.conf" > /etc/nginx/sites-enabled/arma.conf
 
 # Set the config file owner to root
@@ -111,6 +135,16 @@ sudo -u steam npm install
 
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u steam "$repo_dir/update.sh" -swv
+
+
+##install cron job to update at 4 am every day
+#write out current crontab
+sudo -u steam crontab -l > mycron
+#echo new cron into cron file
+sed -e "s/\${repo_dir}/$repo_dir/" "$repo_dir/update.cron.template" >> mycron
+#install new cron file
+sudo -u steam crontab mycron
+rm mycron
 
 # Enable and start the web console service
 systemctl enable arma3-web-console

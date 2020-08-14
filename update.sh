@@ -4,12 +4,9 @@
 #todo: download mods
 #todo: create new symlinks in mod direcctor
 #todo: add --purge -p option to clean up old mods not in current html modlists
-#todo: add systemctl unit file
+#done: add template to systemctl unit file
+
 #navigate to config directory update the config and return.
-pushd ../config
-git fetch --all
-git reset --hard origin/master
-popd
 
 # exit when any command fails
 set -e
@@ -18,6 +15,8 @@ set -e
 script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # The home directory for the user that launches the server
 home_dir="/home/steam"
+#battalion config directory
+config_dir="/home/steam/config"
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
 # The directory where Workshop mods should be downloaded to
@@ -50,6 +49,12 @@ arma_download_attempts=6
 force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
+
+
+pushd "$config_dir"
+git fetch --all
+git reset --hard origin/master
+popd
 
 # Read switches from the command line
 while getopts ":swv" opt; do
@@ -170,7 +175,9 @@ run_steam_cmd() { # run_steam_cmd command attempts
    set -e
    return 1
 }
-
+rxport -f run_steam_cmd
+python3 TAW-Arma/process_html.py config/battalion.html | xargs -n 1 -P 10 -I {} bash -c 'run_steam_cmd "$@"' _ {}
+exit 1
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
 # Mods to validate (have already been downloaded, just need to be checked for updates)
@@ -192,68 +199,68 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 # Read the mod file and loop through each line
 line_no=0
 # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
-while read line || [ -n "$line" ]; do
-   # Increment the line counter
-   line_no=$((line_no+1))
-   # Trim whitespace of the ends of the line
-   line_trimmed="$(trim "$line")"
-   IFS='#' read -ra comment <<< "$line_trimmed"
-   # If the line was empty or just had a comment, skip it
-   if [ -z "${comment[0]}" ]; then
-      continue
-   fi
-   # Split the part before any comments on commas
-   IFS=',' read -ra parts <<< "${comment[0]}"
-   # Parse the line into its fields, trimming whitespace from each
-   mod_id="$(trim "${parts[0]}")"
-   mod_name="$(trim "${parts[1]}")"
-   mod_type="$(trim "${parts[2]}")"
-   # Ensure that the mod ID is a number (digits only)
-   if ! [[ $mod_id =~ $number_regex ]] ; then
-      echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
-   fi
-   # Create the string that would represent this mod in the workshop template file
-   workshop_template_section="
-            <tr data-type='ModContainer'>
-               <td data-type='DisplayName'>$mod_name</td>
-               <td>
-                  <span class='from-steam'>Steam</span>
-               </td>
-               <td>
-                  <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
-               </td>
-            </tr>"
-
-   if [ -d "$mod_install_dir/$mod_id" ]; then
-      # If the install directory for this mod exists, then it's been successfully downloaded
-      # in the past so we just need to validate it
-      validate_mod_ids+=($mod_id)
-   else
-      # If it doesn't exist, it needs to be downloaded
-      download_mod_ids+=($mod_id)
-   fi
-   # Check if it's a server-only mod
-   if [ $mod_type -eq 0 ]; then
-      # Add it to the list of server mods
-      server_mod_ids+=($mod_id)
-   # Check if it's a client required mod
-   elif [ $mod_type -eq 1 ]; then
-      # Add it to the list of client-required mods
-      client_required_mod_ids+=($mod_id)
-      # Add the HTML to the workshop template required file
-      workshop_template_required+="$workshop_template_section"
-      workshop_template_all+="$workshop_template_section"
-   elif [ $mod_type -eq 2 ]; then
-      # Optional client mods are not downloaded, just tracked for whitelisting
-      client_optional_mod_ids+=($mod_id)
-      # Add the HTML to the workshop template required file
-      workshop_template_optional+="$workshop_template_section"
-      workshop_template_all+="$workshop_template_section"
-   else
-      # The mod type was unrecognized
-      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
-   fi
-done < "$script_dir/mods.txt"
+#while read line || [ -n "$line" ]; do
+#   # Increment the line counter
+#   line_no=$((line_no+1))
+#   # Trim whitespace of the ends of the line
+#   line_trimmed="$(trim "$line")"
+#   IFS='#' read -ra comment <<< "$line_trimmed"
+#   # If the line was empty or just had a comment, skip it
+#   if [ -z "${comment[0]}" ]; then
+#      continue
+#   fi
+#   # Split the part before any comments on commas
+#   IFS=',' read -ra parts <<< "${comment[0]}"
+#   # Parse the line into its fields, trimming whitespace from each
+#   mod_id="$(trim "${parts[0]}")"
+#   mod_name="$(trim "${parts[1]}")"
+#   mod_type="$(trim "${parts[2]}")"
+#   # Ensure that the mod ID is a number (digits only)
+#   if ! [[ $mod_id =~ $number_regex ]] ; then
+#      echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
+#   fi
+#   # Create the string that would represent this mod in the workshop template file
+#   workshop_template_section="
+#            <tr data-type='ModContainer'>
+#               <td data-type='DisplayName'>$mod_name</td>
+#               <td>
+#                  <span class='from-steam'>Steam</span>
+#               </td>
+#               <td>
+#                  <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
+#               </td>
+#            </tr>"
+#
+#   if [ -d "$mod_install_dir/$mod_id" ]; then
+#      # If the install directory for this mod exists, then it's been successfully downloaded
+#      # in the past so we just need to validate it
+#      validate_mod_ids+=($mod_id)
+#   else
+#      # If it doesn't exist, it needs to be downloaded
+#      download_mod_ids+=($mod_id)
+#   fi
+#   # Check if it's a server-only mod
+#   if [ $mod_type -eq 0 ]; then
+#      # Add it to the list of server mods
+#      server_mod_ids+=($mod_id)
+#   # Check if it's a client required mod
+#   elif [ $mod_type -eq 1 ]; then
+#      # Add it to the list of client-required mods
+#      client_required_mod_ids+=($mod_id)
+#      # Add the HTML to the workshop template required file
+#      workshop_template_required+="$workshop_template_section"
+#      workshop_template_all+="$workshop_template_section"
+#   elif [ $mod_type -eq 2 ]; then
+#      # Optional client mods are not downloaded, just tracked for whitelisting
+#      client_optional_mod_ids+=($mod_id)
+#      # Add the HTML to the workshop template required file
+#      workshop_template_optional+="$workshop_template_section"
+#      workshop_template_all+="$workshop_template_section"
+#   else
+#      # The mod type was unrecognized
+#      echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
+#   fi
+#done < "$script_dir/mods.txt"
 
 # Append the workshop template suffix
 workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
