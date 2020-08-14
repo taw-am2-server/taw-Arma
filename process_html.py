@@ -45,5 +45,5 @@ if __name__ =="__main__":
     print(args)
     # _modlistFileName = sys.argv [1]
 
-    modlist = loadMods(args["fileList"], args["--names"])
+    modlist = loadMods(args.fileList, args.names)
 
