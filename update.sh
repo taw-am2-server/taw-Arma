@@ -39,10 +39,9 @@ web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 # The .htpasswd file with credentials for accessing the server control panel
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
-repo_profiles_dir="$script_dir/profiles"
 arma_profiles_dir="$home_dir/arma-profiles"
 # Userconfig directories
-repo_userconfig_dir="$script_dir/userconfig"
+repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
 # How many times to try downloading a mod before erroring out (multiple attempts required for large mods due to timeouts)
 mod_download_attempts=6
@@ -104,10 +103,10 @@ get_steam_creds () {
    else
       printf "$steam_username\n$steam_password" > $steam_creds_file
       #run steamcmd once interactively to allow the user to ender steamguard code
-      printf  "\n\n\\n\n\n=============================================================================================
-      Logging in to steam interactively in order to set steamguard code if required.
-      Type 'exit' when complete or you see the 'steam>' prompt
-      ===========================================================================================================\n\n\n"
+      printf  "\e[36m\n\n\\n\n\n=============================================================================================
+Logging in to steam interactively in order to set steamguard code if required.
+Type 'exit' when complete or you see the 'steam>' prompt
+===========================================================================================================\n\n\n\e[39m"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
 }
@@ -223,7 +222,7 @@ for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
 done
 
 # Copy the web panel config file
-cp "$script_dir/config.json" "$web_panel_config_file"
+sed -e "s#\${prefix}#$server_prefix#" "$config_dir/config.js" > "$web_panel_config_file"
 
 # Call the function for loading Steam credentials
 load_steam_creds
@@ -378,3 +377,6 @@ for mod_id in "${key_mods[@]}"; do
       ln -sf "${found_keys[0]}" "$output_file"
    fi
 done
+
+sudo systemctl restart arma3-web-console
+

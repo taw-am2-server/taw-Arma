@@ -4,6 +4,7 @@
 steam_home="/home/steam"
 repo_url="https://github.com/Tirpitz93/TAW-Arma"
 repo_dir="$steam_home/TAW-Arma"
+cofnig_dir="$steam_home/config"
 #get the user (the user that called sudo)
 
 # exit when any command fails
@@ -18,7 +19,7 @@ echo "For which battalion would you like to set up this server?
 2] AM2"
 
 read -p "Please enter 1 for AM1 or 2 for AM2 " -n 1 batt
-# remove config directory
+
 
 if [ "$batt" == '1' ]
  then
@@ -36,6 +37,7 @@ else
   exit 1
 fi
 
+#install a couple of things to make the rest easier
 apt update
 apt install software-properties-common psmisc git install-info -y
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
@@ -105,13 +107,13 @@ else
     sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
 
-if [ -d "$repo_dir/../config" ]
+if [ -d "$config_dir" ]
 then
-  rm -r "$repo_dir/../config"
+  rm -r "$config_dir"
 fi
-sudo -u steam git clone $config_repo_url "$repo_dir/../config"
+sudo -u steam git clone $config_repo_url "$config_dir"
 pushd "$repo_dir"
-source ../config/config.sh
+source "$config_dir/config.sh"
 
 # Install the service file for the web console (replacing template fields as we go)
 sed -e "s#\${repo_dir}#$repo_dir#"  "$repo_dir/arma3-web-console.service" >/etc/systemd/system/arma3-web-console.service
@@ -127,6 +129,8 @@ rm -fr /etc/nginx/sites-enabled/*
 #install nginx config with template substitution
 sed -e "s#\${domain}#$domain#" "$repo_dir/nginx.conf" >/etc/nginx/sites-enabled/arma.conf
 
+sed -e "s#\${domain}#$domain#" "$repo_dir/nginx.conf" >/etc/nginx/sites-enabled/arma.conf
+
 # Set the config file owner to root
 chown -h root:root /etc/nginx/sites-enabled/arma.conf
 # Ensure the nginx config file is valid
@@ -138,6 +142,12 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 # Install dependencies for the web console
 cd "$repo_dir/arma-server-web-admin"
 sudo -u steam npm install
+
+
+#allow steam user to estart the web panel without a password
+echo 'steam  ALL=NOPASSWD: /bin/systemctl start arma3-web-console' >> /etc/sudoers
+echo 'steam  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console' >> /etc/sudoers
+
 
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u steam "$repo_dir/update.sh" -swv
