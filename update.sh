@@ -377,6 +377,6 @@ for mod_id in "${key_mods[@]}"; do
       ln -sf "${found_keys[0]}" "$output_file"
    fi
 done
-
+#uses sudo but shouldnt require a password if install worked correctly
 sudo systemctl restart arma3-web-console
 
