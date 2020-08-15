@@ -156,12 +156,8 @@ sudo -u steam "$repo_dir/update.sh" -swv
 
 ##install cron job to update at 4 am every day
 #write out current crontab
-sudo -u steam crontab -l > mycron
-#echo new cron into cron file
-sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" >>mycron
-#install new cron file
-sudo -u steam crontab mycron
-rm mycron
+sudo -u steam EDITOR=cat crontab -e > old_crontab; cat old_crontab sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" | crontab -
+
 
 # Enable and start the web console service
 systemctl enable arma3-web-console
