@@ -4,7 +4,7 @@
 steam_home="/home/steam"
 repo_url="https://github.com/Tirpitz93/TAW-Arma"
 repo_dir="$steam_home/TAW-Arma"
-cofnig_dir="$steam_home/config"
+config_dir="$steam_home/config"
 #get the user (the user that called sudo)
 
 # exit when any command fails
