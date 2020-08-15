@@ -109,7 +109,7 @@ else
 fi
 pushd "$repo_dir/../config"
 
-sudo -u steam git clone $config_repo_url
+sudo -u steam git clone $config_repo_url .
 popd
 pushd "$repo_dir"
 source ../config/config.sh
