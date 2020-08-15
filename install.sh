@@ -65,6 +65,7 @@ elif lsb_release -i | grep -q 'Ubuntu'; then
 fi
 #accept the steamcmd EULA
 echo steam steam/question select "I AGREE" | sudo debconf-set-selections
+echo steam steam/license note '' | sudo debconf-set-selections
 dpkg --add-architecture i386
 apt update -y
 apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx ufw python3-certbot-nginx unzip python3-pip jq -y
