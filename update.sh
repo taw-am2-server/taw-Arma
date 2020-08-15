@@ -1,10 +1,12 @@
 #!/bin/bash
-#todo: reorganize to use html modlist:
-#todo: move exisitng symlinks to `old mod` directory,
-#todo: download mods
-#todo: create new symlinks in mod direcctor
+#done: reorganize to use html modlist:
+#removed: move exisitng symlinks to `old mod` directory,
+#done: download mods
+#done: create new symlinks in mod direcctory
 #todo: add --purge -p option to clean up old mods not in current html modlists
 #todo: if executatble in config directory install this over the standard one
+#todo: refactor processing key files
+#todo: update userconfig from config repo
 #done: add template to systemctl unit file
 
 #navigate to config directory update the config and return.
@@ -231,6 +233,10 @@ load_web_panel_creds
 
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
+# Create a command that downloads/updates ARMA 3
+arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
+run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
+
 
 #process html files
 for modlist in $config_dir/*.html; do
@@ -255,10 +261,8 @@ for modlist in $config_dir/*.html; do
     popd
     echo "done creating symlink for $name"
 done
-exit 1
-# Create a command that downloads/updates ARMA 3
-arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
-run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
+
+
 if [ $? != 0 ]; then
    exit 1
 fi
@@ -272,121 +276,85 @@ cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 # Remove the readme file in the mpmisisons folder (so it doesn't show up on the web console)
 rm -f "$arma_dir/mpmissions/readme.txt"
 
-# Create the base command for downloading a mod
-mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
-
-# This section compiles a single command for validating all existing mods
-# Since they're already existing, updates should be small and can be completed
-# in one attempt without timing out.
-# Only run this section if there are any mods to validate
-if [ ${#validate_mod_ids[@]} -gt 0 ]; then
-   mod_validate_cmd="$mod_download_base_cmd"
-   # Add a command to download each mod in this array
-   for mod_id in "${validate_mod_ids[@]}"; do
-      mod_validate_cmd="$mod_validate_cmd +workshop_download_item 107410 $mod_id $force_validate"
-   done
-   # Run the command
-   mod_validate_cmd="$mod_validate_cmd +quit"
-   run_steam_cmd "$mod_validate_cmd" 1 "validating existing mods"
-   if [ $? != 0 ]; then
-      exit 1
-   fi
-fi
-
-# This section downloads new mods by attempting each one separately, and attempting it multiple times
-# so that it re-tries after timeouts to continue the download.
-# Only run this section if there are any mods to download
-if [ ${#download_mod_ids[@]} -gt 0 ]; then
-   # Download each mod
-   for mod_id in "${download_mod_ids[@]}"; do
-      # Prepare the command for doing the download
-      mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
-      # Call the function that runs the command
-      run_steam_cmd "$mod_cmd" $mod_download_attempts "downloading mod $mod_id"
-      if [ $? != 0 ]; then
-         exit 1
-      fi
-   done
-fi
-
-# This section is for re-packaging the server-only workshop mods into a single
-# mod folder. The server config then points to this folder to load server-side mods.
-server_mods_dir="$arma_dir/server_mods"
-# This is the directory where the PBOs are linked to
-server_addons_dir="$server_mods_dir/@taw_am1_server/addons"
-# Remove the entire server_mods directory to ensure it's clean
-rm -rf $server_mods_dir
-# Re-create the directory structure
-mkdir -p $server_addons_dir
-# Loop through each server-only mod
-for mod_id in "${server_mod_ids[@]}"; do
-   # This is the directory where the mod was downloaded
-   mod_dir="$mod_install_dir/$mod_id"
-   # Find all "addon" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-   # If no "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -eq 0 ]; then
-      echo "Server mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-   fi
-   # If multiple "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Server mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-   fi
-   # The directory where the mod PBOs were downloaded to
-   addon_dir=${found_dirs[0]}
-   # Loop through all files that are in the mod's addons dir
-   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-      # The link filename, in lowercase
-      output_file="$server_addons_dir/${f,,}"
-      # Create any sub-directories for the file
-      mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$addon_dir/$f" "$output_file"
-   done
-done
-
-# This section is for re-packaging the client-and-server workshop mods into a single
-# mod folder. The web control panel can then select this merged pack.
-client_mods_dir="$arma_dir/@taw_am1_client"
-# This is the directory where the PBOs are linked to
-client_addons_dir="$client_mods_dir/addons"
-# This is the directory where the keys are linked to
-client_keys_dir="$arma_dir/keys"
-# Remove the entire client mods directory to ensure it's clean
-rm -rf $client_mods_dir
-# Re-create the directory structure
-mkdir -p $client_addons_dir
-# Delete all existing symlinked keys in the Arma keys directory
-find "$client_keys_dir" -type l -delete
-
-# Loop through each client-required mod to link the mod files
-for mod_id in "${client_required_mod_ids[@]}"; do
-   # This is the directory where the mod was downloaded
-   mod_dir="$mod_install_dir/$mod_id"
-
-   # Find all "addon" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-   # If no "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -eq 0 ]; then
-      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-   fi
-   # If multiple "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-   fi
-   # The directory where the mod PBOs were downloaded to
-   addon_dir=${found_dirs[0]}
-
-   # Loop through all files that are in the mod's addons dir
-   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-      # The link filename, in lowercase
-      output_file="$client_addons_dir/${f,,}"
-      # Create any sub-directories for the file
-      mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$addon_dir/$f" "$output_file"
-   done
-done
+#
+## This section is for re-packaging the server-only workshop mods into a single
+## mod folder. The server config then points to this folder to load server-side mods.
+#server_mods_dir="$arma_dir/server_mods"
+## This is the directory where the PBOs are linked to
+#server_addons_dir="$server_mods_dir/@taw_am1_server/addons"
+## Remove the entire server_mods directory to ensure it's clean
+#rm -rf $server_mods_dir
+## Re-create the directory structure
+#mkdir -p $server_addons_dir
+## Loop through each server-only mod
+#for mod_id in "${server_mod_ids[@]}"; do
+#   # This is the directory where the mod was downloaded
+#   mod_dir="$mod_install_dir/$mod_id"
+#   # Find all "addon" directories within the download directory
+#   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
+#   # If no "addon" directories were found, that's an error
+#   if [ ${#found_dirs[@]} -eq 0 ]; then
+#      echo "Server mod with ID $mod_id has no 'addons' directory" >&2; exit 1
+#   fi
+#   # If multiple "addon" directories were found, that's an error
+#   if [ ${#found_dirs[@]} -gt 1 ]; then
+#      echo "Server mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
+#   fi
+#   # The directory where the mod PBOs were downloaded to
+#   addon_dir=${found_dirs[0]}
+#   # Loop through all files that are in the mod's addons dir
+#   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
+#      # The link filename, in lowercase
+#      output_file="$server_addons_dir/${f,,}"
+#      # Create any sub-directories for the file
+#      mkdir -p "$(dirname "$output_file")"
+#      # Symlink the file
+#      ln -s "$addon_dir/$f" "$output_file"
+#   done
+#done
+#
+## This section is for re-packaging the client-and-server workshop mods into a single
+## mod folder. The web control panel can then select this merged pack.
+#client_mods_dir="$arma_dir/@taw_am1_client"
+## This is the directory where the PBOs are linked to
+#client_addons_dir="$client_mods_dir/addons"
+## This is the directory where the keys are linked to
+#client_keys_dir="$arma_dir/keys"
+## Remove the entire client mods directory to ensure it's clean
+#rm -rf $client_mods_dir
+## Re-create the directory structure
+#mkdir -p $client_addons_dir
+## Delete all existing symlinked keys in the Arma keys directory
+#find "$client_keys_dir" -type l -delete
+#
+## Loop through each client-required mod to link the mod files
+#for mod_id in "${client_required_mod_ids[@]}"; do
+#   # This is the directory where the mod was downloaded
+#   mod_dir="$mod_install_dir/$mod_id"
+#
+#   # Find all "addon" directories within the download directory
+#   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
+#   # If no "addon" directories were found, that's an error
+#   if [ ${#found_dirs[@]} -eq 0 ]; then
+#      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
+#   fi
+#   # If multiple "addon" directories were found, that's an error
+#   if [ ${#found_dirs[@]} -gt 1 ]; then
+#      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
+#   fi
+#   # The directory where the mod PBOs were downloaded to
+#   addon_dir=${found_dirs[0]}
+#
+#   # Loop through all files that are in the mod's addons dir
+#   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
+#      # The link filename, in lowercase
+#      output_file="$client_addons_dir/${f,,}"
+#      # Create any sub-directories for the file
+#      mkdir -p "$(dirname "$output_file")"
+#      # Symlink the file
+#      ln -s "$addon_dir/$f" "$output_file"
+#   done
+#done
 
 # All mods that should have their bikeys copied to the Arma key directory
 key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
