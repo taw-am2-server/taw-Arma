@@ -5,7 +5,7 @@ steam_home="/home/steam"
 repo_url="https://github.com/Tirpitz93/TAW-Arma"
 repo_dir="$steam_home/TAW-Arma"
 #get the user (the user that called sudo)
-user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
+
 # exit when any command fails
 set -e
 
@@ -40,7 +40,8 @@ else
 fi
 
 apt update
-apt install software-properties-common psmisc  -y
+apt install software-properties-common psmisc git -y
+user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse
 echo "user name is $user_name"
 if lsb_release -i | grep -q 'Debian'
