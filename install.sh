@@ -74,11 +74,16 @@ id -u steam &>/dev/null || useradd -m steam
 #install python libraries
 pip3 install bs4
 # Copy the ubuntu user's authorized keys over to the Steam user
+# but only if it exists
+
 mkdir -p "$steam_home/.ssh"
-cp "/home/$user_name/.ssh/authorized_keys" "$steam_home/.ssh/"
-chown -R steam:steam "$steam_home/.ssh"
-chmod 755 "$steam_home/.ssh"
-chmod 644 "$steam_home/.ssh/authorized_keys"
+if  [ -f "/home/$user_name/.ssh/authorized_keys" ]
+then
+  cp "/home/$user_name/.ssh/authorized_keys" "$steam_home/.ssh/"
+  chown -R steam:steam "$steam_home/.ssh"
+  chmod 755 "$steam_home/.ssh"
+  chmod 644 "$steam_home/.ssh/authorized_keys"
+fi
 
 # Open necessary firewall ports
 ufw allow 80/tcp # HTTP
