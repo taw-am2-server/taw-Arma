@@ -112,6 +112,7 @@ then
   rm -r "$config_dir"
   mkdir "$config_dir"
 fi
+shown steam:steam $config_dir -r
 sudo -u steam git clone $config_repo_url $config_dir
 pushd "$repo_dir"
 source "$config_dir/config.sh"
