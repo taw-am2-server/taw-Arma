@@ -7,8 +7,7 @@ After=network.target
 Type=simple
 WorkingDirectory=${repo_dir}
 ExecStartPre=git pull --recurse-submodules
-ExecStart=/bin/bash ./run.sh
-Restart=on-failure
+ExecStart=npm start
 
 LimitNOFILE=infinity
 LimitCORE=infinity
