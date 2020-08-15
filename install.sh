@@ -32,7 +32,7 @@ if [ "$batt" == '1' ]
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 Config"
-      repo_url="https://github.com/Tirpitz93/AM2_config"
+      config_repo_url="https://github.com/Tirpitz93/AM2_config"
 
 else
   echo "invalid selection"
@@ -107,9 +107,10 @@ else
     sudo -u steam git -C "$repo_dir" reset --hard origin/master
     sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
-pushd "$repo_dir"
+pushd "$repo_dir/../config"
 
-sudo -u steam git clone $repo_url "$repo_dir/../config"
+sudo -u steam git clone $config_repo_url
+popd
 source ../config/config.sh
 
 # Install the service file for the web console (replacing template fields as we go)
