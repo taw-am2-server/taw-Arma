@@ -19,10 +19,7 @@ echo "For which battalion would you like to set up this server?
 
 read -p "Please enter 1 for AM1 or 2 for AM2 " -n 1 batt
 # remove config directory
-if [ -d "../config" ]
-then
-  rm -r ../config
-fi
+
 if [ "$batt" == '1' ]
  then
   echo "Loading AM1 config"
@@ -107,10 +104,10 @@ else
     sudo -u steam git -C "$repo_dir" reset --hard origin/master
     sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
-pushd "$repo_dir/../config"
-
-sudo -u steam git clone $config_repo_url .
-popd
+if [ -d "$repo_dir/../config" ]
+then
+fi
+sudo -u steam git clone $config_repo_url "$repo_dir/../config"
 pushd "$repo_dir"
 source ../config/config.sh
 
