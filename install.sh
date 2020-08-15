@@ -149,18 +149,17 @@ sudo -u steam npm install
 #allow steam user to estart the web panel without a password
 echo 'steam  ALL=NOPASSWD: /bin/systemctl start arma3-web-console' >> /etc/sudoers
 echo 'steam  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console' >> /etc/sudoers
+##install cron job to update at 4 am every day
+#write out current crontab
+
+sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" > /etc/cron.d/arma3_cron
+
 
 
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u steam "$repo_dir/update.sh" -swv
 
 
-##install cron job to update at 4 am every day
-#write out current crontab
-sudo -u steam EDITOR=cat crontab -e > old_crontab
-sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" >> old_crontab
-cat old_crontab  | sudo -u steam crontab -
-rm old_crontab
 
 # Enable and start the web console service
 systemctl enable arma3-web-console

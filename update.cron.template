@@ -1,1 +1,2 @@
-"00 04 * * cd ${repo_dir} && ./update.sh"
+#run the update script every 4 hours to ensure mods are usually up to date.
+00 04 * * steam cd ${repo_dir} && ./update.sh
