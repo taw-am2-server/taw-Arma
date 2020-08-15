@@ -40,7 +40,7 @@ else
 fi
 
 apt update
-apt install software-properties-common psmisc git -y
+apt install software-properties-common psmisc git-all -y
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
 #add-apt-repository multiverse
 echo "user name is $user_name"
