@@ -104,8 +104,10 @@ else
     sudo -u steam git -C "$repo_dir" reset --hard origin/master
     sudo -u steam git -C "$repo_dir" pull --recurse-submodules origin master
 fi
+
 if [ -d "$repo_dir/../config" ]
 then
+  rm -r "$repo_dir/../config"
 fi
 sudo -u steam git clone $config_repo_url "$repo_dir/../config"
 pushd "$repo_dir"
