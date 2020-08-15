@@ -63,8 +63,8 @@ elif lsb_release -i | grep -q 'Ubuntu'; then
     echo "deb http://archive.ubuntu.com/ubuntu xenial-security main universe multiverse" >> /etc/apt/sources.list
   fi
 fi
-
-
+#accept the steamcmd EULA
+echo steam steam/question select "I AGREE" | sudo debconf-set-selections
 dpkg --add-architecture i386
 apt update -y
 apt install lib32gcc1 net-tools dos2unix steamcmd npm apache2-utils nginx ufw python3-certbot-nginx unzip python3-pip jq -y
@@ -157,8 +157,10 @@ sudo -u steam "$repo_dir/update.sh" -swv
 
 ##install cron job to update at 4 am every day
 #write out current crontab
-sudo -u steam EDITOR=cat crontab -e > old_crontab; cat old_crontab sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" | crontab -
-
+sudo -u steam EDITOR=cat crontab -e > old_crontab
+sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" >> old_crontab
+cat old_crontab  | sudo -u steam crontab -
+rm old_crontab
 
 # Enable and start the web console service
 systemctl enable arma3-web-console
