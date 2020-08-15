@@ -18,7 +18,7 @@ echo "For which battalion would you like to set up this server?
 2] AM2"
 
 read -p "Please enter 1 for AM1 or 2 for AM2 " -n 1 batt
-#remove config directory
+# remove config directory
 if [ -d "../config" ]
 then
   rm -r ../config
