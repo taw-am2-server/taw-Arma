@@ -40,7 +40,7 @@ else
 fi
 
 apt update
-apt install software-properties-common -y
+apt install software-properties-common psmisc  -y
 #add-apt-repository multiverse
 echo "user name is $user_name"
 if lsb_release -i | grep -q 'Debian'
