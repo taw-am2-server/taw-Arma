@@ -39,7 +39,8 @@ else
   exit 1
 fi
 
-
+apt update
+apt install software-properties-common -y
 #add-apt-repository multiverse
 echo "user name is $user_name"
 if lsb_release -i | grep -q 'Debian'

@@ -246,12 +246,14 @@ for modlist in $config_dir/*.html; do
     [[ -d "$modlist_dir" ]] && rm -r "$modlist_dir"
     mkdir "$modlist_dir"
     pushd "$modlist_dir"
-    #create symlinks in the <arma_dir>/@<modlistname>/<modName> and <arma_dir>/@<modName>
+    echo "creating symlinks in the '<arma_dir>/@<modlistname>/<modName>' and '<arma_dir>/@<modName>'"
+
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
     pushd "$arma_dir"
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
     popd
     popd
+    echo "done creating symlink for $name"
 done
 exit 1
 # Create a command that downloads/updates ARMA 3
