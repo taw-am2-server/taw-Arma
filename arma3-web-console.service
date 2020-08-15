@@ -5,7 +5,7 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=${repo_dir}
+WorkingDirectory=${repo_dir}/arma-server-web-admin/
 ExecStartPre=git pull --recurse-submodules
 ExecStart=npm start
 
