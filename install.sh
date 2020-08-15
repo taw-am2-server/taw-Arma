@@ -111,6 +111,7 @@ pushd "$repo_dir/../config"
 
 sudo -u steam git clone $config_repo_url
 popd
+pushd "$repo_dir"
 source ../config/config.sh
 
 # Install the service file for the web console (replacing template fields as we go)
