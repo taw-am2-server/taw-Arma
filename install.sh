@@ -110,7 +110,7 @@ fi
 if [ -d "$config_dir" ]
 then
   rm -r "$config_dir"
-  mkdir "$config_dir"
+  sudo -u steam  mkdir "$config_dir"
 fi
 chown steam:steam "$config_dir" -R
 sudo -u steam git clone $config_repo_url $config_dir
