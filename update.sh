@@ -59,6 +59,7 @@ force_validate=""
 pushd "$config_dir"
 git fetch --all
 git reset --hard origin/master
+git pull
 popd
 
 # Read switches from the command line
@@ -106,7 +107,7 @@ get_steam_creds () {
       printf  "\e[36m\n\n\\n\n\n=============================================================================================
 Logging in to steam interactively in order to set steamguard code if required.
 Type 'exit' when complete or you see the 'steam>' prompt
-===========================================================================================================\n\n\n\e[39m"
+===========================================================================================================\n\n\n\e[0m"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
 }
@@ -165,9 +166,7 @@ load_web_panel_creds () {
 run_steam_cmd() { # run_steam_cmd command attempts
    # Don't exit on errors
    set +e
-   echo $1
-   echo $2
-   echo $3
+
 
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
    for (( i=0; i<2; i++ )); do
@@ -176,9 +175,11 @@ run_steam_cmd() { # run_steam_cmd command attempts
       else
          echo "Retrying steamcmd for $3"
       fi
+      printf "\e[2m"
       result=`$1 2>&1 | tee /dev/tty`
       # Track the exit code
       code=$?
+      printf "\n\n\e[0m"
       # Break the loop if the command was successful
       if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
          echo "Steamcmd for $3 was successful!"
@@ -254,13 +255,33 @@ for modlist in $config_dir/*.html; do
     echo "creating symlinks in the '<arma_dir>/@<modlistname>/<modName>' and '<arma_dir>/@<modName>'"
 
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
+    popd
     pushd "$arma_dir"
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
-    popd
     popd
 
     echo "done creating symlink for $name"
     pushd "$mod_install_dir"
+
+    if [[ $modlist == *"server"* ]]
+    then
+      #combine server mods
+      printf "\e[35mCreating server modlist\e[0m\n"
+      server_modlist_dir="${arma_dir:?}/@${name:?}"
+      if [[ ! -d "$server_modlist_dir" ]]
+      then
+        mkdir "$server_modlist_dir"
+      fi
+
+      pushd "$server_modlist_dir"
+      if [[ ! -d "addons" ]]
+      then
+        mkdir "addons"
+      fi
+      find -L "$mod_install_dir" -name '*.pbo'  -exec cp -s -f '{}' "$server_modlist_dir/addons/" \;
+      find -L "$mod_install_dir" -name '*.bisign'  -exec cp -s -f '{}' "$server_modlist_dir/addons/" \;
+
+    fi
 done
 
 
@@ -387,4 +408,3 @@ find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' "$arma_dir/keys/" \;
 
 #uses sudo but shouldnt require a password if install worked correctly
 sudo systemctl restart arma3-web-console
-

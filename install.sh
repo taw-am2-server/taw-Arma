@@ -158,10 +158,6 @@ echo 'steam  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console' >> /etc/sud
 sudo -u steam "$repo_dir/update.sh" -swv
 sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" > /etc/cron.d/arma3_cron
 
-
-
-
-
 # Enable and start the web console service
 systemctl enable arma3-web-console
 systemctl restart arma3-web-console
