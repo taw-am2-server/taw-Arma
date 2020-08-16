@@ -2,7 +2,7 @@
 
 #set some basic common variables
 steam_home="/home/steam"
-repo_url="https://github.com/Tirpitz93/TAW-Arma"
+repo_url="$URL"
 repo_dir="$steam_home/TAW-Arma"
 config_dir="$steam_home/config"
 #get the user (the user that called sudo)
