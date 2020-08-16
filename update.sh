@@ -278,8 +278,8 @@ for modlist in $config_dir/*.html; do
       then
         mkdir "addons"
       fi
-      find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
-      find -L "$mod_install_dir" -name '*.bisign*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
+      find -L "$mod_install_dir" -name '*.pbo'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
+      find -L "$mod_install_dir" -name '*.bisign'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
       printf  "\e[0m"
     fi
 done
@@ -408,4 +408,3 @@ find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' "$arma_dir/keys/" \;
 
 #uses sudo but shouldnt require a password if install worked correctly
 sudo systemctl restart arma3-web-console
-
