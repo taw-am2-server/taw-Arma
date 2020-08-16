@@ -254,13 +254,24 @@ for modlist in $config_dir/*.html; do
     echo "creating symlinks in the '<arma_dir>/@<modlistname>/<modName>' and '<arma_dir>/@<modName>'"
 
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
+    popd
     pushd "$arma_dir"
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
-    popd
     popd
 
     echo "done creating symlink for $name"
     pushd "$mod_install_dir"
+
+    if [[ $string == *"server"* ]]
+    then
+      #combine server mods
+      server_modlist_dir="${arma_dir:?}/@${name:?}"
+      mkdir "$server_modlist_dir"
+      pushd "$server_modlist_dir"
+      find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$arma_dir/addons/" \;
+      find -L "$mod_install_dir" -name '*.bisign*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
+
+    fi
 done
 
 
