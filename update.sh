@@ -265,6 +265,7 @@ for modlist in $config_dir/*.html; do
     if [[ $string == *"server"* ]]
     then
       #combine server mods
+      echo "\e[35mCreating server modlist"
       server_modlist_dir="${arma_dir:?}/@${name:?}"
       mkdir "$server_modlist_dir"
       pushd "$server_modlist_dir"
