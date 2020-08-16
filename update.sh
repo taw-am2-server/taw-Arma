@@ -359,7 +359,7 @@ rm -f "$arma_dir/mpmissions/readme.txt"
 
 
 # All mods that should have their bikeys copied to the Arma key directory
-key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
+#key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
 # Loop over them to link their bikey files
 
 
