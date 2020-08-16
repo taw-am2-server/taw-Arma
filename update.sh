@@ -383,7 +383,8 @@ rm -f "$arma_dir/mpmissions/readme.txt"
 #   fi
 #done
 
-find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' ./keys/ \;
+find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' "$arma_dir/keys/" \;
+
 #uses sudo but shouldnt require a password if install worked correctly
 sudo systemctl restart arma3-web-console
 
