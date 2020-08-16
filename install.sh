@@ -5,6 +5,9 @@ steam_home="/home/steam"
 repo_url="https://github.com/$REPO/"
 
 echo "$repo_url"
+
+exit 1
+
 repo_dir="$steam_home/TAW-Arma"
 config_dir="$steam_home/config"
 #get the user (the user that called sudo)
