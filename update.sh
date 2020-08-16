@@ -266,7 +266,7 @@ for modlist in $config_dir/*.html; do
     if [[ $modlist == *"server"* ]]
     then
       #combine server mods
-      printf "\e[35mCreating server modlist\e[0m"
+      printf "\e[35mCreating server modlist\e[0m\n"
       server_modlist_dir="${arma_dir:?}/@${name:?}"
       if [[ ! -d "$server_modlist_dir" ]]
       then
