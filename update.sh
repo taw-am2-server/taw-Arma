@@ -266,11 +266,18 @@ for modlist in $config_dir/*.html; do
     if [[ $modlist == *"server"* ]]
     then
       #combine server mods
-      echo "\e[35mCreating server modlist"
+      printf "\e[35mCreating server modlist"
       server_modlist_dir="${arma_dir:?}/@${name:?}"
-      mkdir "$server_modlist_dir"
+      if [[ ! -d "$server_modlist_dir" ]]
+      then
+        mkdir "$server_modlist_dir"
+      fi
+
       pushd "$server_modlist_dir"
-      mkdir "addons"
+      if [[ ! -d "addons" ]]
+      then
+        mkdir "addons"
+      fi
       find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
       find -L "$mod_install_dir" -name '*.bisign*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
 
