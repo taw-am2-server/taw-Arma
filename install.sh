@@ -1,6 +1,18 @@
 #!/bin/bash
 
-# Exit when any command fails
+
+#set some basic common variables
+steam_home="/home/steam"
+source repo.sh
+repo_url="https://github.com/$REPO/"
+
+echo "$REPO"
+
+repo_dir="$steam_home/TAW-Arma"
+config_dir="$steam_home/config"
+#get the user (the user that called sudo)
+
+# exit when any command fails
 set -e
 
 if [[ ! "$EUID" = 0 ]]; then
