@@ -59,6 +59,7 @@ force_validate=""
 pushd "$config_dir"
 git fetch --all
 git reset --hard origin/master
+git pull
 popd
 
 # Read switches from the command line
