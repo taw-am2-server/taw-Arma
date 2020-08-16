@@ -270,7 +270,8 @@ for modlist in $config_dir/*.html; do
       server_modlist_dir="${arma_dir:?}/@${name:?}"
       mkdir "$server_modlist_dir"
       pushd "$server_modlist_dir"
-      find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$arma_dir/addons/" \;
+      mkdir "addons"
+      find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
       find -L "$mod_install_dir" -name '*.bisign*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
 
     fi
