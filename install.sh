@@ -3,11 +3,9 @@
 
 #set some basic common variables
 steam_home="/home/steam"
-repo_url="https://github.com/""$REPO""/"
+repo_url="https://github.com/$REPO/"
 
 echo "$REPO"
-
-exit 1
 
 repo_dir="$steam_home/TAW-Arma"
 config_dir="$steam_home/config"
