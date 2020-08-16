@@ -265,7 +265,7 @@ if ls "$config_dir/*.html" 1> /dev/null 2>&1; then
 
   for modlist in $config_dir/*.html; do
 
-    #old naive D/L logic
+    #old naive D/L logic for HTML files
 #      #build steamcmd command
 #      modcmd="'$base_steam_cmd +force_install_dir $workshop_dir +workshop_download_item 107410 {mod} validate +exit'"
 #      #load mod ids from html file
@@ -467,75 +467,75 @@ done
 
 
 
-#
-## This section is for re-packaging the client-and-server workshop mods into a single
-## mod folder. The web control panel can then select this merged pack.
-#client_mods_dir="$arma_dir/@taw_am1_client"
-## This is the directory where the PBOs are linked to
-#client_addons_dir="$client_mods_dir/addons"
-## This is the directory where the keys are linked to
-#client_keys_dir="$arma_dir/keys"
-## Remove the entire client mods directory to ensure it's clean
-#rm -rf $client_mods_dir
-## Re-create the directory structure
-#mkdir -p $client_addons_dir
-## Delete all existing symlinked keys in the Arma keys directory
-#find "$client_keys_dir" -type l -delete
-#
-## Loop through each client-required mod to link the mod files
-#for mod_id in "${client_required_mod_ids[@]}"; do
-#   # This is the directory where the mod was downloaded
-#   mod_dir="$mod_install_dir/$mod_id"
-#
-#   # Find all "addon" directories within the download directory
-#   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-#   # If no "addon" directories were found, that's an error
-#   if [ ${#found_dirs[@]} -eq 0 ]; then
-#      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-#   fi
-#   # If multiple "addon" directories were found, that's an error
-#   if [ ${#found_dirs[@]} -gt 1 ]; then
-#      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-#   fi
-#   # The directory where the mod PBOs were downloaded to
-#   addon_dir=${found_dirs[0]}
-#
-#   # Loop through all files that are in the mod's addons dir
-#   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-#      # The link filename, in lowercase
-#      output_file="$client_addons_dir/${f,,}"
-#      # Create any sub-directories for the file
-#      mkdir -p "$(dirname "$output_file")"
-#      # Symlink the file
-#      ln -s "$addon_dir/$f" "$output_file"
-#   done
-#done
+
+# This section is for re-packaging the client-and-server workshop mods into a single
+# mod folder. The web control panel can then select this merged pack.
+client_mods_dir="$arma_dir/@taw_am1_client"
+# This is the directory where the PBOs are linked to
+client_addons_dir="$client_mods_dir/addons"
+# This is the directory where the keys are linked to
+client_keys_dir="$arma_dir/keys"
+# Remove the entire client mods directory to ensure it's clean
+rm -rf $client_mods_dir
+# Re-create the directory structure
+mkdir -p $client_addons_dir
+# Delete all existing symlinked keys in the Arma keys directory
+find "$client_keys_dir" -type l -delete
+
+# Loop through each client-required mod to link the mod files
+for mod_id in "${client_required_mod_ids[@]}"; do
+   # This is the directory where the mod was downloaded
+   mod_dir="$mod_install_dir/$mod_id"
+
+   # Find all "addon" directories within the download directory
+   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
+   # If no "addon" directories were found, that's an error
+   if [ ${#found_dirs[@]} -eq 0 ]; then
+      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
+   fi
+   # If multiple "addon" directories were found, that's an error
+   if [ ${#found_dirs[@]} -gt 1 ]; then
+      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
+   fi
+   # The directory where the mod PBOs were downloaded to
+   addon_dir=${found_dirs[0]}
+
+   # Loop through all files that are in the mod's addons dir
+   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
+      # The link filename, in lowercase
+      output_file="$client_addons_dir/${f,,}"
+      # Create any sub-directories for the file
+      mkdir -p "$(dirname "$output_file")"
+      # Symlink the file
+      ln -s "$addon_dir/$f" "$output_file"
+   done
+done
 
 
 # All mods that should have their bikeys copied to the Arma key directory
-#key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
+key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
 # Loop over them to link their bikey files
 
 
-#for mod_id in "${key_mods[@]}"; do
-#   # This is the directory where the mod was downloaded
-#   mod_dir="$mod_install_dir/$mod_id"
-#
-#   # Find all "bikey" files within the download directory
-#   readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
-#   # If multiple "keys" directories were found, that's an error
-#   if [ ${#found_keys[@]} -gt 1 ]; then
-#      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
-#   fi
-#   if [ ${#found_keys[@]} -gt 0 ]; then
-#      # The filename without the path
-#      key_basename=$(basename "${found_keys[0]}")
-#      # The link filename, in lowercase
-#      output_file="$client_keys_dir/${key_basename,,}"
-#      # Symlink the file (overwriting existing links/files of the same name)
-#      ln -sf "${found_keys[0]}" "$output_file"
-#   fi
-#done
+for mod_id in "${key_mods[@]}"; do
+   # This is the directory where the mod was downloaded
+   mod_dir="$mod_install_dir/$mod_id"
+
+   # Find all "bikey" files within the download directory
+   readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
+   # If multiple "keys" directories were found, that's an error
+   if [ ${#found_keys[@]} -gt 1 ]; then
+      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
+   fi
+   if [ ${#found_keys[@]} -gt 0 ]; then
+      # The filename without the path
+      key_basename=$(basename "${found_keys[0]}")
+      # The link filename, in lowercase
+      output_file="$client_keys_dir/${key_basename,,}"
+      # Symlink the file (overwriting existing links/files of the same name)
+      ln -sf "${found_keys[0]}" "$output_file"
+   fi
+done
 
 find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' "$arma_dir/keys/" \;
 
