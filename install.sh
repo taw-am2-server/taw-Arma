@@ -1,4 +1,5 @@
 #!/bin/bash
+#original script by TAW.net AM1's Dystroxic
 
 #set some basic common variables
 steam_home="/home/steam"
