@@ -258,7 +258,9 @@ for modlist in $config_dir/*.html; do
     python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
     popd
     popd
+
     echo "done creating symlink for $name"
+    pushd "$mod_install_dir"
 done
 
 
@@ -355,28 +357,33 @@ rm -f "$arma_dir/mpmissions/readme.txt"
 #   done
 #done
 
+
 # All mods that should have their bikeys copied to the Arma key directory
 key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
 # Loop over them to link their bikey files
-for mod_id in "${key_mods[@]}"; do
-   # This is the directory where the mod was downloaded
-   mod_dir="$mod_install_dir/$mod_id"
 
-   # Find all "bikey" files within the download directory
-   readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
-   # If multiple "keys" directories were found, that's an error
-   if [ ${#found_keys[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
-   fi
-   if [ ${#found_keys[@]} -gt 0 ]; then
-      # The filename without the path
-      key_basename=$(basename "${found_keys[0]}")
-      # The link filename, in lowercase
-      output_file="$client_keys_dir/${key_basename,,}"
-      # Symlink the file (overwriting existing links/files of the same name)
-      ln -sf "${found_keys[0]}" "$output_file"
-   fi
-done
+
+#for mod_id in "${key_mods[@]}"; do
+#   # This is the directory where the mod was downloaded
+#   mod_dir="$mod_install_dir/$mod_id"
+#
+#   # Find all "bikey" files within the download directory
+#   readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
+#   # If multiple "keys" directories were found, that's an error
+#   if [ ${#found_keys[@]} -gt 1 ]; then
+#      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
+#   fi
+#   if [ ${#found_keys[@]} -gt 0 ]; then
+#      # The filename without the path
+#      key_basename=$(basename "${found_keys[0]}")
+#      # The link filename, in lowercase
+#      output_file="$client_keys_dir/${key_basename,,}"
+#      # Symlink the file (overwriting existing links/files of the same name)
+#      ln -sf "${found_keys[0]}" "$output_file"
+#   fi
+#done
+
+find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' ./keys/ \;
 #uses sudo but shouldnt require a password if install worked correctly
 sudo systemctl restart arma3-web-console
 
