@@ -3,6 +3,7 @@
 
 #set some basic common variables
 steam_home="/home/steam"
+source repo.sh
 repo_url="https://github.com/$REPO/"
 
 echo "$REPO"
