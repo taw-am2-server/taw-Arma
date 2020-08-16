@@ -107,7 +107,7 @@ get_steam_creds () {
       printf  "\e[36m\n\n\\n\n\n=============================================================================================
 Logging in to steam interactively in order to set steamguard code if required.
 Type 'exit' when complete or you see the 'steam>' prompt
-===========================================================================================================\n\n\n\e[39m"
+===========================================================================================================\n\n\n\e[0m"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
 }
@@ -166,9 +166,7 @@ load_web_panel_creds () {
 run_steam_cmd() { # run_steam_cmd command attempts
    # Don't exit on errors
    set +e
-   echo $1
-   echo $2
-   echo $3
+
 
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
    for (( i=0; i<2; i++ )); do
@@ -177,9 +175,11 @@ run_steam_cmd() { # run_steam_cmd command attempts
       else
          echo "Retrying steamcmd for $3"
       fi
+      printf "\e[2m"
       result=`$1 2>&1 | tee /dev/tty`
       # Track the exit code
       code=$?
+      printf "\e[0m"
       # Break the loop if the command was successful
       if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
          echo "Steamcmd for $3 was successful!"
@@ -280,7 +280,7 @@ for modlist in $config_dir/*.html; do
       fi
       find -L "$mod_install_dir" -name '*.pbo*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
       find -L "$mod_install_dir" -name '*.bisign*'  -exec ln -sf '{}' "$server_modlist_dir/addons/" \;
-
+      printf  "\e[0m"
     fi
 done
 
