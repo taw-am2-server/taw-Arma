@@ -30,7 +30,7 @@ if [ "$batt" == '1' ]
 elif [ "$batt" == "2" ]
  then
       echo "loading AM2 Config"
-      config_repo_url="https://github.com/Tirpitz93/AM2_config"
+      config_repo_url="https://github.com/taw-am2-server/AM2_config"
 
 else
   echo "invalid selection"
