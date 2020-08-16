@@ -4,7 +4,7 @@
 steam_home="/home/steam"
 repo_url="https://github.com/""$REPO""/"
 
-echo "$repo_url"
+echo "$REPO"
 
 exit 1
 
