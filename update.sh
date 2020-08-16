@@ -263,7 +263,7 @@ for modlist in $config_dir/*.html; do
     echo "done creating symlink for $name"
     pushd "$mod_install_dir"
 
-    if [[ $string == *"server"* ]]
+    if [[ $modlist == *"server"* ]]
     then
       #combine server mods
       echo "\e[35mCreating server modlist"
