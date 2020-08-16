@@ -179,7 +179,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
       result=`$1 2>&1 | tee /dev/tty`
       # Track the exit code
       code=$?
-      printf "\e[0m"
+      printf "\n\n\e[0m"
       # Break the loop if the command was successful
       if [ $code == 0 ] && echo "$result" | grep -iqF success && ! echo "$result" | grep -iqF failure; then
          echo "Steamcmd for $3 was successful!"
