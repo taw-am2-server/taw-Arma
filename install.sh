@@ -144,7 +144,7 @@ for (( i=0; i<10; i++ )); do
     ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
 done
 #=================================
-
+echo "$user_home/arma-profiles"
 
 # Configure ARMA profile directory
 sudo -u "$user" mkdir -p "$user_home/arma-profiles"
