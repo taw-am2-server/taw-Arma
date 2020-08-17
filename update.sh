@@ -8,7 +8,7 @@
 #todo: refactor processing key files
 #todo: update userconfig from config repo
 #done: add template to systemctl unit file
-
+printf "\e[31m running update.sh \e[0m\n"
 #navigate to config directory update the config and return.
 case $PWD/ in
   ${HOME}/*) ;;
@@ -44,7 +44,7 @@ while getopts ":swvbu" opt; do
       ;;
   esac
 done
-
+printf "\e[31m user: $user, branch: $branch,  \e[0m\n"
 # exit when any command fails
 set -e
 
@@ -90,6 +90,7 @@ force_new_web_panel_creds=false
 force_validate=""
 # Create the base steamcmd command with the login credentials
 
+printf "\e[31m updating config repo \e[0m\n"
 
 #update the config directory
 pushd "$config_dir"
@@ -97,7 +98,6 @@ git fetch --all
 git reset --hard "origin/$branch"
 git pull
 popd
-
 
 
 trim() {
