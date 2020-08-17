@@ -15,6 +15,9 @@ case $PWD/ in
   *) echo "not running as the correct user, attempthing this will result in broken permissions."; exit 1;
 esac
 # Read switches from the command line
+
+branch="master"
+user="steam"
 while getopts ":swvbu" opt; do
   case $opt in
     s) # force new credentials for Steam
