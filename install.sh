@@ -144,11 +144,12 @@ for (( i=0; i<10; i++ )); do
     ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
 done
 #=================================
+chown $user:$user "$user_home" -R
 echo "$user_home/arma-profiles"
 
 # Configure ARMA profile directory
-mkdir -p "$user_home/arma-profiles"
-chown $user:$user "$user_home/arma-profiles"
+sudo -u "$user" mkdir -p "$user_home/arma-profiles"
+
 
 #=================================
 # Clone the full repo under the Steam user (includes the web console as a submodule)
