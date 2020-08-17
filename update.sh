@@ -506,9 +506,6 @@ for mod_id in "${server_mod_ids[@]}"; do
    done
 done
 
-
-
-
 # This section is for re-packaging the client-and-server workshop mods into a single
 # mod folder. The web control panel can then select this merged pack.
 client_mods_dir="$arma_dir/@taw_am1_client"
@@ -551,7 +548,6 @@ for mod_id in "${client_required_mod_ids[@]}"; do
       ln -s "$addon_dir/$f" "$output_file"
    done
 done
-
 
 # All mods that should have their bikeys copied to the Arma key directory
 key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
