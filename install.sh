@@ -159,7 +159,6 @@ else
     sudo -u "$user" git -C "$repo_dir" fetch --all
     sudo -u "$user" git -C "$repo_dir" reset --hard "origin/"$branch""
     sudo -u "$user" git branch --set-upstream-to="origin/$branch"
-    sudo -u "$user" git -C "$repo_dir" pull --recurse-submodules origin "$branch"
 fi
 #=================================
 
