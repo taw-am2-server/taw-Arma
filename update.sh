@@ -379,11 +379,9 @@ then
 else
   printf "\e[31mCOuld not locate mod.txt or html files, please check configuration directory\e[0m"
   exit 1
-
 fi
 
 # check whether mod needs downloading or validating
-
 all_mods+=("${client_optional_mod_ids[@]}" "${client_required_mod_ids[@]}" "${server_mod_ids[@]}")
 for mod_id in "${all_mods[@]}"
 do
