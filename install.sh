@@ -31,7 +31,7 @@ while getopts ":b:u:r:" opt; do
   esac
 done
 #=================================
-
+printf "\e[31m user: $user, branch: $branch,  \e[0m\n"
 
 #=================================
 #set some basic common variables
