@@ -54,6 +54,8 @@ script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 home_dir=$(eval echo ~$user)
 #battalion config directory
 config_dir="$home_dir/config"
+echo "$config_dir"
+exit 1
 repo_profiles_dir="$config_dir/profiles"
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
