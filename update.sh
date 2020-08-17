@@ -260,7 +260,7 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 
 #process html files or mod.txt
-if ls "$config_dir/*.html" 1> /dev/null 2>&1; then
+if ls $config_dir/*.html 1> /dev/null 2>&1; then
  printf "\e[32mHTML config files exist\e[0m"
 
   for modlist in $config_dir/*.html; do
