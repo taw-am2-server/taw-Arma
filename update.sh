@@ -169,7 +169,7 @@ run_steam_cmd() { # run_steam_cmd command attempts
 
 
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
-   for (( i=0; i<2; i++ )); do
+   for (( i=0; i<$2; i++ )); do
       if [ $i -eq 0 ]; then
          echo "Running steamcmd for $3"
       else
@@ -290,20 +290,15 @@ if ls "$config_dir/*.html" 1> /dev/null 2>&1; then
 #      pushd "$mod_install_dir"
   mapfile -t this_modlist < <( python3 "$script_dir/process_html.py" "$modlist" )
   name=$(basename "$modlist" ".html")
-  all_mods+=("${this_modlist[@]}")
   if [[ $modlist == *"server"* ]]
-  printf "\e[2mAdding mods from $name modlist to the server mods\e[0m"
   then
+    printf "\e[2mAdding mods from $name modlist to the server mods\e[0m"
     server_mod_ids+=("${this_modlist[@]}")
-  fi
-
-  if [[ $modlist == *"optional"* ]]
+  elif [[ $modlist == *"optional"* ]]
   then
     printf "\e[2mAdding mods from $name modlist to the client optional mods\e[0m"
     client_optional_mod_ids+=("${this_modlist[@]}")
-  fi
-   if [[ $modlist == *"client"* ]]
-  then
+  else #otherwise it is probably a client mod
     printf "\e[2mAdding mods from $name modlist to the client required mods\e[0m"
     client_required_mod_ids+=("${this_modlist[@]}")
   fi
@@ -346,7 +341,6 @@ then
                  </td>
               </tr>"
 
-     all_mods+=($mod_id)
      # Check if it's a server-only mod
      if [ $mod_type -eq 0 ]; then
         # Add it to the list of server mods
@@ -389,6 +383,8 @@ else
 fi
 
 # check whether mod needs downloading or validating
+
+all_mods+=("${client_optional_mod_ids[@]}" "${client_required_mod_ids[@]}" "${server_mod_ids[@]}")
 for mod_id in "${all_mods[@]}"
 do
    if [ -d "$mod_install_dir/$mod_id" ]; then
@@ -400,6 +396,51 @@ do
         download_mod_ids+=($mod_id)
      fi
 done
+
+ if ! $skip_steam_check ; then
+   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
+   run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
+   if [ $? != 0 ]; then
+      exit 1
+   fi
+fi
+
+# Create the base command for downloading a mod
+mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
+
+# This section compiles a single command for validating all existing mods
+# Since they're already existing, updates should be small and can be completed
+# in one attempt without timing out.
+# Only run this section if there are any mods to validate and we're not force-skipping the check
+if [ ${#validate_mod_ids[@]} -gt 0 ] && ! $skip_steam_check ; then
+   mod_validate_cmd="$mod_download_base_cmd"
+   # Add a command to download each mod in this array
+   for mod_id in "${validate_mod_ids[@]}"; do
+      mod_validate_cmd="$mod_validate_cmd +workshop_download_item 107410 $mod_id $force_validate"
+   done
+   # Run the command
+   mod_validate_cmd="$mod_validate_cmd +quit"
+   run_steam_cmd "$mod_validate_cmd" 1 "validating existing mods"
+   if [ $? != 0 ]; then
+      exit 1
+   fi
+fi
+
+# This section downloads new mods by attempting each one separately, and attempting it multiple times
+# so that it re-tries after timeouts to continue the download.
+# Only run this section if there are any mods to download
+if [ ${#download_mod_ids[@]} -gt 0 ]; then
+   # Download each mod
+   for mod_id in "${download_mod_ids[@]}"; do
+      # Prepare the command for doing the download
+      mod_cmd="$mod_download_base_cmd +workshop_download_item 107410 $mod_id validate +quit"
+      # Call the function that runs the command
+      run_steam_cmd "$mod_cmd" $mod_download_attempts "downloading mod $mod_id"
+      if [ $? != 0 ]; then
+         exit 1
+      fi
+   done
+fi
 
 if [ $? != 0 ]; then
    exit 1
