@@ -20,6 +20,8 @@ branch="master"
 user="steam"
 while getopts ":s:w:v:b:u" opt; do
   case $opt in
+  u) user="$OPTARG"
+    ;;
     s) # force new credentials for Steam
       force_new_steam_creds=true
       ;;
@@ -31,8 +33,7 @@ while getopts ":s:w:v:b:u" opt; do
       ;;
     b) branch="$OPTARG"
     ;;
-    u) user="$OPTARG"
-    ;;
+
 
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -44,7 +45,7 @@ while getopts ":s:w:v:b:u" opt; do
       ;;
   esac
 done
-printf "\e[31m user: $user, branch: $branch,  \e[0m\n"
+printf "\e[31m user: $user , branch: $branch,  \e[0m\n"
 # exit when any command fails
 set -e
 
