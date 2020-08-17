@@ -18,12 +18,14 @@ user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr 
 # -u user to create and use
 branch="master"
 user="steam"
-while getopts ":b:u:" opt; do
+while getopts ":b:u:r:" opt; do
   case $opt in
     b) branch="$OPTARG"
     ;;
     u) user="$OPTARG"
     ;;
+    r) REPO="OPTARG"
+      ;;
     \?) echo "Invalid option -$OPTARG" >&2
     ;;
   esac
