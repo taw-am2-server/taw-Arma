@@ -157,8 +157,7 @@ if [ ! -d "$repo_dir" ]; then
     sudo -u "$user" git clone --recursive "$repo_url" "$repo_dir" -b "$branch"
 else
     sudo -u "$user" git -C "$repo_dir" fetch --all
-    sudo -u "$user" git -C "$repo_dir" reset --hard "origin/"$branch""
-    sudo -u "$user" git branch --set-upstream-to="origin/$branch"
+    sudo -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
 fi
 #=================================
 
