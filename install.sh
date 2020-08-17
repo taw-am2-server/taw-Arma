@@ -33,6 +33,9 @@ done
 #=================================
 #set some basic common variables
 user_home=$(eval echo ~$user)
+
+echo "$user_home"
+exit 1
 source repo.sh
 repo_url="https://github.com/$REPO/"
 repo_dir="$user_home/TAW-Arma"
@@ -152,6 +155,7 @@ if [ ! -d "$repo_dir" ]; then
 else
     sudo -u "$user" git -C "$repo_dir" fetch --all
     sudo -u "$user" git -C "$repo_dir" reset --hard "origin/"$branch""
+    sudo -u "$user" git branch --set-upstream-to="origin/$branch"
     sudo -u "$user" git -C "$repo_dir" pull --recurse-submodules origin "$branch"
 fi
 #=================================
