@@ -288,6 +288,7 @@ if ls $config_dir/*.html 1> /dev/null 2>&1; then
 #
 #      echo "done creating symlink for $name"
 #      pushd "$mod_install_dir"
+  echo  "processing $modlist..."
   mapfile -t this_modlist < <( python3 "$script_dir/process_html.py" "$modlist" )
   name=$(basename "$modlist" ".html")
   if [[ $modlist == *"server"* ]]
