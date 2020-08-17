@@ -10,6 +10,11 @@
 #done: add template to systemctl unit file
 
 #navigate to config directory update the config and return.
+case $PWD/ in
+  ${HOME}/) ;;
+  *) echo "not running as the correct user, attempthing this will result in broken permissions."; exit 1;
+esac
+
 
 # exit when any command fails
 set -e
