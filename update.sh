@@ -18,7 +18,7 @@ esac
 
 branch="master"
 user="steam"
-while getopts ":swvbu" opt; do
+while getopts ":swv:b:u" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
