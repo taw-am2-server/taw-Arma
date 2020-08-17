@@ -147,8 +147,8 @@ done
 echo "$user_home/arma-profiles"
 
 # Configure ARMA profile directory
-sudo -u "$user" mkdir -p "$user_home/arma-profiles"
-
+mkdir -p "$user_home/arma-profiles"
+chown $user:$user "$user_home/arma-profiles"
 
 #=================================
 # Clone the full repo under the Steam user (includes the web console as a submodule)
