@@ -15,6 +15,7 @@ user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr 
 #=================================
 #get commandline options
 # -b <branch> select git branch to use when cloning this repo
+# -u user to create and use
 branch="master"
 user="steam"
 while getopts ":b:u:" opt; do
