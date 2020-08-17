@@ -95,7 +95,6 @@ printf "\e[31m updating config repo \e[0m\n"
 pushd "$config_dir"
 git fetch --all
 git reset --hard "origin/$branch"
-git pull
 popd
 
 
