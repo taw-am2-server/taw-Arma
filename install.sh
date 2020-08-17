@@ -35,7 +35,7 @@ done
 user_home=$(eval echo ~$user)
 
 echo "$user_home"
-exit 1
+
 source repo.sh
 repo_url="https://github.com/$REPO/"
 repo_dir="$user_home/TAW-Arma"
@@ -142,7 +142,8 @@ for (( i=0; i<10; i++ )); do
 done
 #=================================
 
-
+echo "$user_home"
+exit 1
 # Configure ARMA profile directory
 sudo -u "$user" mkdir -p "$user_home/arma-profiles"
 
