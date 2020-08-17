@@ -20,7 +20,7 @@ script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 home_dir="/home/steam"
 #battalion config directory
 config_dir="/home/steam/config"
-
+repo_profiles_dir="$config_dir/profiles"
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
 # The directory where Workshop mods should be downloaded to
