@@ -219,7 +219,7 @@ sudo -u "$user" npm install
 
 
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -u "$user" "$repo_dir/update.sh" -swv
+sudo -u "$user" "$repo_dir/update.sh" -swv - u "$user" -b "$branch"
 sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" > /etc/cron.d/arma3_cron
 
 # Enable and start the web console service

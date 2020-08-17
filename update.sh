@@ -14,7 +14,33 @@ case $PWD/ in
   ${HOME}/*) ;;
   *) echo "not running as the correct user, attempthing this will result in broken permissions."; exit 1;
 esac
+# Read switches from the command line
+while getopts ":swvbu" opt; do
+  case $opt in
+    s) # force new credentials for Steam
+      force_new_steam_creds=true
+      ;;
+    w) # force new credentials for the web panel
+      force_new_web_panel_creds=true
+      ;;
+    v) # validate ARMA/mod files that have been downloaded
+      force_validate="validate"
+      ;;
+    b) branch="$OPTARG"
+    ;;
+    u) user="$OPTARG"
+    ;;
 
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
 
 # exit when any command fails
 set -e
@@ -22,9 +48,9 @@ set -e
 # Get the directory where this file is located
 script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # The home directory for the user that launches the server
-home_dir="/home/steam"
+home_dir=$(eval echo ~$user)
 #battalion config directory
-config_dir="/home/steam/config"
+config_dir="$home_dir/config"
 repo_profiles_dir="$config_dir/profiles"
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
@@ -67,28 +93,7 @@ git reset --hard origin/master
 git pull
 popd
 
-# Read switches from the command line
-while getopts ":swv" opt; do
-  case $opt in
-    s) # force new credentials for Steam
-      force_new_steam_creds=true
-      ;;
-    w) # force new credentials for the web panel
-      force_new_web_panel_creds=true
-      ;;
-    v) # validate ARMA/mod files that have been downloaded
-      force_validate="validate"
-      ;;
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
-done
+
 
 trim() {
    echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
