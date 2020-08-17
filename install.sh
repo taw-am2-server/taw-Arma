@@ -154,7 +154,7 @@ sudo -u "$user" mkdir -p "$user_home/arma-profiles"
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
 if [ ! -d "$repo_dir" ]; then
-    sudo -u "$user" git clone --recursive "$repo_url" "$repo_dir"
+    sudo -u "$user" git clone --recursive "$repo_url" "$repo_dir" -b "$branch"
 else
     sudo -u "$user" git -C "$repo_dir" fetch --all
     sudo -u "$user" git -C "$repo_dir" reset --hard "origin/"$branch""
