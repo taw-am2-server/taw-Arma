@@ -261,7 +261,7 @@ workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
 
 #process html files or mod.txt
 if ls $config_dir/*.html 1> /dev/null 2>&1; then
- printf "\e[32mHTML config files exist\e[0m"
+ printf "\e[32mHTML config files exist\e[0m\n"
 
   for modlist in $config_dir/*.html; do
 
@@ -292,14 +292,14 @@ if ls $config_dir/*.html 1> /dev/null 2>&1; then
   name=$(basename "$modlist" ".html")
   if [[ $modlist == *"server"* ]]
   then
-    printf "\e[2mAdding mods from $name modlist to the server mods\e[0m"
+    printf "\e[2mAdding mods from $name modlist to the server mods\e[0m\n"
     server_mod_ids+=("${this_modlist[@]}")
   elif [[ $modlist == *"optional"* ]]
   then
-    printf "\e[2mAdding mods from $name modlist to the client optional mods\e[0m"
+    printf "\e[2mAdding mods from $name modlist to the client optional mods\e[0m\n"
     client_optional_mod_ids+=("${this_modlist[@]}")
   else #otherwise it is probably a client mod
-    printf "\e[2mAdding mods from $name modlist to the client required mods\e[0m"
+    printf "\e[2mAdding mods from $name modlist to the client required mods\e[0m\n"
     client_required_mod_ids+=("${this_modlist[@]}")
   fi
   done
@@ -307,7 +307,7 @@ if ls $config_dir/*.html 1> /dev/null 2>&1; then
 elif [[ -f "$config_dir/mods.txt" ]]
 then
   #do mod.txt processing
-  printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m"
+  printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m\n"
   # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
   while read line || [ -n "$line" ]; do
      # Increment the line counter
@@ -377,7 +377,7 @@ then
   echo "$workshop_template_all" > "$workshop_template_file_all"
 
 else
-  printf "\e[31mCOuld not locate mod.txt or html files, please check configuration directory\e[0m"
+  printf "\e[31mCOuld not locate mod.txt or html files, please check configuration directory\e[0m\n"
   exit 1
 fi
 
