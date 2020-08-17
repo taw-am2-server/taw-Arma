@@ -24,7 +24,7 @@ while getopts ":b:u:r:" opt; do
     ;;
     u) user="$OPTARG"
     ;;
-    r) REPO="OPTARG"
+    r) REPO="$OPTARG"
       ;;
     \?) echo "Invalid option -$OPTARG" >&2
     ;;
