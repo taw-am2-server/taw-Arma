@@ -182,8 +182,12 @@ chmod 644 /etc/systemd/system/arma3-web-console.service
 systemctl daemon-reload
 
 #allow steam user to estart the web panel without a password
-echo '$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console' >> /etc/sudoers
-echo '$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console' >> /etc/sudoers
+if grep -q "$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console" /etc/sudoers; then
+echo "$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console" >> /etc/sudoers
+fi
+if grep -q "$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console" /etc/sudoers; then
+echo "$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console" >> /etc/sudoers
+fi
 
 
 # Configure nginx
