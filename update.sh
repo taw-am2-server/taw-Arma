@@ -486,7 +486,7 @@ rm -f "$arma_dir/mpmissions/readme.txt"
 
 # This section is for re-packaging the server-only workshop mods into a single
 # mod folder. The server config then points to this folder to load server-side mods.
-server_mods_dir="$arma_dir/server_mods"
+server_mods_dir="$arma_dir/@server_mods"
 # This is the directory where the PBOs are linked to
 server_addons_dir="$server_mods_dir/addons"
 # Remove the entire server_mods directory to ensure it's clean

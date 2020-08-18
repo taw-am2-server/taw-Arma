@@ -18,13 +18,16 @@ user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr 
 # -u user to create and use
 branch="master"
 user="steam"
-while getopts ":b:u:r:" opt; do
+config_branch="master"
+while getopts ":b:u:r:c:" opt; do
   case $opt in
     b) branch="$OPTARG"
     ;;
     u) user="$OPTARG"
     ;;
     r) REPO="$OPTARG"
+      ;;
+    c) config_branch="$OPTARG"
       ;;
     \?) echo "Invalid option -$OPTARG" >&2
     ;;
@@ -222,7 +225,7 @@ sudo -u "$user" npm install
 
 
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -u "$user" "$repo_dir/update.sh" -s 1 -w 1 -v 1  -u "$user"
+sudo -u "$user" "$repo_dir/update.sh" -s 1 -w 1 -v 1  -u "$user" -b "$config_branch"
 sed -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/update.cron.template" > /etc/cron.d/arma3_cron
 
 # Enable and start the web console service
