@@ -18,7 +18,6 @@ esac
 # Read switches from the command line
 
 
-printf "\e[31m user: $user , branch: $branch,  \e[0m\n"
 # exit when any command fails
 set -e
 
@@ -91,6 +90,9 @@ while getopts ":s:w:v:b:u:" opt; do
       ;;
   esac
 done
+
+
+printf "\e[31m user: $user , branch: $branch,  \e[0m\n"
 printf "\e[31m updating config repo \e[0m\n"
 
 #update the config directory
