@@ -6,7 +6,6 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=${repo_dir}
-ExecStartPre=git pull --recurse-submodules
 ExecStart=/bin/bash ./run.sh
 Restart=on-failure
 
@@ -18,7 +17,7 @@ StandardError=syslog
 Restart=always
 SyslogIdentifier=arma3-web-console
 PIDFile=/run/arma3-web-console.pid
-User=steam
-Group=steam
+User=${user}
+Group=${user}
 [Install]
 WantedBy=multi-user.target

@@ -177,7 +177,7 @@ source "$config_dir/config.sh"
 
 #=================================
 # Install the service file for the web console (replacing template fields as we go)
-sed -e "s#\${repo_dir}#$repo_dir#"  "$repo_dir/arma3-web-console.service.template" >/etc/systemd/system/arma3-web-console.service
+sed -e "s#\${user}#$user#"  -e "s#\${repo_dir}#$repo_dir#"  "$repo_dir/arma3-web-console.service.template" >/etc/systemd/system/arma3-web-console.service
 chmod 644 /etc/systemd/system/arma3-web-console.service
 systemctl daemon-reload
 
