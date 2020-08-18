@@ -8,7 +8,7 @@
 #todo: refactor processing key files
 #todo: update userconfig from config repo
 #done: add template to systemctl unit file
-printf "\e[31m running update.sh \e[0m\n"
+printf "\e[32m running update.sh \e[0m\n"
 script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #navigate to config directory update the config and return.
 case $script_dir in
@@ -92,8 +92,8 @@ while getopts ":s:w:v:b:u:" opt; do
 done
 
 
-printf "\e[31m user: $user , branch: $branch,  \e[0m\n"
-printf "\e[31m updating config repo \e[0m\n"
+printf "\e[32m user: $user , branch: $branch,  \e[0m\n"
+printf "\e[32m updating config repo \e[0m\n"
 
 #update the config directory
 pushd "$config_dir"
@@ -123,7 +123,7 @@ get_steam_creds () {
       #run steamcmd once interactively to allow the user to ender steamguard code
       printf  "\e[36m\n\n\\n\n\n=============================================================================================
 Logging in to steam interactively in order to set steamguard code if required.
-Type 'exit' when complete or you see the 'steam>' prompt
+Type \e[36m'exit'\e[0m when complete or you see the \e[36m'steam>'\e[0m prompt
 ===========================================================================================================\n\n\n\e[0m"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
