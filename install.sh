@@ -85,7 +85,7 @@ echo "user name is $user_name"
 if lsb_release -i | grep -q 'Debian'
 then
   #if linide repo is not present add it
-  if grep -q "deb http://mirrors.linode.com/debian stretch main non-free" /etc/apt/sources.list; then
+  if ! grep -q "deb http://mirrors.linode.com/debian stretch main non-free" /etc/apt/sources.list; then
     echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
     echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
 
@@ -95,7 +95,7 @@ then
   apt-add-repository non-free
 elif lsb_release -i | grep -q 'Ubuntu'; then
   #if multiverse is not present add it
-  if grep -q "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" /etc/apt/sources.list
+  if ! grep -q "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" /etc/apt/sources.list
   then
     echo "deb http://archive.ubuntu.com/ubuntu xenial main universe multiverse" >>  /etc/apt/sources.list
     echo "deb http://archive.ubuntu.com/ubuntu xenial-updates main universe multiverse" >> /etc/apt/sources.list
@@ -182,10 +182,10 @@ chmod 644 /etc/systemd/system/arma3-web-console.service
 systemctl daemon-reload
 
 #allow steam user to estart the web panel without a password
-if grep -q "$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console" /etc/sudoers; then
+if  ! grep -q "$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console" /etc/sudoers; then
 echo "$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console" >> /etc/sudoers
 fi
-if grep -q "$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console" /etc/sudoers; then
+if  ! grep -q "$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console" /etc/sudoers; then
 echo "$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console" >> /etc/sudoers
 fi
 
