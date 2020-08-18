@@ -17,35 +17,7 @@ case $script_dir in
 esac
 # Read switches from the command line
 
-branch="master"
-user="steam"
-while getopts ":s:w:v:b:u:" opt; do
-  case $opt in
-    u) user="$OPTARG"
-    ;;
-    s) # force new credentials for Steam
-      force_new_steam_creds=true
-      ;;
-    w) # force new credentials for the web panel
-      force_new_web_panel_creds=true
-      ;;
-    v) # validate ARMA/mod files that have been downloaded
-      force_validate="validate"
-      ;;
-    b) branch="$OPTARG"
-    ;;
 
-
-    \?)
-      echo "Invalid option: -$OPTARG" >&2
-      exit 1
-      ;;
-    :)
-      echo "Option -$OPTARG requires an argument." >&2
-      exit 1
-      ;;
-  esac
-done
 printf "\e[31m user: $user , branch: $branch,  \e[0m\n"
 # exit when any command fails
 set -e
@@ -90,7 +62,35 @@ force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
 # Create the base steamcmd command with the login credentials
+branch="master"
+user="steam"
+while getopts ":s:w:v:b:u:" opt; do
+  case $opt in
+    u) user="$OPTARG"
+    ;;
+    s) # force new credentials for Steam
+      force_new_steam_creds=true
+      ;;
+    w) # force new credentials for the web panel
+      force_new_web_panel_creds=true
+      ;;
+    v) # validate ARMA/mod files that have been downloaded
+      force_validate="validate"
+      ;;
+    b) branch="$OPTARG"
+    ;;
 
+
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
 printf "\e[31m updating config repo \e[0m\n"
 
 #update the config directory
