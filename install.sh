@@ -222,7 +222,7 @@ sudo -u "$user" npm install
 
 ##install cron job to update at 4 am every day
 #write out current crontab
-
+printf "\e[31m user: $user, config branch: $config_branch,  \e[0m\n"
 
 # Run the update script to download ARMA and the mods, and to configure the web console
 sudo -u "$user" "$repo_dir/update.sh" -s 1 -w 1 -v 1  -u "$user" -b "$config_branch"
