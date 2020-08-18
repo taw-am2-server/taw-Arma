@@ -123,7 +123,7 @@ get_steam_creds () {
       #run steamcmd once interactively to allow the user to ender steamguard code
       printf  "\e[36m\n\n\\n\n\n=============================================================================================
 Logging in to steam interactively in order to set steamguard code if required.
-Type \e[36m'exit'\e[0m when complete or you see the \e[36m'steam>'\e[0m prompt
+Type \e[32m'exit'\e[36m when complete or you see the \e[32m'steam>'\e[36m prompt
 ===========================================================================================================\n\n\n\e[0m"
       /usr/games/steamcmd +login $steam_username $steam_password
    fi
