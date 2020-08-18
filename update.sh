@@ -19,7 +19,7 @@ esac
 
 branch="master"
 user="steam"
-while getopts ":s:w:v:b:u:" opt; do
+while getopts ":swv:b:u:" opt; do
   case $opt in
     u) user="$OPTARG"
     ;;
@@ -488,7 +488,7 @@ rm -f "$arma_dir/mpmissions/readme.txt"
 # mod folder. The server config then points to this folder to load server-side mods.
 server_mods_dir="$arma_dir/server_mods"
 # This is the directory where the PBOs are linked to
-server_addons_dir="$server_mods_dir/@taw_am1_server/addons"
+server_addons_dir="$server_mods_dir/addons"
 # Remove the entire server_mods directory to ensure it's clean
 rm -rf $server_mods_dir
 # Re-create the directory structure
@@ -522,7 +522,7 @@ done
 
 # This section is for re-packaging the client-and-server workshop mods into a single
 # mod folder. The web control panel can then select this merged pack.
-client_mods_dir="$arma_dir/@taw_am1_client"
+client_mods_dir="$arma_dir/@taw_client"
 # This is the directory where the PBOs are linked to
 client_addons_dir="$client_mods_dir/addons"
 # This is the directory where the keys are linked to
