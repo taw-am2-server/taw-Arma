@@ -9,8 +9,9 @@
 #todo: update userconfig from config repo
 #done: add template to systemctl unit file
 printf "\e[31m running update.sh \e[0m\n"
+script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 #navigate to config directory update the config and return.
-case $PWD/ in
+case $script_dir in
   ${HOME}/*) ;;
   *) echo "not running as the correct user, attempthing this will result in broken permissions."; exit 1;
 esac
