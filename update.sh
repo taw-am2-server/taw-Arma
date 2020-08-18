@@ -19,7 +19,7 @@ esac
 
 branch="master"
 user="steam"
-while getopts ":swv:b:u:" opt; do
+while getopts ":s:w:v:b:u:" opt; do
   case $opt in
     u) user="$OPTARG"
     ;;
