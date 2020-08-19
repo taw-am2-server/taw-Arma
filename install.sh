@@ -34,7 +34,7 @@ while getopts ":b:u:r:c:" opt; do
   esac
 done
 #=================================
-printf "\e[31m user: $user, branch: $branch,  \e[0m\n"
+printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
 
 #=================================
 #set some basic common variables
@@ -167,14 +167,17 @@ fi
 
 
 #=================================
+printf "\e[31m$config_dir\e[0m\n"
 if [ -d "$config_dir" ]
 then
   rm -r "$config_dir"
 fi
-sudo -u "$user"  mkdir "$config_dir"
+mkdir "$config_dir"
+chown "$user:$user" "$config_dir" -R
 sudo -u "$user" git clone $config_repo_url $config_dir
 
 pushd "$repo_dir"
+
 source "$config_dir/config.sh"
 #=================================
 
