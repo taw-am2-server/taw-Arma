@@ -44,8 +44,7 @@ echo "$user_home"
 
 source repo.sh
 repo_url="https://github.com/$REPO/"
-repo_dir="$user_home/TAW-Arma"
-config_dir="$user_home/config"
+
 echo "$REPO"
 #=================================
 
@@ -137,6 +136,8 @@ then
   chmod 755 "$user_home/.ssh"
   chmod 644 "$user_home/.ssh/authorized_keys"
 fi
+repo_dir="$user_home/TAW-Arma"
+config_dir="$user_home/config"
 #=================================
 # Open necessary firewall ports
 ufw allow 80/tcp # HTTP
