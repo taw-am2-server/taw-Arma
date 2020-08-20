@@ -222,8 +222,15 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Install dependencies for the web console
-cd "$repo_dir/arma-server-web-admin"
+pushd "$repo_dir/arma-server-web-admin"
+set +e
 sudo -u "$user" npm install
+if [ ! $? -eq 0 ]; then # if default install fails try without https
+    set -e #if this fails the script should exit again
+    npm config set registry http://registry.npmjs.org/
+    sudo -u "$user" npm install
+fi
+set -e
 #=================================
 
 ##install cron job to update at 4 am every day
