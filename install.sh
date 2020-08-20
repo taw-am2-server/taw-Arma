@@ -39,14 +39,10 @@ printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
 
 #=================================
 #set some basic common variables
-
-
-echo "$user_home"
-
-source repo.sh
 repo_url="https://github.com/$REPO/"
-
-echo "$REPO"
+user_home="/home/$user"
+repo_dir="$user_home/TAW-Arma"
+config_dir="$user_home/config"
 #=================================
 
 
@@ -137,9 +133,7 @@ then
   chmod 755 "$user_home/.ssh"
   chmod 644 "$user_home/.ssh/authorized_keys"
 fi
-user_home=$(eval echo ~$user)
-repo_dir="$user_home/TAW-Arma"
-config_dir="$user_home/config"
+
 #=================================
 # Open necessary firewall ports
 ufw allow 80/tcp # HTTP
