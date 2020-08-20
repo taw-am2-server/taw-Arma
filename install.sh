@@ -1,4 +1,5 @@
 #!/bin/bash
+#todo: check variable order (user home dir accessed before setting
 #original script by TAW.net AM1's Dystroxic
 if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
@@ -38,7 +39,7 @@ printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
 
 #=================================
 #set some basic common variables
-user_home=$(eval echo ~$user)
+
 
 echo "$user_home"
 
@@ -136,6 +137,7 @@ then
   chmod 755 "$user_home/.ssh"
   chmod 644 "$user_home/.ssh/authorized_keys"
 fi
+user_home=$(eval echo ~$user)
 repo_dir="$user_home/TAW-Arma"
 config_dir="$user_home/config"
 #=================================
