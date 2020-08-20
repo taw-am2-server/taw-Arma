@@ -1,4 +1,5 @@
 #!/bin/bash
+#todo: check variable order (user home dir accessed before setting
 #original script by TAW.net AM1's Dystroxic
 if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
@@ -34,19 +35,14 @@ while getopts ":b:u:r:c:" opt; do
   esac
 done
 #=================================
-printf "\e[31m user: $user, branch: $branch,  \e[0m\n"
+printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
 
 #=================================
 #set some basic common variables
-user_home=$(eval echo ~$user)
-
-echo "$user_home"
-
-source repo.sh
 repo_url="https://github.com/$REPO/"
+user_home="/home/$user" # changed from getting the homedir by command
 repo_dir="$user_home/TAW-Arma"
 config_dir="$user_home/config"
-echo "$REPO"
 #=================================
 
 
@@ -137,6 +133,7 @@ then
   chmod 755 "$user_home/.ssh"
   chmod 644 "$user_home/.ssh/authorized_keys"
 fi
+
 #=================================
 # Open necessary firewall ports
 ufw allow 80/tcp # HTTP
@@ -167,14 +164,17 @@ fi
 
 
 #=================================
+printf "\e[31m$config_dir\e[0m\n"
 if [ -d "$config_dir" ]
 then
   rm -r "$config_dir"
 fi
-sudo -u "$user"  mkdir "$config_dir"
+mkdir "$config_dir"
+chown "$user:$user" "$config_dir" -R
 sudo -u "$user" git clone $config_repo_url $config_dir
 
 pushd "$repo_dir"
+
 source "$config_dir/config.sh"
 #=================================
 
@@ -216,8 +216,15 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Install dependencies for the web console
-cd "$repo_dir/arma-server-web-admin"
+pushd "$repo_dir/arma-server-web-admin"
+set +e
 sudo -u "$user" npm install
+if [ ! $? -eq 0 ]; then # if default install fails try without https
+    set -e #if this fails the script should exit again
+    sudo -u "$user" npm config set registry http://registry.npmjs.org/
+    sudo -u "$user" npm install
+fi
+set -e
 #=================================
 
 ##install cron job to update at 4 am every day
