@@ -40,7 +40,7 @@ printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
 #=================================
 #set some basic common variables
 repo_url="https://github.com/$REPO/"
-user_home="/home/$user"
+user_home="/home/$user" # changed from getting the homedir by command
 repo_dir="$user_home/TAW-Arma"
 config_dir="$user_home/config"
 #=================================
@@ -221,7 +221,7 @@ set +e
 sudo -u "$user" npm install
 if [ ! $? -eq 0 ]; then # if default install fails try without https
     set -e #if this fails the script should exit again
-    npm config set registry http://registry.npmjs.org/
+    sudo -u "$user" npm config set registry http://registry.npmjs.org/
     sudo -u "$user" npm install
 fi
 set -e

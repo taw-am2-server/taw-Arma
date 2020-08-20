@@ -8,3 +8,4 @@ To configure the server:
     `export repo="taw-am2-server/TAW-Arma" && export branch="master" && curl "https://raw.githubusercontent.com/$repo/$branch/install.sh" > install.sh && chmod +x install.sh && sudo ./install.sh -r "$repo" -b "$branch"`
     - additional options `-r "repository name" `, `-b "branchName"`, `-u "username"` and `-c "configRepoBranchName"` can be specified for `install.sh`
     - the repository name and branch should be changed to the appropriate one being used.
+    - to use the Dev branch use: `export repo="taw-am2-server/TAW-Arma" && export branch="master" && curl "https://raw.githubusercontent.com/$repo/$branch/install.sh" > install.sh && chmod +x install.sh && sudo ./install.sh -r "$repo" -b "$branch"`
