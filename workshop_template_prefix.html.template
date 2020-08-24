@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <html>
-<!--Created by Arma 3 Launcher: https://arma3.com-->
+    <!--Created by Arma 3 Launcher: https://arma3.com-->
 
-<head>
-    <meta name="arma:Type" content="list" />
-    <meta name="generator" content="Arma 3 Launcher - https://arma3.com" />
-    <title>TAW AM1 Arma 3 Mods - Required</title>
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
-    <style>
+    <head>
+        <meta name="arma:Type" content="list" />
+        <meta name="generator" content="Arma 3 Launcher - https://arma3.com" />
+        <title>${battalion} Arma 3 Mods - ${subname}</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
+        <style>
         body {
             margin: 0;
             padding: 0;
@@ -79,15 +79,15 @@
         .from-local {
             color: gray;
         }
-    </style>
-</head>
+        </style>
+    </head>
 
-<body>
-    <h1>TAW AM1 Arma 3 Mods - Required</h1>
-    <p class="before-list">
-        <em>From the Arma 3 Launcher, go to "Mods" (left sidebar) > "Preset" (top right) > "Import" (bottom right).
-            Select the downloaded copy of this file and click "Open". Rename the preset from "Imported Preset" to "TAW
-            AM1 Required".</em>
-    </p>
-    <div class="mod-list">
-        <table>
+    <body>
+        <h1>{$battalion} Arma 3 Mods - ${subname}</h1>
+        <p class="before-list">
+            <em>From the Arma 3 Launcher, go to "Mods" (left sidebar) > "Preset" (top right) > "Import" (bottom right).
+            Select the downloaded copy of this file and click "Open". Rename the preset from "Imported Preset" to
+            "${preset_name}".</em>
+        </p>
+        <div class="mod-list">
+            <table>

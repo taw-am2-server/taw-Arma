@@ -1,12 +1,15 @@
-- patch strobes to have longer lifespan
 - multiple web panel users
 - test Battleye
-- test ACE rappelling
 - Allow admins to change server CBA settings (https://github.com/CBATeam/CBA_A3/pull/892)
-- override the BIS arsenal functions to eliminate BIS arsenal
 - auto-generate CBA_settings PBO whitelist for ACE PBO check
-- blacklist vanilla mags?
 
 On mod updates:
 - remove RHS smoke grenades from arsenals
 - remove thermals
+
+For merge:
+- check install.sh username for spaces
+
+They got rid of:
+- Mod bundling to work with A3 Launcher
+- alteration of mod.cpp, meta.cpp

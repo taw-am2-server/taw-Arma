@@ -1,7 +1,7 @@
       </table>
     </div>
     <div class="footer">
-      <span>Created by TAW AM1.</span>
+      <span>Created by ${battalion}.</span>
     </div>
   </body>
 </html>

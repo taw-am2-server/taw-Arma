@@ -5,8 +5,8 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory=${repo_dir}
-ExecStart=/bin/bash ./run.sh
+WorkingDirectory=${repo_dir}/arma-server-web-admin
+ExecStart=/usr/bin/npm start
 Restart=on-failure
 
 LimitNOFILE=infinity
@@ -15,8 +15,8 @@ StandardInput=null
 StandardOutput=syslog
 StandardError=syslog
 Restart=always
-SyslogIdentifier=arma3-web-console
-PIDFile=/run/arma3-web-console.pid
+SyslogIdentifier=arma3-web-console-${user}
+PIDFile=/run/arma3-web-console-${user}.pid
 User=${user}
 Group=${user}
 [Install]
