@@ -88,12 +88,9 @@ while getopts ":s:w:v:b" opt; do
 done
 
 # Update the config directory
-pushd "$config_dir"
-echo "Current dir:"
-pwd
-git fetch --all
-git reset --hard "origin/$config_branch"
-popd
+git -C "$config_dir" fetch --all
+echo "git -C \"$config_dir\" reset --hard \"origin/$config_branch\""
+git -C "$config_dir" reset --hard "origin/$config_branch"
 
 #---------------------------------------------
 # Process the config repo 'settings.json' file

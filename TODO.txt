@@ -8,7 +8,7 @@ On mod updates:
 - remove thermals
 
 For merge:
-- check install.sh username for spaces
+- test overwriting of server list file in web console (when re-running install.sh)
 
 They got rid of:
 - Mod bundling to work with A3 Launcher
