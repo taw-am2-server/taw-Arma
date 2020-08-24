@@ -106,27 +106,27 @@ if [ -z "$settings_json" ]; then
    echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
 fi
 # Extract the battalion name from the settings file
-battalion=$(echo "$settings_json" | jq ".battalion")
+battalion=$(echo "$settings_json" | jq -r ".battalion")
 if [ -z "$var" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'battalion' key/value" >&2; exit 1
 fi
 # Extract the list of game admins from the settings file
-admin_steam_ids=$(echo "$settings_json" | jq ".admin_steam_ids")
+admin_steam_ids=$(echo "$settings_json" | jq -r ".admin_steam_ids")
 if [ -z "$var" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'admin_steam_ids' key/value" >&2; exit 1
 fi
 # Extract the web console port from the settings file
-web_console_local_port=$(echo "$settings_json" | jq ".web_console_local_port")
+web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
 if [ -z "$web_console_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
 fi
 # Extract the server name prefix from the settings file
-server_prefix=$(echo "$settings_json" | jq ".server_prefix")
+server_prefix=$(echo "$settings_json" | jq -r ".server_prefix")
 if [ -z "$server_prefix" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'server_prefix' key/value" >&2; exit 1
 fi
 # Extract the server name suffix from the settings file
-server_suffix=$(echo "$settings_json" | jq ".server_suffix")
+server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
 if [ -z "$server_suffix" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'server_suffix' key/value" >&2; exit 1
 fi

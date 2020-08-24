@@ -133,17 +133,17 @@ if [ -z "$settings_json" ]; then
    echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
 fi
 # Extract the domain from the settings file
-domain=$(echo "$settings_json" | jq ".domain")
+domain=$(echo "$settings_json" | jq -r ".domain")
 if [ -z "$domain" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'domain' key/value" >&2; exit 1
 fi
 # Extract the certificate email from the settings file
-email=$(echo "$settings_json" | jq ".email")
+email=$(echo "$settings_json" | jq -r ".email")
 if [ -z "$email" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'email' key/value" >&2; exit 1
 fi
 # Extract the web console port from the settings file
-web_console_local_port=$(echo "$settings_json" | jq ".web_console_local_port")
+web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
 if [ -z "$web_console_local_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
 fi
@@ -166,12 +166,13 @@ fi
 
 #=================================
 # Configure nginx
-nginx_conf_file="/etc/nginx/sites-enabled/arma-$user.conf"
+nginx_sites_enabled_dir="/etc/nginx/sites-enabled"
+nginx_conf_file="$nginx_sites_enabled_dir/arma-$user.conf"
 # Remove any existing config files
 rm -f "$nginx_conf_file"
-# Copy the config file
-#cp "$repo_dir/nginx.conf" /etc/nginx/sites-enabled/arma.conf
-#install nginx config with template substitution
+# Remove the default nginx config if it's set
+rm -f "$nginx_sites_enabled_dir/default"
+# Install nginx config with template substitution
 sed -e "s#\${domain}#$domain#" -e "s#\${user}#$user#" -e "s#\${web_console_local_port}#$web_console_local_port#" "$repo_dir/nginx.conf.template" >"$nginx_conf_file"
 
 # Set the config file owner to root
