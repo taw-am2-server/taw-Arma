@@ -190,7 +190,7 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -H -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
+#sudo -H -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
 
 #=================================
 # Create the cron file from the template
