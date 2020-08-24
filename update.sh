@@ -126,9 +126,6 @@ if [ -z "$server_prefix" ]; then
 fi
 # Extract the server name suffix from the settings file
 server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
-if [ -z "$server_suffix" ]; then
-  echo "ERROR: 'settings.json' file in config repository has no 'server_suffix' key/value" >&2; exit 1
-fi
 
 #---------------------------------------------
 # Process the server repo 'config.json' file
@@ -584,9 +581,12 @@ fi
 if [ ${#server_mod_ids[@]} -gt 0 ]; then
    panel_config=$(echo "$panel_config" | jq ".serverMods |= . + [\"$server_mods_name\"]")
 fi
-
+# If the server suffix is provided, set it in the config file
+if [ ! -z "$server_suffix" ]; then
+   panel_config=$(echo "$panel_config" | jq ".suffix = \"$server_suffix\"")
+fi
 # Add all other requried fields
-panel_config=$(echo "$panel_config" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .suffix = \"$server_suffix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
+panel_config=$(echo "$panel_config" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
 # Write the web panel config.js file
 echo "module.exports = $panel_config" > "$web_panel_config_file"
