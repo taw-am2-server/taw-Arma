@@ -70,7 +70,9 @@ while getopts ":s:w:v:b" opt; do
       force_validate="validate"
       echo "Forcing validation of Arma 3 and Workshop files"
       ;;
-    b) config_branch="$OPTARG"
+    b) # Set the config branch
+      config_branch="$OPTARG"
+      echo "Config branch set: $config_branch"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
