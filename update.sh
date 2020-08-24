@@ -89,7 +89,8 @@ done
 
 # Update the config directory
 pushd "$config_dir"
-echo "Current dir: $pwd"
+echo "Current dir:"
+pwd
 git fetch --all
 git reset --hard "origin/$config_branch"
 popd
