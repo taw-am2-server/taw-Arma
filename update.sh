@@ -388,12 +388,6 @@ find "$repo_profiles_dir" -mindepth 1 -type f -print0 |
       dos2unix "$output_file"
    done
 
-# Copy the userconfig files
-# Remove the existing userconfig folder
-rm -rf "$arma_userconfig_dir"
-# Copy over the new one
-cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
-
 # check whether mod needs downloading or validating
 all_mods+=("${client_optional_mod_ids[@]}" "${client_required_mod_ids[@]}" "${server_mod_ids[@]}")
 for mod_id in "${all_mods[@]}"
@@ -425,6 +419,17 @@ if ! $skip_steam_check ; then
       exit 1
    fi
 fi
+
+# Next steps require the arma directory to exist 
+if [ ! -d $arma_dir ]; then
+   echo "ERROR: Arma install directory does not exist, cannot continue (did you call this script with the '-n' option, thereby skipping Arma install?)" >&2; exit 1
+fi
+
+# Copy the userconfig files
+# Remove the existing userconfig folder
+rm -rf "$arma_userconfig_dir"
+# Copy over the new one
+cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
 
 # Remove the readme file in the mpmisisons folder (so it doesn't show up on the web console)
 rm -f "$arma_dir/mpmissions/readme.txt"
