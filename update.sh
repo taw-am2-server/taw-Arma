@@ -72,7 +72,6 @@ while getopts ":s:w:v:b:" opt; do
       ;;
     b) # Set the config branch
       config_branch="$OPTARG"
-      echo "Config branch set: $config_branch"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
@@ -91,7 +90,6 @@ done
 
 # Update the config directory
 git -C "$config_dir" fetch --all
-echo "git -C \"$config_dir\" reset --hard \"origin/$config_branch\""
 git -C "$config_dir" reset --hard "origin/$config_branch"
 
 #---------------------------------------------
@@ -108,17 +106,17 @@ if [ -z "$settings_json" ]; then
 fi
 # Extract the battalion name from the settings file
 battalion=$(echo "$settings_json" | jq -r ".battalion")
-if [ -z "$var" ]; then
+if [ -z "$battalion" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'battalion' key/value" >&2; exit 1
 fi
 # Extract the list of game admins from the settings file
 admin_steam_ids=$(echo "$settings_json" | jq -r ".admin_steam_ids")
-if [ -z "$var" ]; then
+if [ -z "$admin_steam_ids" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'admin_steam_ids' key/value" >&2; exit 1
 fi
 # Extract the web console port from the settings file
 web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
-if [ -z "$web_console_port" ]; then
+if [ -z "$web_console_local_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
 fi
 # Extract the server name prefix from the settings file
