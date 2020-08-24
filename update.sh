@@ -42,6 +42,8 @@ arma_profiles_dir="$home_dir/arma-profiles"
 # Userconfig directories
 repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
+# The basic.cfg file to use
+basic_cfg_file="$config_dir/basic.cfg"
 # How many times to try downloading a mod before erroring out (multiple attempts required for large mods due to timeouts)
 mod_download_attempts=6
 # How many times to try downloading ARMA before erroring out (multiple attempts required on slow connections due to timeouts)
@@ -96,7 +98,7 @@ popd
 
 # Ensure the file exists
 if [ ! -f "$settings_file" ]; then
-  echo "ERROR: missing 'settings.json' file in config repository" >&2; exit 1
+  echo "ERROR: missing 'settings.json' file in the config repository" >&2; exit 1
 fi
 # Load the settings JSON
 settings_json=$(jq -enf "$settings_file")
@@ -140,6 +142,11 @@ fi
 panel_config_json=$(jq -enf "$web_panel_config_template")
 if [ -z "$panel_config_json" ]; then
    echo "Error: failed to parse 'config.json' in the server repository" >&2; exit 1
+fi
+
+# Ensure the basic.cfg file exists
+if [ ! -f "$basic_cfg_file" ]; then
+  echo "ERROR: missing 'basic.cfg' file in the config repository" >&2; exit 1
 fi
 
 # Names of output template files
@@ -578,8 +585,9 @@ fi
 if [ ${#server_mod_ids[@]} -gt 0 ]; then
    panel_config=$(echo "$panel_config" | jq ".serverMods |= . + [\"$server_mods_name\"]")
 fi
+
 # Add all other requried fields
-panel_config=$(echo "$panel_config" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .suffix = \"$server_suffix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\"]")
+panel_config=$(echo "$panel_config" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .suffix = \"$server_suffix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
 # Write the web panel config.js file
 echo "module.exports = $panel_config" > "$web_panel_config_file"
