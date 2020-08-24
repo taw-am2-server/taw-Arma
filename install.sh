@@ -125,7 +125,7 @@ fi
 #=================================
 rm -rf "$config_dir"
 sudo -u "$user" mkdir "$config_dir"
-sudo -u "$user" git clone $config_repo $config_dir
+sudo -u "$user" git clone "$config_repo" "$config_dir"
 
 # Ensure the config settings.json file exists
 if [ ! -f "$settings_file" ]; then
@@ -147,6 +147,7 @@ if [ -z "$email" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'email' key/value" >&2; exit 1
 fi
 # Extract the web console port from the settings file
+echo "settings json: $settings_json"
 web_console_local_port=$(echo "$settings_json" | jq ".web_console_local_port")
 if [ -z "$web_console_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
