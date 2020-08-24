@@ -75,7 +75,7 @@ elif lsb_release -i | grep -q 'Ubuntu'; then
 fi
 
 #accept the steamcmd EULA
-echo steam steam/question select \"I AGREE\" | sudo debconf-set-selections
+echo steam steam/question select "I AGREE" | sudo debconf-set-selections # Add a quote in a comment to fix code editor formatting "
 echo steam steam/license note '' | sudo debconf-set-selections
 
 # Add the architecture needed for Steam
