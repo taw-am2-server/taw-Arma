@@ -58,7 +58,7 @@ skip_steam_check=false
 # The default branch/user
 config_branch="master"
 
-while getopts ":s:w:v:b" opt; do
+while getopts ":s:w:v:b:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
