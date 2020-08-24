@@ -49,10 +49,6 @@ if [[ ! $user =~ ^[0-9a-zA-Z]+$ ]]; then
 fi
 
 #=================================
-# Show the user being used for Git checkout
-printf "\e[31muser: $user, branch: $branch,  \e[0m\n"
-
-#=================================
 #set some basic common variables
 user_home="/home/$user" # changed from getting the homedir by command
 repo_dir="$user_home/taw-arma"
@@ -147,9 +143,8 @@ if [ -z "$email" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'email' key/value" >&2; exit 1
 fi
 # Extract the web console port from the settings file
-echo "settings json: $settings_json"
 web_console_local_port=$(echo "$settings_json" | jq ".web_console_local_port")
-if [ -z "$web_console_port" ]; then
+if [ -z "$web_console_local_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
 fi
 
