@@ -200,7 +200,7 @@ sed -e "s#\${repo_dir}#$repo_dir#" -e "s#\${config_branch}#$config_branch#" "$re
 sudo -H -u "$user" crontab "$cronfile"
 
 # Enable and start the web console service
-systemctl enable arma3-web-console
+systemctl enable arma3-web-console-$user
 
 # Set up nginx
 systemctl enable nginx
