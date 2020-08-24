@@ -186,9 +186,7 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Install dependencies for the web console
-pushd "$repo_dir/arma-server-web-admin"
-sudo -u "$user" npm install
-popd
+( cd "$repo_dir/arma-server-web-admin" ; sudo -u "$user" npm install )
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
