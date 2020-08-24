@@ -71,8 +71,8 @@ elif lsb_release -i | grep -q 'Ubuntu'; then
 fi
 
 #accept the steamcmd EULA
-echo steam steam/question select "I AGREE" | sudo debconf-set-selections # Add a quote in a comment to fix code editor formatting "
-echo steam steam/license note '' | sudo debconf-set-selections
+echo steam steam/question select "I AGREE" | debconf-set-selections # Add a quote in a comment to fix code editor formatting "
+echo steam steam/license note '' | debconf-set-selections
 
 # Add the architecture needed for Steam
 dpkg --add-architecture i386
@@ -112,16 +112,16 @@ done
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
 if [ ! -d "$repo_dir" ]; then
-  sudo -u "$user" git clone --recursive "https://github.com/$repo" "$repo_dir" -b "$branch"
+  sudo -H -u "$user" git clone --recursive "https://github.com/$repo" "$repo_dir" -b "$branch"
 else
-  sudo -u "$user" git -C "$repo_dir" fetch --all
-  sudo -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
+  sudo -H -u "$user" git -C "$repo_dir" fetch --all
+  sudo -H -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
 fi
 
 #=================================
 rm -rf "$config_dir"
-sudo -u "$user" mkdir "$config_dir"
-sudo -u "$user" git clone "$config_repo" "$config_dir"
+sudo -H -u "$user" mkdir "$config_dir"
+sudo -H -u "$user" git clone "$config_repo" "$config_dir"
 
 # Ensure the config settings.json file exists
 if [ ! -f "$settings_file" ]; then
@@ -186,18 +186,18 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Install dependencies for the web console
-( cd "$repo_dir/arma-server-web-admin" ; sudo -u "$user" npm install )
+( cd "$repo_dir/arma-server-web-admin" ; sudo -H -u "$user" npm install )
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
+sudo -H -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
 
 #=================================
 # Create the cron file from the template
 cronfile="/tmp/cronfile-$user"
 sed -e "s#\${repo_dir}#$repo_dir#" -e "s#\${config_branch}#$config_branch#" "$repo_dir/update.cron.template" >"$cronfile"
 # Install the crontab file
-sudo -u "$user" crontab "$cronfile"
+sudo -H -u "$user" crontab "$cronfile"
 
 # Enable and start the web console service
 systemctl enable arma3-web-console
