@@ -113,10 +113,6 @@ for (( i=0; i<10; i++ )); do
 done
 
 #=================================
-# Configure ARMA profile directory
-sudo -u "$user" mkdir "$user_home/arma-profiles"
-
-#=================================
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
 if [ ! -d "$repo_dir" ]; then
