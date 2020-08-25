@@ -31,7 +31,7 @@ workshop_template_dir="$home_dir/workshop_templates"
 # The config repo settings file
 settings_file="$config_dir/settings.json"
 # The web panel config template file
-web_panel_config_template="$config_dir/settings.json"
+web_panel_config_template="$config_dir/config.json"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 # The .htpasswd file with credentials for accessing the server control panel
