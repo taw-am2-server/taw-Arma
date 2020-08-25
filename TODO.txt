@@ -7,10 +7,7 @@ On mod updates:
 - remove RHS smoke grenades from arsenals
 - remove thermals
 
-For merge:
+TODO:
 - test overwriting of server list file in web console (when re-running install.sh)
 - test using the right profile
-
-They got rid of:
-- Mod bundling to work with A3 Launcher
-- alteration of mod.cpp, meta.cpp
+- add steam login attempt to handle steamguard and incorrect credentials
