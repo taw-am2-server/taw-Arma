@@ -39,7 +39,7 @@ done
 get_install_user () {
   printf "Username to install Arma under: "
   read username1 </dev/tty
-  printf "\nUsername to install Arma under (confirm): "
+  printf "Username to install Arma under (confirm): "
   read username2 </dev/tty
   printf "\n"
   if [ "$username1" != "$username2" ]; then
