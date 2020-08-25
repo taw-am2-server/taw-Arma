@@ -78,7 +78,7 @@ while getopts ":swvnpb:" opt; do
       skip_steam_check=true
       echo "Skipping file checks for existing Arma 3 and Workshop files"
       ;;
-    n) # skip Steam file checks for Arma and existing mods
+    p) # skip Steam file checks for Arma and existing mods
       passwords_only=true
       echo "Running update script for passwords-only"
       ;;

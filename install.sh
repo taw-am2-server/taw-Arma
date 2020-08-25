@@ -108,7 +108,7 @@ fi
 dpkg --add-architecture i386
 apt update
 # apache2-utils is needed for htpasswd, used by update.sh
-apt install apache2-utils 
+apt install apache2-utils -y
 # Run the update script just to get the passwords
 sudo -H -u "$user" "$repo_dir/update.sh" -p
 
