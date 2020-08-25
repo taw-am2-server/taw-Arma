@@ -11,3 +11,4 @@ TODO:
 - test overwriting of server list file in web console (when re-running install.sh)
 - test using the right profile
 - add steam login attempt to handle steamguard and incorrect credentials
+- load templated file for list of servers
