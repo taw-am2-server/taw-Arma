@@ -267,10 +267,15 @@ client_optional_mod_ids=()
 all_mods=()
 
 # Load the prefix of the template file
-workshop_template_required=$(sed -e "s#\${battalion}#$battalion#" -e "s#\${preset_name}#$battalion Required#" -e "s#\${subname}#Required#" "$script_dir/workshop_template_prefix.html.template")
-workshop_template_optional=$(sed -e "s#\${battalion}#$battalion#" -e "s#\${preset_name}#$battalion Optional#" -e "s#\${subname}#Optional#" "$script_dir/workshop_template_prefix.html.template")
-workshop_template_all=$(sed -e "s#\${battalion}#$battalion#" -e "s#\${preset_name}#$battalion All#" -e "s#\${subname}#All (Required + Optional)#" "$script_dir/workshop_template_prefix.html.template")
+workshop_template_prefix=$(sed -e "s#\${battalion}#$battalion#" "$script_dir/workshop_template_prefix.html.template")
+# Prepare the required mods prefix
+workshop_template_required=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Required#" -e "s#\${subname}#Required#")
+# Prepare the optional mods prefix
+workshop_template_optional=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Optional#" -e "s#\${subname}#Optional#")
+# Prepare the all mods prefix
+workshop_template_all=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion All#" -e "s#\${subname}#All (Required + Optional)#")
 workshop_template_suffix=$(sed -e "s#\${battalion}#$battalion#" "$script_dir/workshop_template_suffix.html.template")
+workshop_template_mod=$(<"$script_dir/workshop_template_mod.html.template")
 
 # Delete the template directory if it exists (to clean it out)
 rm -rf "$workshop_template_dir"
@@ -296,41 +301,31 @@ if ls $config_dir/*.html 1> /dev/null 2>&1; then
       fi
    done
 elif [[ -f "$config_dir/mods.txt" ]]; then
-  #do mod.txt processing
-  printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m\n"
-  # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
-  while read line || [ -n "$line" ]; do
-     # Increment the line counter
-     line_no=$((line_no+1))
-     # Trim whitespace of the ends of the line
-     line_trimmed="$(trim "$line")"
-     IFS='#' read -ra comment <<< "$line_trimmed"
-     # If the line was empty or just had a comment, skip it
-     if [ -z "${comment[0]}" ]; then
-        continue
-     fi
-     # Split the part before any comments on commas
-     IFS=',' read -ra parts <<< "${comment[0]}"
-     # Parse the line into its fields, trimming whitespace from each
-     mod_id="$(trim "${parts[0]}")"
-     mod_name="$(trim "${parts[1]}")"
-     mod_type="$(trim "${parts[2]}")"
-     # Ensure that the mod ID is a number (digits only)
-     if ! [[ $mod_id =~ $number_regex ]] ; then
-        echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
-     fi
-     # Create the string that would represent this mod in the workshop template file
-     workshop_template_section="
-            <tr data-type='ModContainer'>
-               <td data-type='DisplayName'>$mod_name</td>
-               <td>
-                  <span class='from-steam'>Steam</span>
-               </td>
-               <td>
-                  <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
-               </td>
-            </tr>"
-
+   #do mod.txt processing
+   printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m\n"
+   # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
+   while read line || [ -n "$line" ]; do
+      # Increment the line counter
+      line_no=$((line_no+1))
+      # Trim whitespace of the ends of the line
+      line_trimmed="$(trim "$line")"
+      IFS='#' read -ra comment <<< "$line_trimmed"
+      # If the line was empty or just had a comment, skip it
+      if [ -z "${comment[0]}" ]; then
+         continue
+      fi
+      # Split the part before any comments on commas
+      IFS=',' read -ra parts <<< "${comment[0]}"
+      # Parse the line into its fields, trimming whitespace from each
+      mod_id="$(trim "${parts[0]}")"
+      mod_name="$(trim "${parts[1]}")"
+      mod_type="$(trim "${parts[2]}")"
+      # Ensure that the mod ID is a number (digits only)
+      if ! [[ $mod_id =~ $number_regex ]] ; then
+         echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
+      fi
+      # Create the string that would represent this mod in the workshop template file
+      workshop_template_section=$(echo $workshop_template_mod | sed -e "s#\${mod_name}#$mod_name#" -e "s#\${mod_id}#$mod_id#")
       # Check if it's a server-only mod
       if [ $mod_type -eq 0 ]; then
          # Add it to the list of server mods
@@ -355,15 +350,15 @@ elif [[ -f "$config_dir/mods.txt" ]]; then
          # The mod type was unrecognized
          echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
       fi
-  done < "$config_dir/mods.txt"
-  # Append the workshop template suffix
-  workshop_template_required+="$workshop_template_suffix"
-  workshop_template_optional+="$workshop_template_suffix"
-  workshop_template_all+="$workshop_template_suffix"
-  # Write the complete workshop templates to file
-  echo "$workshop_template_required" > "$workshop_template_file_required"
-  echo "$workshop_template_optional" > "$workshop_template_file_optional"
-  echo "$workshop_template_all" > "$workshop_template_file_all"
+   done < "$config_dir/mods.txt"
+   # Append the workshop template suffix
+   workshop_template_required+="$workshop_template_suffix"
+   workshop_template_optional+="$workshop_template_suffix"
+   workshop_template_all+="$workshop_template_suffix"
+   # Write the complete workshop templates to file
+   echo "$workshop_template_required" > "$workshop_template_file_required"
+   echo "$workshop_template_optional" > "$workshop_template_file_optional"
+   echo "$workshop_template_all" > "$workshop_template_file_all"
 else
   printf "\e[31mERROR: Could not locate mod.txt or html files, please check configuration directory\e[0m\n" >&2; exit 1
 fi

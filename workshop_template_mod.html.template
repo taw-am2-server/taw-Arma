@@ -1,0 +1,9 @@
+                <tr data-type='ModContainer'>
+                    <td data-type='DisplayName'>${mod_name}</td>
+                    <td>
+                        <span class='from-steam'>Steam</span>
+                    </td>
+                    <td>
+                        <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=${mod_id}' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=${mod_id}</a>
+                    </td>
+                </tr>
