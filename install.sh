@@ -105,12 +105,14 @@ else
 fi
 
 #=================================
+dpkg --add-architecture i386
+apt update
+# apache2-utils is needed for htpasswd, used by update.sh
+apt install apache2-utils 
 # Run the update script just to get the passwords
 sudo -H -u "$user" "$repo_dir/update.sh" -p
 
 # Install a couple of things to make the rest easier
-dpkg --add-architecture i386
-apt update
 apt install software-properties-common psmisc install-info debconf -y
 
 # Get the username of the caller of this script
@@ -145,7 +147,7 @@ echo steam steam/question select "I AGREE" | debconf-set-selections # Add a quot
 echo steam steam/license note '' | debconf-set-selections
 
 # Add the architecture needed for Steam
-apt install lib32gcc1 net-tools dos2unix steamcmd git npm apache2-utils nginx ufw python3-certbot-nginx python3-pip jq -y
+apt install lib32gcc1 net-tools dos2unix steamcmd git npm nginx ufw python3-certbot-nginx python3-pip jq -y
 apt upgrade -y
 
 #install python libraries
