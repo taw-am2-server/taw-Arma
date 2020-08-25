@@ -80,7 +80,7 @@ fi
 #=================================
 # Get the checked out repo information
 repo=$(cd "$script_dir" && git config --get remote.origin.url)
-branch=$(cd "$script_dir" && git rev-parse -C "$script_dir" --abbrev-ref HEAD)
+branch=$(cd "$script_dir" && git rev-parse --abbrev-ref HEAD)
 echo "Config repo: $repo, branch: $branch"
 echo "PWD:"
 pwd
