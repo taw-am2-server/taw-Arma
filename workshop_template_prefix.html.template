@@ -83,7 +83,7 @@
     </head>
 
     <body>
-        <h1>{$battalion} Arma 3 Mods - ${subname}</h1>
+        <h1>${battalion} Arma 3 Mods - ${subname}</h1>
         <p class="before-list">
             <em>From the Arma 3 Launcher, go to "Mods" (left sidebar) > "Preset" (top right) > "Import" (bottom right).
             Select the downloaded copy of this file and click "Open". Rename the preset from "Imported Preset" to
