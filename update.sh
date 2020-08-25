@@ -34,6 +34,10 @@ settings_file="$config_dir/settings.json"
 web_panel_config_template="$script_dir/config.json"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
+# The web panel servers template file
+web_panel_servers_template="$config_dir/servers.json.template"
+# The web panel servers file
+web_panel_servers_file="$script_dir/arma-server-web-admin/servers.json"
 # The .htpasswd file with credentials for accessing the server control panel
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
@@ -253,12 +257,23 @@ fi
 # Load the web panel config JSON
 panel_config_json=$(jq -enf "$web_panel_config_template")
 if [ -z "$panel_config_json" ]; then
-   echo "Error: failed to parse 'config.json' in the server repository" >&2; exit 1
+   echo "ERROR: failed to parse 'config.json' in the server repository" >&2; exit 1
 fi
 
 # Ensure the basic.cfg file exists
 if [ ! -f "$basic_cfg_file" ]; then
   echo "ERROR: missing 'basic.cfg' file in the config repository" >&2; exit 1
+fi
+
+# Process the config repo 'servers.json.template' file
+if [ ! -f "$web_panel_servers_template" ]; then
+  echo "ERROR: missing 'servers.json.template' file in the config repository" >&2; exit 1
+fi
+
+# If there isn't an existing web panel servers file, create one
+if [ ! -f "$web_panel_servers_file" ]; then
+   temp_password=$(tr -dc '[:alnum:]' < /dev/urandom | dd bs=4 count=4 2>/dev/null)
+   sed -e "s#\${password}#$temp_password#g" "$web_panel_servers_template" >"$web_panel_servers_file"
 fi
 
 # Names of output template files
