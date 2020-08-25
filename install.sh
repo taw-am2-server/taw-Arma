@@ -62,10 +62,10 @@ if [ -z "$config_repo" ]; then
 fi
 
 if [ -z "$config_branch" ]; then 
-  printf "Configuration repository branch: "
+  printf "Configuration repository branch (master): "
   read config_branch </dev/tty
   if [ -z "$config_branch" ]; then 
-    echo "ERROR: configuration repository branch must be specified" >&2; exit 1
+    config_branch="master"
   fi
 fi
 
@@ -81,9 +81,6 @@ fi
 # Get the checked out repo information
 repo=$(cd "$script_dir" && git config --get remote.origin.url)
 branch=$(cd "$script_dir" && git rev-parse --abbrev-ref HEAD)
-echo "Config repo: $repo, branch: $branch"
-echo "PWD:"
-pwd
 
 #=================================
 #set some basic common variables
