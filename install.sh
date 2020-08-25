@@ -74,10 +74,12 @@ if [[ ! $user =~ ^[0-9a-zA-Z]+$ ]]; then
   echo "ERROR: specified username '$user' is not alphanumeric" >&2; exit 1
 fi
 
+echo "Install as user: $user"
 #=================================
 # Get the checked out repo information
 repo=$(git config --get remote.origin.url)
 branch=$(git rev-parse --abbrev-ref HEAD)
+echo "Config repo: $repo, branch: $branch"
 
 #=================================
 #set some basic common variables
