@@ -38,7 +38,7 @@ web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
 repo_profiles_dir="$config_dir/profiles"
-arma_profiles_dir="$home_dir/arma-profiles"
+arma_profiles_dir="$home_dir/arma-profiles/home"
 # Userconfig directories
 repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"

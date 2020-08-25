@@ -1,11 +1,17 @@
 # TAW-Arma
 
 To configure the server:
- 1) install Debian or Ubuntu (under test)
- 2) ensure any upstream Proxies are set up correctly
- 3) install curl (`sudo apt install curl -y`)
- 4) run the following command from the terminal:
-    `export repo="taw-am2-server/TAW-Arma" && export branch="master" && curl "https://raw.githubusercontent.com/$repo/$branch/install.sh" > install.sh && chmod +x install.sh && sudo ./install.sh -r "$repo" -b "$branch"`
-    - additional options `-r "repository name" `, `-b "branchName"`, `-u "username"` and `-c "configRepoBranchName"` can be specified for `install.sh`
-    - the repository name and branch should be changed to the appropriate one being used.
-    - to use the Dev branch use: `export repo="taw-am2-server/TAW-Arma" && export branch="master" && curl "https://raw.githubusercontent.com/$repo/$branch/install.sh" > install.sh && chmod +x install.sh && sudo ./install.sh -r "$repo" -b "$branch"`
+ 1) Install Debian or Ubuntu (under test)
+ 2) Ensure any upstream Proxies are set up correctly
+ 3) Install curl (`sudo apt install curl -y`)
+ 4) Run the following commands from the terminal:
+```
+git clone https://github.com/Dystroxic/taw-am1 ~/taw-server
+chmod +x ~/taw-server/install.sh
+sudo ~/taw-server/install.sh
+```
+
+Additional options can be specified for `install.sh`:
+   -  `-c "config_repository_url"` (URL of the configuration repository to use)
+   - `-b "config_repository_branch"` (branch of the configuration repository to use)
+   - `-u "username"` (username to install Steam/Arma under)

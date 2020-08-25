@@ -9,6 +9,7 @@ On mod updates:
 
 For merge:
 - test overwriting of server list file in web console (when re-running install.sh)
+- test using the right profile
 
 They got rid of:
 - Mod bundling to work with A3 Launcher

@@ -16,37 +16,75 @@ user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr 
 
 #=================================
 #get commandline options
-# -b <branch> select git branch to use when cloning this repo
 # -u user to create and use
-branch="master"
-user="steam"
-config_branch="master"
-while getopts ":b:u:r:c:a" opt; do
+user=""
+config_branch=""
+config_repo=""
+while getopts ":u:c:b:" opt; do
   case $opt in
-    # The branch to check out for the install script
-    b) branch="$OPTARG"
-    ;;
     # The user to install ARMA under
     u) user="$OPTARG"
-    ;;
-    # The repository to check out
-    r) repo="$OPTARG"
     ;;
     # The config repo to check out
     c) config_repo="$OPTARG"
     ;;
     # The branch to check out for the config repo
-    a) config_branch="$OPTARG"
+    b) config_branch="$OPTARG"
     ;;
-    \?) echo "Invalid option -$OPTARG" >&2
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      exit 1
+    ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
     ;;
   esac
 done
 
+# A function for getting Steam username/password from the command line
+get_install_user () {
+  printf "Username to install Arma under: "
+  read username1 </dev/tty
+  printf "\nUsername to install Arma under (confirm): "
+  read username2 </dev/tty
+  printf "\n"
+  if [ "$username1" != "$username2" ]; then
+    echo "Usernames do not match! Try again."
+    get_install_user
+  else
+    user="$username1"
+  fi
+}
+
+if [ -z "$config_repo" ]; then
+  printf "Configuration repository URL: "
+  read config_repo </dev/tty
+  if [ -z "$config_repo" ]; then 
+    echo "ERROR: configuration repository URL must be specified" >&2; exit 1
+  fi
+fi
+
+if [ -z "$config_branch" ]; then 
+  printf "Configuration repository branch: "
+  read config_branch </dev/tty
+  if [ -z "$config_branch" ]; then 
+    echo "ERROR: configuration repository branch must be specified" >&2; exit 1
+  fi
+fi
+
+if [ -z "$user" ]; then 
+  get_install_user
+fi
 # Ensure the username is alphanumeric so it doesn't break other things below
 if [[ ! $user =~ ^[0-9a-zA-Z]+$ ]]; then
   echo "ERROR: specified username '$user' is not alphanumeric" >&2; exit 1
 fi
+
+#=================================
+# Get the checked out repo information
+repo=$(git config --get remote.origin.url)
+branch=$(git rev-parse --abbrev-ref HEAD)
 
 #=================================
 #set some basic common variables
@@ -112,7 +150,7 @@ done
 # Clone the full repo under the Steam user (includes the web console as a submodule)
 # If already cloned, pull updates instead
 if [ ! -d "$repo_dir" ]; then
-  sudo -H -u "$user" git clone --recursive "https://github.com/$repo" "$repo_dir" -b "$branch"
+  sudo -H -u "$user" git clone --recursive "$repo" "$repo_dir" -b "$branch"
 else
   sudo -H -u "$user" git -C "$repo_dir" fetch --all
   sudo -H -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
