@@ -7,13 +7,6 @@ if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
-# Install a couple of things to make the rest easier
-apt update
-apt install software-properties-common psmisc install-info debconf -y
-
-# Get the username of the caller of this script
-user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
-
 #=================================
 #get commandline options
 # -u user to create and use
@@ -94,6 +87,14 @@ config_dir="$user_home/config"
 settings_file="$config_dir/settings.json"
 #=================================
 
+# Install a couple of things to make the rest easier
+dpkg --add-architecture i386
+apt update
+apt install software-properties-common psmisc install-info debconf -y
+
+# Get the username of the caller of this script
+user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
+
 #install dependencies
 if lsb_release -i | grep -q 'Debian'; then
   #if linide repo is not present add it
@@ -113,8 +114,6 @@ echo steam steam/question select "I AGREE" | debconf-set-selections # Add a quot
 echo steam steam/license note '' | debconf-set-selections
 
 # Add the architecture needed for Steam
-dpkg --add-architecture i386
-apt update -y
 apt install lib32gcc1 net-tools dos2unix steamcmd git npm apache2-utils nginx ufw python3-certbot-nginx python3-pip jq -y
 apt upgrade -y
 
@@ -122,7 +121,7 @@ apt upgrade -y
 pip3 install bs4
 
 #=================================
-#Create $user user
+# Create $user user
 id -u "$user" &>/dev/null || useradd -m "$user"
 mkdir -p "$user_home/.ssh"
 
