@@ -88,7 +88,25 @@ user_home="/home/$user" # changed from getting the homedir by command
 repo_dir="$user_home/taw-arma"
 config_dir="$user_home/config"
 settings_file="$config_dir/settings.json"
+
 #=================================
+# Create $user user
+id -u "$user" &>/dev/null || useradd -m "$user"
+mkdir -p "$user_home/.ssh"
+
+#=================================
+# Clone the full repo under the new user (includes the web console as a submodule)
+# If already cloned, pull updates instead
+if [ ! -d "$repo_dir" ]; then
+  sudo -H -u "$user" git clone --recursive "$repo" "$repo_dir" -b "$branch"
+else
+  sudo -H -u "$user" git -C "$repo_dir" fetch --all
+  sudo -H -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
+fi
+
+#=================================
+# Run the update script just to get the passwords
+sudo -H -u "$user" "$repo_dir/update.sh" -p
 
 # Install a couple of things to make the rest easier
 dpkg --add-architecture i386
@@ -97,6 +115,16 @@ apt install software-properties-common psmisc install-info debconf -y
 
 # Get the username of the caller of this script
 user_name=$(pstree -lu -s $$ | grep --max-count=1 -o '([^)]*)' | head -n 1 | tr -d '()')
+
+#=================================
+# Copy the ubuntu user's authorized keys over to the $user user
+# but only if it exists
+if  [ -f "/home/$user_name/.ssh/authorized_keys" ]; then
+  cp "/home/$user_name/.ssh/authorized_keys" "$user_home/.ssh/"
+  chown -R $user:$user "$user_home/.ssh"
+  chmod 700 "$user_home/.ssh"
+  chmod 600 "$user_home/.ssh/authorized_keys"
+fi
 
 #install dependencies
 if lsb_release -i | grep -q 'Debian'; then
@@ -124,21 +152,6 @@ apt upgrade -y
 pip3 install bs4
 
 #=================================
-# Create $user user
-id -u "$user" &>/dev/null || useradd -m "$user"
-mkdir -p "$user_home/.ssh"
-
-#=================================
-# Copy the ubuntu user's authorized keys over to the $user user
-# but only if it exists
-if  [ -f "/home/$user_name/.ssh/authorized_keys" ]; then
-  cp "/home/$user_name/.ssh/authorized_keys" "$user_home/.ssh/"
-  chown -R $user:$user "$user_home/.ssh"
-  chmod 700 "$user_home/.ssh"
-  chmod 600 "$user_home/.ssh/authorized_keys"
-fi
-
-#=================================
 # Open necessary firewall ports
 ufw allow 80/tcp # HTTP
 ufw allow 443/tcp # HTTPS
@@ -147,16 +160,6 @@ ufw allow 22/tcp # SSH
 for (( i=0; i<10; i++ )); do
     ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
 done
-
-#=================================
-# Clone the full repo under the Steam user (includes the web console as a submodule)
-# If already cloned, pull updates instead
-if [ ! -d "$repo_dir" ]; then
-  sudo -H -u "$user" git clone --recursive "$repo" "$repo_dir" -b "$branch"
-else
-  sudo -H -u "$user" git -C "$repo_dir" fetch --all
-  sudo -H -u "$user" git -C "$repo_dir" reset --hard "origin/$branch"
-fi
 
 #=================================
 rm -rf "$config_dir"
@@ -230,7 +233,7 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -H -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
+sudo -H -u "$user" "$repo_dir/update.sh" -v -b "$config_branch"
 
 #=================================
 # Create the cron file from the template

@@ -54,11 +54,12 @@ force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
 skip_steam_check=false
+passwords_only=false
 
 # The default branch/user
 config_branch="master"
 
-while getopts ":s:w:v:b:n:" opt; do
+while getopts ":s:w:v:b:n:p:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -77,6 +78,10 @@ while getopts ":s:w:v:b:n:" opt; do
       skip_steam_check=true
       echo "Skipping file checks for existing Arma 3 and Workshop files"
       ;;
+    n) # skip Steam file checks for Arma and existing mods
+      passwords_only=true
+      echo "Running update script for passwords-only"
+      ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -87,68 +92,6 @@ while getopts ":s:w:v:b:n:" opt; do
       ;;
   esac
 done
-
-# Update the config directory
-git -C "$config_dir" fetch --all
-git -C "$config_dir" reset --hard "origin/$config_branch"
-
-#---------------------------------------------
-# Process the config repo 'settings.json' file
-
-# Ensure the file exists
-if [ ! -f "$settings_file" ]; then
-  echo "ERROR: missing 'settings.json' file in the config repository" >&2; exit 1
-fi
-# Load the settings JSON
-settings_json=$(jq -enf "$settings_file")
-if [ -z "$settings_json" ]; then
-   echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
-fi
-# Extract the battalion name from the settings file
-battalion=$(echo "$settings_json" | jq -r ".battalion")
-if [ -z "$battalion" ]; then
-  echo "ERROR: 'settings.json' file in config repository has no 'battalion' key/value" >&2; exit 1
-fi
-# Extract the list of game admins from the settings file
-admin_steam_ids=$(echo "$settings_json" | jq -r ".admin_steam_ids")
-if [ -z "$admin_steam_ids" ]; then
-  echo "ERROR: 'settings.json' file in config repository has no 'admin_steam_ids' key/value" >&2; exit 1
-fi
-# Extract the web console port from the settings file
-web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
-if [ -z "$web_console_local_port" ]; then
-  echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
-fi
-# Extract the server name prefix from the settings file
-server_prefix=$(echo "$settings_json" | jq -r ".server_prefix")
-if [ -z "$server_prefix" ]; then
-  echo "ERROR: 'settings.json' file in config repository has no 'server_prefix' key/value" >&2; exit 1
-fi
-# Extract the server name suffix from the settings file
-server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
-
-#---------------------------------------------
-# Process the server repo 'config.json' file
-
-# Ensure the config.json file for the web panel config exists
-if [ ! -f "$web_panel_config_template" ]; then
-  echo "ERROR: missing 'config.json' file in the server repository" >&2; exit 1
-fi
-# Load the web panel config JSON
-panel_config_json=$(jq -enf "$web_panel_config_template")
-if [ -z "$panel_config_json" ]; then
-   echo "Error: failed to parse 'config.json' in the server repository" >&2; exit 1
-fi
-
-# Ensure the basic.cfg file exists
-if [ ! -f "$basic_cfg_file" ]; then
-  echo "ERROR: missing 'basic.cfg' file in the config repository" >&2; exit 1
-fi
-
-# Names of output template files
-workshop_template_file_required="$workshop_template_dir/$battalion (Required).html"
-workshop_template_file_optional="$workshop_template_dir/$battalion (Optional).html"
-workshop_template_file_all="$workshop_template_dir/$battalion (All).html"
 
 # A function for trimming strings
 trim() {
@@ -249,6 +192,79 @@ run_steam_cmd() { # run_steam_cmd command attempts
    set -e
    return 1
 }
+
+# Call the function for loading Steam credentials
+load_steam_creds
+
+# Call the function for loading web panel credentials
+load_web_panel_creds
+
+# If the script was only called to set passwords, exit out
+if $passwords_only ; then
+   exit 0
+fi
+
+# Update the config directory
+git -C "$config_dir" fetch --all
+git -C "$config_dir" reset --hard "origin/$config_branch"
+
+#---------------------------------------------
+# Process the config repo 'settings.json' file
+
+# Ensure the file exists
+if [ ! -f "$settings_file" ]; then
+  echo "ERROR: missing 'settings.json' file in the config repository" >&2; exit 1
+fi
+# Load the settings JSON
+settings_json=$(jq -enf "$settings_file")
+if [ -z "$settings_json" ]; then
+   echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
+fi
+# Extract the battalion name from the settings file
+battalion=$(echo "$settings_json" | jq -r ".battalion")
+if [ -z "$battalion" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'battalion' key/value" >&2; exit 1
+fi
+# Extract the list of game admins from the settings file
+admin_steam_ids=$(echo "$settings_json" | jq -r ".admin_steam_ids")
+if [ -z "$admin_steam_ids" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'admin_steam_ids' key/value" >&2; exit 1
+fi
+# Extract the web console port from the settings file
+web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
+if [ -z "$web_console_local_port" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
+fi
+# Extract the server name prefix from the settings file
+server_prefix=$(echo "$settings_json" | jq -r ".server_prefix")
+if [ -z "$server_prefix" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'server_prefix' key/value" >&2; exit 1
+fi
+# Extract the server name suffix from the settings file
+server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
+
+#---------------------------------------------
+# Process the server repo 'config.json' file
+
+# Ensure the config.json file for the web panel config exists
+if [ ! -f "$web_panel_config_template" ]; then
+  echo "ERROR: missing 'config.json' file in the server repository" >&2; exit 1
+fi
+# Load the web panel config JSON
+panel_config_json=$(jq -enf "$web_panel_config_template")
+if [ -z "$panel_config_json" ]; then
+   echo "Error: failed to parse 'config.json' in the server repository" >&2; exit 1
+fi
+
+# Ensure the basic.cfg file exists
+if [ ! -f "$basic_cfg_file" ]; then
+  echo "ERROR: missing 'basic.cfg' file in the config repository" >&2; exit 1
+fi
+
+# Names of output template files
+workshop_template_file_required="$workshop_template_dir/$battalion (Required).html"
+workshop_template_file_optional="$workshop_template_dir/$battalion (Optional).html"
+workshop_template_file_all="$workshop_template_dir/$battalion (All).html"
 
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
@@ -396,13 +412,6 @@ do
         download_mod_ids+=($mod_id)
      fi
 done
-
-# We put these functions here (instead of at the top) so it doesn't bother the user with asking for input unless all of the files have been properly validated
-# Call the function for loading Steam credentials
-load_steam_creds
-
-# Call the function for loading web panel credentials
-load_web_panel_creds
 
 # Create the base steamcmd command with the login credentials
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
