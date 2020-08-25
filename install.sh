@@ -44,7 +44,6 @@ get_install_user () {
   read username1 </dev/tty
   printf "Username to install Arma under (confirm): "
   read username2 </dev/tty
-  printf "\n"
   if [ "$username1" != "$username2" ]; then
     echo "Usernames do not match! Try again."
     get_install_user
@@ -105,9 +104,9 @@ else
 fi
 
 #=================================
+# apache2-utils is needed for htpasswd, used by update.sh
 dpkg --add-architecture i386
 apt update
-# apache2-utils is needed for htpasswd, used by update.sh
 apt install apache2-utils -y
 # Run the update script just to get the passwords
 sudo -H -u "$user" "$repo_dir/update.sh" -p
@@ -160,7 +159,7 @@ ufw allow 443/tcp # HTTPS
 ufw allow 22/tcp # SSH
 # Configure ingress ports for 10 game servers (2302-2306, 2312-2316, 2322-2326, etc.)
 for (( i=0; i<10; i++ )); do
-    ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
+  ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
 done
 
 #=================================
@@ -175,7 +174,7 @@ fi
 # Load the settings JSON
 settings_json=$(jq -enf "$settings_file")
 if [ -z "$settings_json" ]; then
-   echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
+  echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
 fi
 # Extract the domain from the settings file
 domain=$(echo "$settings_json" | jq -r ".domain")
@@ -202,11 +201,11 @@ systemctl daemon-reload
 #allow steam user to restart the web panel without a password
 sudoers_start_string="$user  ALL=NOPASSWD: /bin/systemctl start arma3-web-console-$user"
 if ! grep -q "$sudoers_start_string" /etc/sudoers; then
-echo "$sudoers_start_string" >> /etc/sudoers
+  echo "$sudoers_start_string" >> /etc/sudoers
 fi
 sudoers_restart_string="$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-console-$user"
 if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
-echo "$sudoers_restart_string" >> /etc/sudoers
+  echo "$sudoers_restart_string" >> /etc/sudoers
 fi
 
 #=================================
