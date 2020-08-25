@@ -150,7 +150,7 @@ fi
 
 #=================================
 # Install the service file for the web console (replacing template fields as we go)
-sed -e "s#\${user}#$user#" -e "s#\${repo_dir}#$repo_dir#" "$repo_dir/arma3-web-console.service.template" >"/etc/systemd/system/arma3-web-console-$user.service"
+sed -e "s#\${user}#$user#g" -e "s#\${repo_dir}#$repo_dir#g" "$repo_dir/arma3-web-console.service.template" >"/etc/systemd/system/arma3-web-console-$user.service"
 chmod 644 "/etc/systemd/system/arma3-web-console-$user.service"
 systemctl daemon-reload
 
@@ -173,7 +173,7 @@ rm -f "$nginx_conf_file"
 # Remove the default nginx config if it's set
 rm -f "$nginx_sites_enabled_dir/default"
 # Install nginx config with template substitution
-sed -e "s#\${domain}#$domain#" -e "s#\${user}#$user#" -e "s#\${web_console_local_port}#$web_console_local_port#" "$repo_dir/nginx.conf.template" >"$nginx_conf_file"
+sed -e "s#\${domain}#$domain#g" -e "s#\${user}#$user#g" -e "s#\${web_console_local_port}#$web_console_local_port#g" "$repo_dir/nginx.conf.template" >"$nginx_conf_file"
 
 # Set the config file owner to root
 chown -h root:root "$nginx_conf_file"
@@ -195,7 +195,7 @@ sudo -H -u "$user" "$repo_dir/update.sh" -swv -b "$config_branch"
 #=================================
 # Create the cron file from the template
 cronfile="/tmp/cronfile-$user"
-sed -e "s#\${repo_dir}#$repo_dir#" -e "s#\${config_branch}#$config_branch#" "$repo_dir/update.cron.template" >"$cronfile"
+sed -e "s#\${repo_dir}#$repo_dir#g" -e "s#\${config_branch}#$config_branch#g" "$repo_dir/update.cron.template" >"$cronfile"
 # Install the crontab file
 sudo -H -u "$user" crontab "$cronfile"
 

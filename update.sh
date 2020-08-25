@@ -267,14 +267,14 @@ client_optional_mod_ids=()
 all_mods=()
 
 # Load the prefix of the template file
-workshop_template_prefix=$(sed -e "s#\${battalion}#$battalion#" "$script_dir/workshop_template_prefix.html.template")
+workshop_template_prefix=$(sed -e "s#\${battalion}#$battalion#g" "$script_dir/workshop_template_prefix.html.template")
 # Prepare the required mods prefix
-workshop_template_required=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Required#" -e "s#\${subname}#Required#")
+workshop_template_required=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Required#g" -e "s#\${subname}#Required#g")
 # Prepare the optional mods prefix
-workshop_template_optional=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Optional#" -e "s#\${subname}#Optional#")
+workshop_template_optional=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Optional#g" -e "s#\${subname}#Optional#g")
 # Prepare the all mods prefix
-workshop_template_all=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion All#" -e "s#\${subname}#All (Required + Optional)#")
-workshop_template_suffix=$(sed -e "s#\${battalion}#$battalion#" "$script_dir/workshop_template_suffix.html.template")
+workshop_template_all=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion All#g" -e "s#\${subname}#All (Required + Optional)#g")
+workshop_template_suffix=$(sed -e "s#\${battalion}#$battalion#g" "$script_dir/workshop_template_suffix.html.template")
 workshop_template_mod=$(<"$script_dir/workshop_template_mod.html.template")
 
 # Delete the template directory if it exists (to clean it out)
@@ -325,7 +325,7 @@ elif [[ -f "$config_dir/mods.txt" ]]; then
          echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
       fi
       # Create the string that would represent this mod in the workshop template file
-      workshop_template_section=$(echo $workshop_template_mod | sed -e "s#\${mod_name}#$mod_name#" -e "s#\${mod_id}#$mod_id#")
+      workshop_template_section=$(echo $workshop_template_mod | sed -e "s#\${mod_name}#$mod_name#g" -e "s#\${mod_id}#$mod_id#g")
       # Check if it's a server-only mod
       if [ $mod_type -eq 0 ]; then
          # Add it to the list of server mods
