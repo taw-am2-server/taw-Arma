@@ -7,6 +7,9 @@ if [[ ! "$EUID" = 0 ]]; then
     echo "This script must be run as root/sudo" >&2; exit 1
 fi
 
+# Get the directory where this file is located
+script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 #=================================
 #get commandline options
 # -u user to create and use
@@ -74,11 +77,10 @@ if [[ ! $user =~ ^[0-9a-zA-Z]+$ ]]; then
   echo "ERROR: specified username '$user' is not alphanumeric" >&2; exit 1
 fi
 
-echo "Install as user: $user"
 #=================================
 # Get the checked out repo information
-repo=$(git config --get remote.origin.url)
-branch=$(git rev-parse --abbrev-ref HEAD)
+repo=$(git config -C "$script_dir" --get remote.origin.url)
+branch=$(git rev-parse -C "$script_dir" --abbrev-ref HEAD)
 echo "Config repo: $repo, branch: $branch"
 
 #=================================
