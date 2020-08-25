@@ -580,21 +580,21 @@ done
 
 # If there's at least one client-side mod to load, add a startup parameter for it
 if [ ${#client_required_mod_ids[@]} -gt 0 ]; then
-   panel_config=$(echo "$panel_config" | jq ".parameters |= . + [\"$mod_param\"]")
+   panel_config_json=$(echo "$panel_config_json" | jq ".parameters |= . + [\"$mod_param\"]")
 fi
 # If there's at least one server-only mod to load, add the config value for it
 if [ ${#server_mod_ids[@]} -gt 0 ]; then
-   panel_config=$(echo "$panel_config" | jq ".serverMods |= . + [\"$server_mods_name\"]")
+   panel_config_json=$(echo "$panel_config_json" | jq ".serverMods |= . + [\"$server_mods_name\"]")
 fi
 # If the server suffix is provided, set it in the config file
 if [ ! -z "$server_suffix" ]; then
-   panel_config=$(echo "$panel_config" | jq ".suffix = \"$server_suffix\"")
+   panel_config_json=$(echo "$panel_config_json" | jq ".suffix = \"$server_suffix\"")
 fi
 # Add all other requried fields
-panel_config=$(echo "$panel_config" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
+panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
 # Write the web panel config.js file
-echo "module.exports = $panel_config" > "$web_panel_config_file"
+echo "module.exports = $panel_config_json" > "$web_panel_config_file"
 
 # Uses sudo but shouldnt require a password if install.sh worked correctly
 sudo systemctl restart "arma3-web-console-$USER"
