@@ -42,7 +42,9 @@ web_panel_servers_file="$script_dir/arma-server-web-admin/servers.json"
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
 repo_profiles_dir="$config_dir/profiles"
-arma_profiles_dir="$home_dir/arma-profiles/home"
+web_console_profiles_dir="$home_dir/arma-profiles"
+# ARMA on Linux does weird things and appends a "/home" directory to the actual provided directory
+arma_profiles_dir="$web_console_profiles_dir/home"
 # Userconfig directories
 repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
@@ -610,7 +612,7 @@ if [ ! -z "$server_suffix" ]; then
    panel_config_json=$(echo "$panel_config_json" | jq ".suffix = \"$server_suffix\"")
 fi
 # Add all other requried fields
-panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$arma_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
+panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$web_console_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
 # Write the web panel config.js file
 echo "module.exports = $panel_config_json" > "$web_panel_config_file"
