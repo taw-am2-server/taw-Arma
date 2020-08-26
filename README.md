@@ -11,6 +11,6 @@ sudo ~/taw-server/install.sh
 ```
 
 Additional options can be specified for `install.sh`:
-   -  `-c "config_repository_url"` (URL of the configuration repository to use)
+   - `-c "config_repository_url"` (URL of the configuration repository to use)
    - `-b "config_repository_branch"` (branch of the configuration repository to use)
    - `-u "username"` (username to install Steam/Arma under)

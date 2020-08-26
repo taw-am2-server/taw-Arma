@@ -1,3 +1,7 @@
+- update default loadouts to have spray cans
+- test using the right profile
+- reboot server just before scheduled missions
+- add steam login attempt to handle steamguard and incorrect credentials
 - multiple web panel users
 - test Battleye
 - Allow admins to change server CBA settings (https://github.com/CBATeam/CBA_A3/pull/892)
@@ -6,9 +10,3 @@
 On mod updates:
 - remove RHS smoke grenades from arsenals
 - remove thermals
-
-TODO:
-- test overwriting of server list file in web console (when re-running install.sh)
-- test using the right profile
-- add steam login attempt to handle steamguard and incorrect credentials
-- load templated file for list of servers

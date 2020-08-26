@@ -1,2 +1,2 @@
 #run the update script every 4 hours to ensure mods are usually up to date.
-00 04 * * * ${repo_dir}/update.sh -b ${config_branch}
+00 04 * * * git pull -C "${repo_dir}" && ${repo_dir}/update.sh -b ${config_branch}
