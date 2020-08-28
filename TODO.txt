@@ -1,5 +1,4 @@
 - update default loadouts to have spray cans
-- test using the right profile
 - reboot server just before scheduled missions
 - add steam login attempt to handle steamguard and incorrect credentials
 - multiple web panel users
