@@ -183,7 +183,10 @@ run_steam_cmd() { # run_steam_cmd command attempts
          echo "Retrying steamcmd for $3"
       fi
       printf "\e[2m"
-      result=`$1 2>&1 | tee /dev/stdout`
+      # Create a file descriptor that directs to stdout
+      exec 9>&1
+      # Run the steam command and tee the output to stdout and the variable
+      result=$($1 2>&1 | tee >(cat - >&9))
       # Track the exit code
       code=$?
       printf "\n\n\e[0m"
