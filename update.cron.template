@@ -1,3 +1,3 @@
 #run the update script every 4 hours to ensure mods are usually up to date.
 MAILTO="${email}"
-00 04 * * * ${user} /usr/bin/git pull -C "${repo_dir}" 2>&1 >> "${logfile}" && "${repo_dir}/update.sh" -b ${config_branch} 2>&1 >> "${logfile}"
+00 04 * * * ${user} /usr/bin/git -C "${repo_dir}" pull 2>&1 >> "${logfile}" && "${repo_dir}/update.sh" -b ${config_branch} 2>&1 >> "${logfile}"
