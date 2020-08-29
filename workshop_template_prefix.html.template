@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <html>
     <!--Created by Arma 3 Launcher: https://arma3.com-->
-
     <head>
-        <meta name="arma:Type" content="list" />
+        <meta name="arma:Type" content="preset" />
+        <meta name="arma:PresetName" content="${preset_name}" />
         <meta name="generator" content="Arma 3 Launcher - https://arma3.com" />
         <title>${battalion} Arma 3 Mods - ${subname}</title>
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css" />
@@ -86,8 +86,7 @@
         <h1>${battalion} Arma 3 Mods - ${subname}</h1>
         <p class="before-list">
             <em>From the Arma 3 Launcher, go to "Mods" (left sidebar) > "Preset" (top right) > "Import" (bottom right).
-            Select the downloaded copy of this file and click "Open". Rename the preset from "Imported Preset" to
-            "${preset_name}".</em>
+            Select the downloaded copy of this file and click "Open".</em>
         </p>
         <div class="mod-list">
             <table>
