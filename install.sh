@@ -154,12 +154,13 @@ pip3 install bs4
 
 #=================================
 # Open necessary firewall ports
+ufw default allow outgoing # Allow all outgoing connections
 ufw allow 80/tcp # HTTP
 ufw allow 443/tcp # HTTPS
 ufw allow 22/tcp # SSH
-# Configure ingress ports for 10 game servers (2302-2306, 2312-2316, 2322-2326, etc.)
+# Configure ingress ports for 10 game servers (2442-2446, 2542-2546, 2642-2646, etc.)
 for (( i=0; i<10; i++ )); do
-  ufw allow $(( i*10 + 2302 )):$(( i*10 + 2306 ))/udp
+  ufw allow $(( i*100 + 2442 )):$(( i*100 + 2446 ))/udp
 done
 
 #=================================
