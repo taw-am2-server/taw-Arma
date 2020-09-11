@@ -1,34 +1,23 @@
 #!/bin/bash
-#done: reorganize to use html modlist:
-#removed: move exisitng symlinks to `old mod` directory,
-#done: download mods
-#done: create new symlinks in mod direcctory
 #todo: add --purge -p option to clean up old mods not in current html modlists
-#todo: if executatble in config directory install this over the standard one
-#todo: refactor processing key files
-#todo: update userconfig from config repo
-#done: add template to systemctl unit file
-printf "\e[32m running update.sh \e[0m\n"
-script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-#navigate to config directory update the config and return.
-case $script_dir in
-  ${HOME}/*) ;;
-  *) echo "not running as the correct user, attempthing this will result in broken permissions."; exit 1;
-esac
-# Read switches from the command line
-
 
 # exit when any command fails
 set -e
 
 # Get the directory where this file is located
 script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 # The home directory for the user that launches the server
-home_dir=$(eval echo ~$user)
-#battalion config directory
+home_dir=$(eval echo ~$USER)
+
+#navigate to config directory update the config and return.
+case $script_dir in
+  ${home_dir}/*) ;;
+  *) echo "ERROR: Not running as the correct user, attempting this will result in broken permissions."; exit 1;
+esac
+
+# Battalion config directory
 config_dir="$home_dir/config"
-echo "$config_dir"
-repo_profiles_dir="$config_dir/profiles"
 # The directory where ARMA is installed
 arma_dir="$home_dir/arma3"
 # The directory where Workshop mods should be downloaded to
@@ -39,18 +28,28 @@ mod_install_dir="$workshop_dir/steamapps/workshop/content/107410"
 steam_creds_file="$home_dir/.steam_credentials"
 # The filename for the HTML template that can be imported to Steam to specify the modpack
 workshop_template_dir="$home_dir/workshop_templates"
-workshop_template_file_required="$workshop_template_dir/TAW AM1 (Required).html"
-workshop_template_file_optional="$workshop_template_dir/TAW AM1 (Optional).html"
-workshop_template_file_all="$workshop_template_dir/TAW AM1 (All).html"
+# The config repo settings file
+settings_file="$config_dir/settings.json"
+# The web panel config template file
+web_panel_config_template="$script_dir/config.json"
 # The web panel config file
 web_panel_config_file="$script_dir/arma-server-web-admin/config.js"
+# The web panel servers template file
+web_panel_servers_template="$config_dir/servers.json.template"
+# The web panel servers file
+web_panel_servers_file="$script_dir/arma-server-web-admin/servers.json"
 # The .htpasswd file with credentials for accessing the server control panel
 htpasswd_file="$home_dir/panel.htpasswd"
 # Profiles directories
-arma_profiles_dir="$home_dir/arma-profiles"
+repo_profiles_dir="$config_dir/profiles"
+web_console_profiles_dir="$home_dir/arma-profiles"
+# ARMA on Linux does weird things and appends a "/home" directory to the actual provided directory
+arma_profiles_dir="$web_console_profiles_dir/home"
 # Userconfig directories
 repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
+# The basic.cfg file to use
+basic_cfg_file="$config_dir/basic.cfg"
 # How many times to try downloading a mod before erroring out (multiple attempts required for large mods due to timeouts)
 mod_download_attempts=6
 # How many times to try downloading ARMA before erroring out (multiple attempts required on slow connections due to timeouts)
@@ -60,13 +59,14 @@ arma_download_attempts=6
 force_new_steam_creds=false
 force_new_web_panel_creds=false
 force_validate=""
-# Create the base steamcmd command with the login credentials
-branch="master"
-user="steam"
-while getopts ":s:w:v:b:u:" opt; do
+skip_steam_check=false
+passwords_only=false
+
+# The default branch/user
+config_branch="master"
+
+while getopts ":swvnpb:" opt; do
   case $opt in
-    u) user="$OPTARG"
-    ;;
     s) # force new credentials for Steam
       force_new_steam_creds=true
       ;;
@@ -75,11 +75,19 @@ while getopts ":s:w:v:b:u:" opt; do
       ;;
     v) # validate ARMA/mod files that have been downloaded
       force_validate="validate"
+      echo "Forcing validation of Arma 3 and Workshop files"
       ;;
-    b) branch="$OPTARG"
-    ;;
-
-
+    b) # Set the config branch
+      config_branch="$OPTARG"
+      ;;
+    n) # skip Steam file checks for Arma and existing mods
+      skip_steam_check=true
+      echo "Skipping file checks for existing Arma 3 and Workshop files"
+      ;;
+    p) # skip Steam file checks for Arma and existing mods
+      passwords_only=true
+      echo "Running update script for passwords-only"
+      ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -91,17 +99,7 @@ while getopts ":s:w:v:b:u:" opt; do
   esac
 done
 
-
-printf "\e[32m user: $user , branch: $branch,  \e[0m\n"
-printf "\e[32m updating config repo \e[0m\n"
-
-#update the config directory
-pushd "$config_dir"
-git fetch --all
-git reset --hard "origin/$branch"
-popd
-
-
+# A function for trimming strings
 trim() {
    echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 }
@@ -120,20 +118,6 @@ get_steam_creds () {
       get_steam_creds
    else
       printf "$steam_username\n$steam_password" > $steam_creds_file
-      #run steamcmd once interactively to allow the user to ender steamguard code
-      printf  "\e[36m\n\n\\n\n\n=============================================================================================
-Logging in to steam interactively in order to set steamguard code if required.
-If the script hangs on \m[32m'Logging in user 'user' to Steam Public ...'\e[36m enter guard code here.
-Type \e[32m'exit'\e[36m when complete or you see the \e[32m'steam>'\e[36m prompt.
-=============================================================================================\n\n\n\e[0m"
-      result=`/usr/games/steamcmd +login $steam_username $steam_password 2>&1 | tee /dev/tty`
-      if [[ $result == *"FAILED login"* ]]; then
-        rm -f $steam_creds_file
-        printf  "\n\e[31mError: incorrect steam username, password, or guard code, retrying:\n\n\e[0m"
-        get_steam_creds
-      fi
-
-
    fi
 }
 
@@ -191,8 +175,6 @@ load_web_panel_creds () {
 run_steam_cmd() { # run_steam_cmd command attempts
    # Don't exit on errors
    set +e
-
-
    # On a slow connection, the download may timeout, so we have to try multiple times (will resume the download)
    for (( i=0; i<$2; i++ )); do
       if [ $i -eq 0 ]; then
@@ -201,7 +183,10 @@ run_steam_cmd() { # run_steam_cmd command attempts
          echo "Retrying steamcmd for $3"
       fi
       printf "\e[2m"
-      result=`$1 2>&1 | tee /dev/tty`
+      # Create a file descriptor that directs to stdout
+      exec 9>&1
+      # Run the steam command and tee the output to stdout and the variable
+      result=$($1 2>&1 | tee >(cat - >&9))
       # Track the exit code
       code=$?
       printf "\n\n\e[0m"
@@ -216,39 +201,6 @@ run_steam_cmd() { # run_steam_cmd command attempts
    set -e
    return 1
 }
-export -f run_steam_cmd
-
-# Append the workshop template suffix
-workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
-workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
-workshop_template_all+=$(<$script_dir/workshop_template_suffix.html)
-# Delete the template directory if it exists (to clean it out)
-rm -rf "$workshop_template_dir"
-# Re-create the template directory
-mkdir -p "$workshop_template_dir"
-# Write the complete workshop templates to file
-echo "$workshop_template_required" > "$workshop_template_file_required"
-echo "$workshop_template_optional" > "$workshop_template_file_optional"
-echo "$workshop_template_all" > "$workshop_template_file_all"
-
-# Copy the ARMA profiles
-for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
-   if [ ${profile_file: -13} != ".Arma3Profile" ]; then
-      echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
-   fi
-   profile_basename=$(basename "$profile_file")
-   profile_name=${profile_basename%.Arma3Profile}
-   if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
-      echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
-   fi
-   # Create the profile directory
-   mkdir -p "$arma_profiles_dir/$profile_name"
-   # Copy over the profile file
-   cp "$profile_file" "$arma_profiles_dir/$profile_name/$profile_basename"
-done
-
-# Copy the web panel config file
-sed -e "s#\${prefix}#$server_prefix#" "$config_dir/config.js" > "$web_panel_config_file"
 
 # Call the function for loading Steam credentials
 load_steam_creds
@@ -256,11 +208,83 @@ load_steam_creds
 # Call the function for loading web panel credentials
 load_web_panel_creds
 
-base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+# If the script was only called to set passwords, exit out
+if $passwords_only ; then
+   exit 0
+fi
 
-# Create a command that downloads/updates ARMA 3
-arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
-run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
+# Update the config directory
+git -C "$config_dir" fetch --all
+git -C "$config_dir" reset --hard "origin/$config_branch"
+
+#---------------------------------------------
+# Process the config repo 'settings.json' file
+
+# Ensure the file exists
+if [ ! -f "$settings_file" ]; then
+  echo "ERROR: missing 'settings.json' file in the config repository" >&2; exit 1
+fi
+# Load the settings JSON
+settings_json=$(jq -enf "$settings_file")
+if [ -z "$settings_json" ]; then
+   echo "ERROR: failed to parse 'settings.json' in the config repository" >&2; exit 1
+fi
+# Extract the battalion name from the settings file
+battalion=$(echo "$settings_json" | jq -r ".battalion")
+if [ -z "$battalion" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'battalion' key/value" >&2; exit 1
+fi
+# Extract the list of game admins from the settings file
+admin_steam_ids=$(echo "$settings_json" | jq -r ".admin_steam_ids")
+if [ -z "$admin_steam_ids" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'admin_steam_ids' key/value" >&2; exit 1
+fi
+# Extract the web console port from the settings file
+web_console_local_port=$(echo "$settings_json" | jq -r ".web_console_local_port")
+if [ -z "$web_console_local_port" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
+fi
+# Extract the server name prefix from the settings file
+server_prefix=$(echo "$settings_json" | jq -r ".server_prefix")
+if [ -z "$server_prefix" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'server_prefix' key/value" >&2; exit 1
+fi
+# Extract the server name suffix from the settings file
+server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
+
+#---------------------------------------------
+# Process the server repo 'config.json' file
+
+# Ensure the config.json file for the web panel config exists
+if [ ! -f "$web_panel_config_template" ]; then
+  echo "ERROR: missing 'config.json' file in the server repository" >&2; exit 1
+fi
+# Load the web panel config JSON
+panel_config_json=$(jq -enf "$web_panel_config_template")
+if [ -z "$panel_config_json" ]; then
+   echo "ERROR: failed to parse 'config.json' in the server repository" >&2; exit 1
+fi
+
+# Ensure the basic.cfg file exists
+if [ ! -f "$basic_cfg_file" ]; then
+  echo "ERROR: missing 'basic.cfg' file in the config repository" >&2; exit 1
+fi
+
+# Process the config repo 'servers.json.template' file
+if [ ! -f "$web_panel_servers_template" ]; then
+  echo "ERROR: missing 'servers.json.template' file in the config repository" >&2; exit 1
+fi
+
+# If there isn't an existing web panel servers file, create one
+if [ ! -f "$web_panel_servers_file" ]; then
+   temp_password=$(tr -dc '[:alnum:]' < /dev/urandom | dd bs=4 count=4 2>/dev/null)
+   sed -e "s#\${password}#$temp_password#g" "$web_panel_servers_template" >"$web_panel_servers_file"
+fi
+
+# Names of output template files
+workshop_template_file_required="$workshop_template_dir/$battalion (Required).html"
+workshop_template_file_optional="$workshop_template_dir/$battalion (Optional).html"
+workshop_template_file_all="$workshop_template_dir/$battalion (All).html"
 
 # Regex for checking if a string is all digits
 number_regex='^[0-9]+$'
@@ -279,133 +303,121 @@ client_optional_mod_ids=()
 all_mods=()
 
 # Load the prefix of the template file
-workshop_template_required=$(<$script_dir/workshop_template_required_prefix.html)
-workshop_template_optional=$(<$script_dir/workshop_template_optional_prefix.html)
-workshop_template_all=$(<$script_dir/workshop_template_all_prefix.html)
+workshop_template_prefix=$(sed -e "s#\${battalion}#$battalion#g" "$script_dir/workshop_template_prefix.html.template")
+# Prepare the required mods prefix
+workshop_template_required=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Required#g" -e "s#\${subname}#Required#g")
+# Prepare the optional mods prefix
+workshop_template_optional=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion Optional#g" -e "s#\${subname}#Optional#g")
+# Prepare the all mods prefix
+workshop_template_all=$(echo "$workshop_template_prefix" | sed -e "s#\${preset_name}#$battalion All#g" -e "s#\${subname}#All (Required + Optional)#g")
+workshop_template_suffix=$(sed -e "s#\${battalion}#$battalion#g" "$script_dir/workshop_template_suffix.html.template")
+workshop_template_mod=$(<"$script_dir/workshop_template_mod.html.template")
 
+# Delete the template directory if it exists (to clean it out)
+rm -rf "$workshop_template_dir"
+# Re-create the template directory
+mkdir -p "$workshop_template_dir"
 
 #process html files or mod.txt
 if ls $config_dir/*.html 1> /dev/null 2>&1; then
- printf "\e[32mHTML config files exist\e[0m\n"
-
-  for modlist in $config_dir/*.html; do
-
-    #old naive D/L logic for HTML files
-#      #build steamcmd command
-#      modcmd="'$base_steam_cmd +force_install_dir $workshop_dir +workshop_download_item 107410 {mod} validate +exit'"
-#      #load mod ids from html file
-#      python3 "$script_dir/process_html.py" "$modlist" | xargs -n 1 -I  {mod} bash -c "run_steam_cmd $modcmd  $mod_download_attempts 'downloading mod id {mod}'"
-#
-#      #get the modlist filename
-#      name=$(basename "$modlist" ".html")
-#
-#      modlist_dir="${arma_dir:?}/@_modpack_${name:?}"
-#      [[ -d "$modlist_dir" ]] && rm -r "$modlist_dir"
-#      mkdir "$modlist_dir"
-#      pushd "$modlist_dir"
-#      echo "creating symlinks in the '<arma_dir>/@<modlistname>/<modName>' and '<arma_dir>/@<modName>'"
-#
-#      python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
-#      popd
-#      pushd "$arma_dir"
-#      python3 "$script_dir/process_html.py" "$modlist" -n -a | xargs -d "\n" -n 2 -I  {} bash -c "ln -s -f $mod_install_dir/{}"
-#      popd
-#
-#      echo "done creating symlink for $name"
-#      pushd "$mod_install_dir"
-  echo  "processing $modlist..."
-  mapfile -t this_modlist < <( python3 "$script_dir/process_html.py" "$modlist" )
-  name=$(basename "$modlist" ".html")
-  if [[ $modlist == *"server"* ]]
-  then
-    printf "\e[2mAdding mods from $name modlist to the server mods\e[0m\n"
-    server_mod_ids+=("${this_modlist[@]}")
-  elif [[ $modlist == *"optional"* ]]
-  then
-    printf "\e[2mAdding mods from $name modlist to the client optional mods\e[0m\n"
-    client_optional_mod_ids+=("${this_modlist[@]}")
-  else #otherwise it is probably a client mod
-    printf "\e[2mAdding mods from $name modlist to the client required mods\e[0m\n"
-    client_required_mod_ids+=("${this_modlist[@]}")
-  fi
-  done
-
-elif [[ -f "$config_dir/mods.txt" ]]
-then
-  #do mod.txt processing
-  printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m\n"
-  # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
-  while read line || [ -n "$line" ]; do
-     # Increment the line counter
-     line_no=$((line_no+1))
-     # Trim whitespace of the ends of the line
-     line_trimmed="$(trim "$line")"
-     IFS='#' read -ra comment <<< "$line_trimmed"
-     # If the line was empty or just had a comment, skip it
-     if [ -z "${comment[0]}" ]; then
-        continue
-     fi
-     # Split the part before any comments on commas
-     IFS=',' read -ra parts <<< "${comment[0]}"
-     # Parse the line into its fields, trimming whitespace from each
-     mod_id="$(trim "${parts[0]}")"
-     mod_name="$(trim "${parts[1]}")"
-     mod_type="$(trim "${parts[2]}")"
-     # Ensure that the mod ID is a number (digits only)
-     if ! [[ $mod_id =~ $number_regex ]] ; then
-        echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
-     fi
-     # Create the string that would represent this mod in the workshop template file
-     workshop_template_section="
-              <tr data-type='ModContainer'>
-                 <td data-type='DisplayName'>$mod_name</td>
-                 <td>
-                    <span class='from-steam'>Steam</span>
-                 </td>
-                 <td>
-                    <a href='http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id' data-type='Link'>http://steamcommunity.com/sharedfiles/filedetails/?id=$mod_id</a>
-                 </td>
-              </tr>"
-
-     # Check if it's a server-only mod
-     if [ $mod_type -eq 0 ]; then
-        # Add it to the list of server mods
-        server_mod_ids+=($mod_id)
-     # Check if it's a client required mod
-     elif [ $mod_type -eq 1 ]; then
-        # Add it to the list of client-required mods
-        client_required_mod_ids+=($mod_id)
-        # Add the HTML to the workshop template required file
-        workshop_template_required+="$workshop_template_section"
-        workshop_template_all+="$workshop_template_section"
-     elif [ $mod_type -eq 2 ]; then
-        # Optional client mods are not downloaded, just tracked for whitelisting
-        client_optional_mod_ids+=($mod_id)
-        # Add the HTML to the workshop template required file
-        workshop_template_optional+="$workshop_template_section"
-        workshop_template_all+="$workshop_template_section"
-     else
-        # The mod type was unrecognized
-        echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
-     fi
-  done < "$config_dir/mods.txt"
-  # Append the workshop template suffix
-  workshop_template_required+=$(<$script_dir/workshop_template_suffix.html)
-  workshop_template_optional+=$(<$script_dir/workshop_template_suffix.html)
-  workshop_template_all+=$(<$script_dir/workshop_template_suffix.html)
-  # Delete the template directory if it exists (to clean it out)
-  rm -rf "$workshop_template_dir"
-  # Re-create the template directory
-  mkdir -p "$workshop_template_dir"
-  # Write the complete workshop templates to file
-  echo "$workshop_template_required" > "$workshop_template_file_required"
-  echo "$workshop_template_optional" > "$workshop_template_file_optional"
-  echo "$workshop_template_all" > "$workshop_template_file_all"
-
+   printf "\e[32mHTML config files exist\e[0m\n"
+   for modlist in $config_dir/*.html; do
+      echo  "processing $modlist..."
+      mapfile -t this_modlist < <( python3 "$script_dir/process_html.py" "$modlist" )
+      name=$(basename "$modlist" ".html")
+      if [[ $modlist == *"server"* ]];  then
+         printf "\e[2mAdding mods from $name modlist to the server mods\e[0m\n"
+         server_mod_ids+=("${this_modlist[@]}")
+      elif [[ $modlist == *"optional"* ]]; then
+         printf "\e[2mAdding mods from $name modlist to the client optional mods\e[0m\n"
+         client_optional_mod_ids+=("${this_modlist[@]}")
+      else #otherwise it is probably a client mod
+         printf "\e[2mAdding mods from $name modlist to the client required mods\e[0m\n"
+         client_required_mod_ids+=("${this_modlist[@]}")
+      fi
+   done
+elif [[ -f "$config_dir/mods.txt" ]]; then
+   #do mod.txt processing
+   printf "\e[32mHTML config files do not exist, Using mod.txt instead\e[0m\n"
+   # This reads each line of the mods.txt file, with a special condition for last lines that don't have a trailing newline
+   while read line || [ -n "$line" ]; do
+      # Increment the line counter
+      line_no=$((line_no+1))
+      # Trim whitespace of the ends of the line
+      line_trimmed="$(trim "$line")"
+      IFS='#' read -ra comment <<< "$line_trimmed"
+      # If the line was empty or just had a comment, skip it
+      if [ -z "${comment[0]}" ]; then
+         continue
+      fi
+      # Split the part before any comments on commas
+      IFS=',' read -ra parts <<< "${comment[0]}"
+      # Parse the line into its fields, trimming whitespace from each
+      mod_id="$(trim "${parts[0]}")"
+      mod_name="$(trim "${parts[1]}")"
+      mod_type="$(trim "${parts[2]}")"
+      # Ensure that the mod ID is a number (digits only)
+      if ! [[ $mod_id =~ $number_regex ]] ; then
+         echo "Error: invalid line in mods.txt, line $line_no - '$mod_id'" >&2; exit 1
+      fi
+      # Create the string that would represent this mod in the workshop template file
+      workshop_template_section=$(echo $workshop_template_mod | sed -e "s#\${mod_name}#$mod_name#g" -e "s#\${mod_id}#$mod_id#g")
+      # Check if it's a server-only mod
+      if [ $mod_type -eq 0 ]; then
+         # Add it to the list of server mods
+         server_mod_ids+=($mod_id)
+      # Check if it's a client required mod
+      elif [ $mod_type -eq 1 ]; then
+         # Add it to the list of client-required mods
+         client_required_mod_ids+=($mod_id)
+         # Add the HTML to the workshop template required file
+         workshop_template_required+="$workshop_template_section"
+         workshop_template_all+="$workshop_template_section"
+      elif [ $mod_type -eq 2 ]; then
+         # Optional client mods are not downloaded, just tracked for whitelisting
+         client_optional_mod_ids+=($mod_id)
+         # Add the HTML to the workshop template required file
+         workshop_template_optional+="$workshop_template_section"
+         workshop_template_all+="$workshop_template_section"
+      elif [ $mod_type -eq 3 ]; then
+         # Optional client mods are not downloaded, just tracked for whitelisting (but these are hidden ones that don't get added to the template)
+         client_optional_mod_ids+=($mod_id)
+      else
+         # The mod type was unrecognized
+         echo "Error: unknown mod type in mods.txt, line $line_no - '$mod_type'" >&2; exit 1
+      fi
+   done < "$config_dir/mods.txt"
+   # Append the workshop template suffix
+   workshop_template_required+="$workshop_template_suffix"
+   workshop_template_optional+="$workshop_template_suffix"
+   workshop_template_all+="$workshop_template_suffix"
+   # Write the complete workshop templates to file
+   echo "$workshop_template_required" > "$workshop_template_file_required"
+   echo "$workshop_template_optional" > "$workshop_template_file_optional"
+   echo "$workshop_template_all" > "$workshop_template_file_all"
 else
-  printf "\e[31mCOuld not locate mod.txt or html files, please check configuration directory\e[0m\n"
-  exit 1
+  printf "\e[31mERROR: Could not locate mod.txt or html files, please check configuration directory\e[0m\n" >&2; exit 1
 fi
+
+# Copy the ARMA profiles
+find "$repo_profiles_dir" -mindepth 1 -type f -print0 | 
+   while IFS= read -r -d '' profile_file; do
+      if [ ${profile_file: -13} != ".Arma3Profile" ]; then
+         echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
+      fi
+      profile_basename=$(basename "$profile_file")
+      profile_name=${profile_basename%.Arma3Profile}
+      if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
+         echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
+      fi
+      # Create the profile directory
+      mkdir -p "$arma_profiles_dir/$profile_name"
+      output_file="$arma_profiles_dir/$profile_name/$profile_basename"
+      # Copy over the profile file
+      cp "$profile_file" "$output_file"
+      # Convert any Windows line-ending issues
+      dos2unix "$output_file"
+   done
 
 # check whether mod needs downloading or validating
 all_mods+=("${client_optional_mod_ids[@]}" "${client_required_mod_ids[@]}" "${server_mod_ids[@]}")
@@ -421,13 +433,30 @@ do
      fi
 done
 
- if ! $skip_steam_check ; then
+# Create the base steamcmd command with the login credentials
+base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
+
+if ! $skip_steam_check ; then
    arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
    run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
    if [ $? != 0 ]; then
       exit 1
    fi
 fi
+
+# Next steps require the arma directory to exist 
+if [ ! -d $arma_dir ]; then
+   echo "ERROR: Arma install directory does not exist, cannot continue (did you call this script with the '-n' option, thereby skipping Arma install?)" >&2; exit 1
+fi
+
+# Copy the userconfig files
+# Remove the existing userconfig folder
+rm -rf "$arma_userconfig_dir"
+# Copy over the new one
+cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
+
+# Remove the readme file in the mpmisisons folder (so it doesn't show up on the web console)
+rm -f "$arma_dir/mpmissions/readme.txt"
 
 # Create the base command for downloading a mod
 mod_download_base_cmd="$base_steam_cmd +force_install_dir $workshop_dir"
@@ -466,37 +495,10 @@ if [ ${#download_mod_ids[@]} -gt 0 ]; then
    done
 fi
 
-if [ $? != 0 ]; then
-   exit 1
-fi
-# Copy the ARMA profiles
-for profile_file in $(find "$repo_profiles_dir" -mindepth 1 -type f); do
-   if [ ${profile_file: -13} != ".Arma3Profile" ]; then
-      echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
-   fi
-   profile_basename=$(basename "$profile_file")
-   profile_name=${profile_basename%.Arma3Profile}
-   if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
-      echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
-   fi
-   # Create the profile directory
-   mkdir -p "$arma_profiles_dir/$profile_name"
-   # Copy over the profile file
-   cp "$profile_file" "$arma_profiles_dir/$profile_name/$profile_basename"
-done
-# Copy the userconfig files
-# Remove the existing userconfig folder
-rm -rf "$arma_userconfig_dir"
-# Copy over the new one
-cp -R "$repo_userconfig_dir" "$arma_userconfig_dir"
-
-# Remove the readme file in the mpmisisons folder (so it doesn't show up on the web console)
-rm -f "$arma_dir/mpmissions/readme.txt"
-
-
 # This section is for re-packaging the server-only workshop mods into a single
 # mod folder. The server config then points to this folder to load server-side mods.
-server_mods_dir="$arma_dir/@server_mods"
+server_mods_name="mods_server"
+server_mods_dir="$arma_dir/$server_mods_name"
 # This is the directory where the PBOs are linked to
 server_addons_dir="$server_mods_dir/addons"
 # Remove the entire server_mods directory to ensure it's clean
@@ -520,64 +522,66 @@ for mod_id in "${server_mod_ids[@]}"; do
    # The directory where the mod PBOs were downloaded to
    addon_dir=${found_dirs[0]}
    # Loop through all files that are in the mod's addons dir
-   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-      # The link filename, in lowercase
-      output_file="$server_addons_dir/${f,,}"
-      # Create any sub-directories for the file
-      mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$addon_dir/$f" "$output_file"
-   done
+   find "$addon_dir" -type f -printf '%P\0' | 
+      while IFS= read -r -d '' file; do
+         # The link filename, in lowercase
+         output_file="$server_addons_dir/${file,,}"
+         # Create any sub-directories for the file
+         mkdir -p "$(dirname "$output_file")"
+         # Symlink the file
+         ln -s "$addon_dir/$file" "$output_file"
+      done
 done
 
 # This section is for re-packaging the client-and-server workshop mods into a single
 # mod folder. The web control panel can then select this merged pack.
-client_mods_dir="$arma_dir/@taw_client"
-# This is the directory where the PBOs are linked to
-client_addons_dir="$client_mods_dir/addons"
+client_mods_dir="mods_client"
+client_mods_path="$arma_dir/$client_mods_dir"
 # This is the directory where the keys are linked to
 client_keys_dir="$arma_dir/keys"
 # Remove the entire client mods directory to ensure it's clean
-rm -rf $client_mods_dir
+rm -rf $client_mods_path
 # Re-create the directory structure
-mkdir -p $client_addons_dir
+mkdir -p $client_mods_path
 # Delete all existing symlinked keys in the Arma keys directory
 find "$client_keys_dir" -type l -delete
+
+# Create the mod startup parameter
+mod_param="-mod="
 
 # Loop through each client-required mod to link the mod files
 for mod_id in "${client_required_mod_ids[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
+   mod_param+="$client_mods_dir/$mod_id;"
 
-   # Find all "addon" directories within the download directory
-   readarray -d '' found_dirs < <(find "$mod_dir" -maxdepth 1 -type d -iname 'addons' -print0)
-   # If no "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -eq 0 ]; then
-      echo "Client mod with ID $mod_id has no 'addons' directory" >&2; exit 1
-   fi
-   # If multiple "addon" directories were found, that's an error
-   if [ ${#found_dirs[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple 'addons' directories" >&2; exit 1
-   fi
-   # The directory where the mod PBOs were downloaded to
-   addon_dir=${found_dirs[0]}
-
-   # Loop through all files that are in the mod's addons dir
-   for f in $(find "$addon_dir" -type f -printf '%P\n'); do
-      # The link filename, in lowercase
-      output_file="$client_addons_dir/${f,,}"
-      # Create any sub-directories for the file
-      mkdir -p "$(dirname "$output_file")"
-      # Symlink the file
-      ln -s "$addon_dir/$f" "$output_file"
-   done
+   # Loop through all files that are in the mod folder to symlink them
+   find "$mod_dir" -type f -printf '%P\0' | 
+      while IFS= read -r -d '' f; do
+         file_lowercase="${f,,}"
+         # The link filename, in lowercase
+         output_file="$client_mods_path/$mod_id/$file_lowercase"
+         # Create any sub-directories for the file
+         mkdir -p "$(dirname "$output_file")"
+         # If it's the meta.cpp or mod.cpp file, it's special
+         if [ "$file_lowercase" == "meta.cpp" ] || [ "$file_lowercase" == "mod.cpp" ]; then
+            # Copy the file (instead of symlink) so we can edit it
+            cp "$mod_dir/$f" "$output_file"
+            # Try converting from UTF-8 with a silent fail (won't do anything if input wasn't UTF-8)
+            # This is to handle the occational mod that uses CRLF line endings
+            dos2unix "$output_file"
+            # Change the mod name to be the mod ID so it takes less space in the packet sent to Steam (to fix issues with mod list in Arma 3 Launcher)
+            sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\";/" "$output_file"
+         else
+            # Otherwise, just symlink the file
+            ln -s "$mod_dir/$f" "$output_file"
+         fi
+      done
 done
 
 # All mods that should have their bikeys copied to the Arma key directory
 key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
 # Loop over them to link their bikey files
-
-
 for mod_id in "${key_mods[@]}"; do
    # This is the directory where the mod was downloaded
    mod_dir="$mod_install_dir/$mod_id"
@@ -598,7 +602,23 @@ for mod_id in "${key_mods[@]}"; do
    fi
 done
 
-find "$mod_install_dir" -name '*.bikey*'  -exec ln -sf '{}' "$arma_dir/keys/" \;
+# If there's at least one client-side mod to load, add a startup parameter for it
+if [ ${#client_required_mod_ids[@]} -gt 0 ]; then
+   panel_config_json=$(echo "$panel_config_json" | jq ".parameters |= . + [\"$mod_param\"]")
+fi
+# If there's at least one server-only mod to load, add the config value for it
+if [ ${#server_mod_ids[@]} -gt 0 ]; then
+   panel_config_json=$(echo "$panel_config_json" | jq ".serverMods |= . + [\"$server_mods_name\"]")
+fi
+# If the server suffix is provided, set it in the config file
+if [ ! -z "$server_suffix" ]; then
+   panel_config_json=$(echo "$panel_config_json" | jq ".suffix = \"$server_suffix\"")
+fi
+# Add all other requried fields
+panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$web_console_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
-#uses sudo but shouldnt require a password if install worked correctly
-sudo systemctl restart arma3-web-console
+# Write the web panel config.js file
+echo "module.exports = $panel_config_json" > "$web_panel_config_file"
+
+# Uses sudo but shouldnt require a password if install.sh worked correctly
+sudo systemctl restart "arma3-web-console-$USER"

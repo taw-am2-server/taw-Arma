@@ -2,17 +2,19 @@
 server {
 	server_name ${domain};
 
-	access_log /var/log/nginx/arma-access.log;
-	error_log /var/log/nginx/arma-error.log;
+	access_log /var/log/nginx/arma-${domain}-access.log;
+	error_log /var/log/nginx/arma-${domain}-error.log;
 
 	location / {
-		proxy_pass http://127.0.0.1:3000;
+		proxy_pass http://127.0.0.1:${web_console_local_port};
 		auth_basic           "Server Control Panel";
-        auth_basic_user_file /home/steam/panel.htpasswd;
+		auth_basic_user_file /home/${user}/panel.htpasswd;
+		# Increase file upload limit
+		client_max_body_size 20M;
 	}
 
 	location /templates/ {
-		alias /home/steam/workshop_templates/;
+		alias /home/${user}/workshop_templates/;
 		# List all available template files
 		autoindex on;
 		# Download template files instead of viewing them
