@@ -141,11 +141,6 @@ fi
 
 #install dependencies
 if lsb_release -i | grep -q 'Debian'; then
-  #if linide repo is not present add it
-  if ! grep -q "deb http://mirrors.linode.com/debian stretch main non-free" /etc/apt/sources.list; then
-    echo "deb http://mirrors.linode.com/debian stretch main non-free"  >> /etc/apt/sources.list
-    echo "deb-src http://mirrors.linode.com/debian stretch main non-free" >> /etc/apt/sources.list
-  fi
   # add contrib and non-free repos
   apt-add-repository contrib
   apt-add-repository non-free
@@ -158,7 +153,7 @@ echo steam steam/question select "I AGREE" | debconf-set-selections # Add a quot
 echo steam steam/license note '' | debconf-set-selections
 
 # Add the architecture needed for Steam
-apt install lib32gcc1 net-tools dos2unix steamcmd git npm nginx ufw python3-certbot-nginx python3-pip jq -y
+apt install lib32gcc1 net-tools dos2unix steamcmd git npm nginx-light nginx-extras nginx ufw python3-certbot-nginx python3-pip jq libsdl2-2.0-0:i386 -y
 apt upgrade -y
 
 #install python libraries
