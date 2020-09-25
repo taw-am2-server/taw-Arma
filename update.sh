@@ -589,9 +589,9 @@ for mod_id in "${key_mods[@]}"; do
    # Find all "bikey" files within the download directory
    readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
    # If multiple "keys" directories were found, that's an error
-   if [ ${#found_keys[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
-   fi
+#   if [ ${#found_keys[@]} -gt 1 ]; then
+#      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
+#   fi
    if [ ${#found_keys[@]} -gt 0 ]; then
       # The filename without the path
       key_basename=$(basename "${found_keys[0]}")
