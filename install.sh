@@ -153,7 +153,7 @@ echo steam steam/question select "I AGREE" | debconf-set-selections # Add a quot
 echo steam steam/license note '' | debconf-set-selections
 
 # Add the architecture needed for Steam
-apt install lib32gcc1 net-tools dos2unix steamcmd git npm nginx-light nginx-extras nginx ufw python3-certbot-nginx python3-pip jq libsdl2-2.0-0:i386 -y
+apt install lib32gcc1 net-tools dos2unix steamcmd git npm nginx ufw python3-certbot-nginx python3-pip jq libsdl2-2.0-0:i386 -y
 apt upgrade -y
 
 #install python libraries
