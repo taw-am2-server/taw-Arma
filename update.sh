@@ -614,6 +614,26 @@ fi
 if [ ! -z "$server_suffix" ]; then
    panel_config_json=$(echo "$panel_config_json" | jq ".suffix = \"$server_suffix\"")
 fi
+#======================
+#remove old mods
+pushd "${mod_install_dir}"
+currently_downloaded_mods=($( ls ) )
+pushd $config_dir
+for i in "${currently_downloaded_mods[@]}"; do
+    echo $i
+done
+for i in "${all_mods[@]}"; do
+         currently_downloaded_mods=(${currently_downloaded_mods[@]//*$i*})
+done
+popd
+for i in "${currently_downloaded_mods[@]}"; do
+    rm $i -r
+done
+popd
+
+
+#==========================
+
 # Add all other requried fields
 panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$web_console_profiles_dir\", \"-cfg=$basic_cfg_file\"]")
 
