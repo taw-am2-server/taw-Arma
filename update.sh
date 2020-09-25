@@ -630,8 +630,6 @@ for i in "${currently_downloaded_mods[@]}"; do
     rm $i -r
 done
 popd
-
-
 #==========================
 
 # Add all other requried fields
