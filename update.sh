@@ -61,11 +61,11 @@ force_new_web_panel_creds=false
 force_validate=""
 skip_steam_check=false
 passwords_only=false
-
+remove_old=false
 # The default branch/user
 config_branch="master"
 
-while getopts ":swvnpb:" opt; do
+while getopts ":swvnpbr:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -87,6 +87,10 @@ while getopts ":swvnpb:" opt; do
     p) # skip Steam file checks for Arma and existing mods
       passwords_only=true
       echo "Running update script for passwords-only"
+      ;;
+    r) # remove mods no longer in modset
+      remove_old=true
+      echo "Removing old mods after update"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -437,7 +441,7 @@ done
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 if ! $skip_steam_check ; then
-   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
+   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780  $force_validate +quit"
    run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
    if [ $? != 0 ]; then
       exit 1
@@ -589,9 +593,9 @@ for mod_id in "${key_mods[@]}"; do
    # Find all "bikey" files within the download directory
    readarray -d '' found_keys < <(find "$mod_dir" -type f -iname '*.bikey' -print0)
    # If multiple "keys" directories were found, that's an error
-   if [ ${#found_keys[@]} -gt 1 ]; then
-      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
-   fi
+#   if [ ${#found_keys[@]} -gt 1 ]; then
+#      echo "Client mod with ID $mod_id has multiple '.bikey' files" >&2; exit 1
+#   fi
    if [ ${#found_keys[@]} -gt 0 ]; then
       # The filename without the path
       key_basename=$(basename "${found_keys[0]}")
@@ -619,9 +623,6 @@ fi
 pushd "${mod_install_dir}"
 currently_downloaded_mods=($( ls ) )
 pushd $config_dir
-for i in "${currently_downloaded_mods[@]}"; do
-    echo $i
-done
 for i in "${all_mods[@]}"; do
          currently_downloaded_mods=(${currently_downloaded_mods[@]//*$i*})
 done
@@ -630,9 +631,7 @@ for i in "${currently_downloaded_mods[@]}"; do
     rm $i -r
 done
 popd
-
-
-#==========================
+#======================
 
 # Add all other requried fields
 panel_config_json=$(echo "$panel_config_json" | jq ".path = \"$arma_dir\" | .port = $web_console_local_port | .prefix = \"$server_prefix\" | .admins = $admin_steam_ids | .parameters |= . + [\"-profiles=$web_console_profiles_dir\", \"-cfg=$basic_cfg_file\"]")

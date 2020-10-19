@@ -28,7 +28,7 @@ script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 user=""
 config_branch=""
 config_repo=""
-while getopts ":u:c:b:" opt; do
+while getopts ":u:c:b:p:" opt; do
   case $opt in
     # The user to install ARMA under
     u) user="$OPTARG"
@@ -38,6 +38,9 @@ while getopts ":u:c:b:" opt; do
     ;;
     # The branch to check out for the config repo
     b) config_branch="$OPTARG"
+    ;;
+  # The branch to check out for the config repo
+    p) panel_port="$OPTARG"
     ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
