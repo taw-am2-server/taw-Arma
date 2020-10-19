@@ -79,6 +79,7 @@ while getopts ":swvnpbr:" opt; do
       ;;
     b) # Set the config branch
       config_branch="${OPTARG}"
+      echo "Config Branch set to:${OPTARG}"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
