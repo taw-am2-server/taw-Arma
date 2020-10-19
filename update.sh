@@ -102,7 +102,7 @@ while getopts ":swvnpbr:" opt; do
       ;;
   esac
 done
-
+echo "$config_branch"
 # A function for trimming strings
 trim() {
    echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
