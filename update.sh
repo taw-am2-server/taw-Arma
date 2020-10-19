@@ -65,7 +65,7 @@ remove_old=false
 # The default branch/user
 config_branch="master"
 
-while getopts ":swvnpbr:" opt; do
+while getopts ":swvbnpr:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
