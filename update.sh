@@ -64,8 +64,8 @@ passwords_only=false
 remove_old=false
 # The default branch/user
 config_branch="master"
-
-while getopts ":s:w:v:b:n:p:r:" opt; do
+beta_comand=""
+while getopts ":s:w:v:b:n:p:r:B:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -80,6 +80,10 @@ while getopts ":s:w:v:b:n:p:r:" opt; do
     b) # Set the config branch
       config_branch=$OPTARG
       echo "Config Branch set to:$OPTARG"
+      ;;
+    B) # Set the beta branch and pass
+      beta_comand="$OPTARG"
+      echo "Beta build set to: $OPTARG"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
@@ -442,7 +446,7 @@ done
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 if ! $skip_steam_check ; then
-   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780  $force_validate +quit"
+   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 $beta_comand $force_validate +quit"
    run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
    if [ $? != 0 ]; then
       exit 1
