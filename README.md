@@ -5,7 +5,7 @@ To configure the server:
  2) Ensure any upstream Proxies are set up correctly
  3) Run the following commands from the terminal under a user with `sudo` access:
 ```
-git clone https://github.com/Dystroxic/taw-am1 ~/taw-server
+git clone https://github.com/taw-am2-server/TAW-Arma ~/taw-server
 chmod +x ~/taw-server/install.sh
 sudo ~/taw-server/install.sh
 ```
