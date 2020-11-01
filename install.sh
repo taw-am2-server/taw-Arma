@@ -1,15 +1,7 @@
 #!/bin/bash
 
 
-#set some basic common variables
-steam_home="/home/steam"
-source repo.sh
-repo_url="https://github.com/$REPO/"
 
-echo "$REPO"
-
-repo_dir="$steam_home/TAW-Arma"
-config_dir="$steam_home/config"
 #get the user (the user that called sudo)
 
 # exit when any command fails
@@ -90,7 +82,11 @@ fi
 if [[ ! $user =~ ^[0-9a-zA-Z]+$ ]]; then
   echo "ERROR: specified username '$user' is not alphanumeric" >&2; exit 1
 fi
+#set some basic common variables
+steam_home="/home/steam"
 
+repo_dir="$steam_home/TAW-Arma"
+config_dir="$steam_home/config"
 #=================================
 # Get the checked out repo information
 repo=$(cd "$script_dir" && git config --get remote.origin.url)
