@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 #get the user (the user that called sudo)
 
 # exit when any command fails
@@ -20,7 +18,10 @@ script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
 user=""
 config_branch=""
 config_repo=""
-while getopts ":u:c:b:p:" opt; do
+panel_port="3000"
+conf_nginx="true"
+conf_cert="true"
+while getopts ":u:c:b:p:d" opt; do
   case $opt in
     # The user to install ARMA under
     u) user="$OPTARG"
@@ -33,6 +34,10 @@ while getopts ":u:c:b:p:" opt; do
     ;;
   # The branch to check out for the config repo
     p) panel_port="$OPTARG"
+    ;;
+  # Do not configure domain or Nginx
+    d) conf_nginx="false"
+      conf_cert="false"
     ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -215,25 +220,30 @@ if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
   echo "$sudoers_restart_string" >> /etc/sudoers
 fi
 
-#=================================
-# Configure nginx
-nginx_sites_enabled_dir="/etc/nginx/sites-enabled"
-nginx_conf_file="$nginx_sites_enabled_dir/arma-$user.conf"
-# Remove any existing config files
-rm -f "$nginx_conf_file"
-# Remove the default nginx config if it's set
-rm -f "$nginx_sites_enabled_dir/default"
-# Install nginx config with template substitution
-sed -e "s#\${domain}#$domain#g" -e "s#\${user}#$user#g" -e "s#\${web_console_local_port}#$web_console_local_port#g" "$repo_dir/nginx.conf.template" >"$nginx_conf_file"
+if [$conf_nginx == "true"]
+    then
+    #=================================
+    # Configure nginx
+    nginx_sites_enabled_dir="/etc/nginx/sites-enabled"
+    nginx_conf_file="$nginx_sites_enabled_dir/arma-$user.conf"
+    # Remove any existing config files
+    rm -f "$nginx_conf_file"
+    # Remove the default nginx config if it's set
+    rm -f "$nginx_sites_enabled_dir/default"
+    # Install nginx config with template substitution
+    sed -e "s#\${domain}#$domain#g" -e "s#\${user}#$user#g" -e "s#\${web_console_local_port}#$web_console_local_port#g" "$repo_dir/nginx.conf.template" >"$nginx_conf_file"
 
-# Set the config file owner to root
-chown -h root:root "$nginx_conf_file"
-# Ensure the nginx config file is valid
-nginx -t
-
-#=================================
-# Configure the new certificate
-certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --domains "$domain"
+    # Set the config file owner to root
+    chown -h root:root "$nginx_conf_file"
+    # Ensure the nginx config file is valid
+    nginx -t
+fi
+if [$conf_cert == "true"]
+    then
+    #=================================
+    # Configure the new certificate
+    certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --domains "$domain"
+fi
 
 #=================================
 # Install dependencies for the web console
@@ -241,7 +251,7 @@ certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --doma
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -H -u "$user" "$repo_dir/update.sh" -v -b "$config_branch"
+sudo -H -u "$user" "$repo_dir/update.sh" -v -b -f "$config_branch"
 
 #=================================
 # Create the cron file from the template${user}
