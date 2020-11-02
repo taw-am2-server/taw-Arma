@@ -51,7 +51,7 @@ basic_cfg_file="$config_dir/basic.cfg"
 repo_dir="$user_hometaw-arma"
 panel_dir="$repo_dir/arma-server-web-admin"
 
-python3 "${repo_dir}/process_servers.sh" "${panel_dir}/servers.json" "$config_dir/servers.json.template"
+python3 "${repo_dir}/process_servers.py" "${panel_dir}/servers.json" "$config_dir/servers.json.template"
 
 pushd "${config_dir}" || exit
 git commit -m "writing live panel config to repo"
