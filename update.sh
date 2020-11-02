@@ -61,11 +61,11 @@ force_new_web_panel_creds=false
 force_validate=""
 skip_steam_check=false
 passwords_only=false
-
+remove_old=false
 # The default branch/user
 config_branch="master"
-
-while getopts ":swvnpb:" opt; do
+beta_comand=""
+while getopts ":swvb:nprB:" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -78,7 +78,12 @@ while getopts ":swvnpb:" opt; do
       echo "Forcing validation of Arma 3 and Workshop files"
       ;;
     b) # Set the config branch
-      config_branch="$OPTARG"
+      config_branch=$OPTARG
+      echo "Config Branch set to:$OPTARG"
+      ;;
+    B) # Set the beta branch and pass
+      beta_comand="$OPTARG"
+      echo "Beta build set to: $OPTARG"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
@@ -87,6 +92,10 @@ while getopts ":swvnpb:" opt; do
     p) # skip Steam file checks for Arma and existing mods
       passwords_only=true
       echo "Running update script for passwords-only"
+      ;;
+    r) # remove mods no longer in modset
+      remove_old=true
+      echo "Removing old mods after update"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -98,7 +107,7 @@ while getopts ":swvnpb:" opt; do
       ;;
   esac
 done
-
+echo "$config_branch"
 # A function for trimming strings
 trim() {
    echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
@@ -437,7 +446,7 @@ done
 base_steam_cmd="/usr/games/steamcmd +login $steam_username $steam_password"
 
 if ! $skip_steam_check ; then
-   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 -beta profiling -betapassword CautionSpecialProfilingAndTestingBranchArma3 $force_validate +quit"
+   arma_update_cmd="$base_steam_cmd +force_install_dir $arma_dir +app_update 233780 $beta_comand $force_validate +quit"
    run_steam_cmd "$arma_update_cmd" $arma_download_attempts "downloading ARMA"
    if [ $? != 0 ]; then
       exit 1
