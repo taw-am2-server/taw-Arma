@@ -48,7 +48,7 @@ repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
 # The basic.cfg file to use
 basic_cfg_file="$config_dir/basic.cfg"
-repo_dir="${user_home}/taw-arma"
+repo_dir="${home_dir}/taw-arma"
 panel_dir="${repo_dir}/arma-server-web-admin"
 echo "${repo_dir}/process_servers.py"
 echo "${panel_dir}/servers.json"
