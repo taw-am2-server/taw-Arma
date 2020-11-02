@@ -1,4 +1,19 @@
-user_home="/home/$user"
+
+
+# exit when any command fails
+set -e
+
+# Get the directory where this file is located
+script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# The home directory for the user that launches the server
+home_dir=$(eval echo ~$USER)
+
+#navigate to config directory update the config and return.
+case $script_dir in
+  ${home_dir}/*) ;;
+  *) echo "ERROR: Not running as the correct user, attempting this will result in broken permissions."; exit 1;
+esac
 # Battalion config directory
 config_dir="$home_dir/config"
 # The directory where ARMA is installed
@@ -33,7 +48,7 @@ repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
 # The basic.cfg file to use
 basic_cfg_file="$config_dir/basic.cfg"
-repo_dir="$user_home/taw-arma"
+repo_dir="$user_hometaw-arma"
 panel_dir="$repo_dir/arma-server-web-admin"
 
 python3 "${repo_dir}/process_servers.sh" "${panel_dir}/servers.json" "$config_dir/servers.json.template"
