@@ -416,7 +416,7 @@ find "$repo_profiles_dir" -mindepth 1 -type f -print0 |
       fi
       profile_basename=$(basename "$profile_file")
       profile_name=${profile_basename%.Arma3Profile}
-      if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
+      if [[ ! $profile_name =~ ^[0-9a-zA-Z.]+$ ]]; then
          echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
       fi
       # Create the profile directory
