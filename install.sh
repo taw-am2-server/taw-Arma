@@ -204,6 +204,8 @@ if [ -z "$web_console_local_port" ]; then
   echo "ERROR: 'settings.json' file in config repository has no 'web_console_local_port' key/value" >&2; exit 1
 fi
 
+
+
 #=================================
 # Install the service file for the web console (replacing template fields as we go)
 sed -e "s#\${user}#$user#g" -e "s#\${repo_dir}#$repo_dir#g" "$repo_dir/arma3-web-console.service.template" >"/etc/systemd/system/arma3-web-console-$user.service"

@@ -48,12 +48,19 @@ repo_userconfig_dir="$config_dir/userconfig"
 arma_userconfig_dir="$arma_dir/userconfig"
 # The basic.cfg file to use
 basic_cfg_file="$config_dir/basic.cfg"
-repo_dir="$user_hometaw-arma"
+repo_dir="${user_home}taw-arma"
 panel_dir="$repo_dir/arma-server-web-admin"
 echo "${repo_dir}/process_servers.py"
 echo "${panel_dir}/servers.json"
 echo "$config_dir/servers.json.template"
+settings_json=$(jq -enf "$settings_file")
 python3 "${repo_dir}/process_servers.py" "${panel_dir}/servers.json" "$config_dir/servers.json.template"
+email=$(echo "$settings_json" | jq -r ".email")
+if [ -z "$email" ]; then
+  echo "ERROR: 'settings.json' file in config repository has no 'email' key/value" >&2; exit 1
+fi
+git config --global user.email = ${email}
+git config --global user.name = "TAW linux server bot"
 
 pushd "${config_dir}" || exit
 git commit -m "writing live panel config to repo"
