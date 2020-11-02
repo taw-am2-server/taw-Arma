@@ -63,5 +63,6 @@ git config --global user.email = ${email}
 git config --global user.name = "TAW linux server bot"
 
 pushd "${config_dir}" || exit
+git add "$config_dir/servers.json.template"
 git commit -m "writing live panel config to repo"
 git push
