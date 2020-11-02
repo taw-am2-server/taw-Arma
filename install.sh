@@ -251,7 +251,7 @@ fi
 
 #=================================
 # Run the update script to download ARMA and the mods, and to configure the web console
-sudo -H -u "$user" "$repo_dir/update.sh" -v -b -f "$config_branch"
+sudo -H -u "$user" "$repo_dir/update.sh" -v -b "$config_branch"
 
 #=================================
 # Create the cron file from the template${user}
