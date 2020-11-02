@@ -50,7 +50,9 @@ arma_userconfig_dir="$arma_dir/userconfig"
 basic_cfg_file="$config_dir/basic.cfg"
 repo_dir="$user_hometaw-arma"
 panel_dir="$repo_dir/arma-server-web-admin"
-
+echo "${repo_dir}/process_servers.py"
+echo "${panel_dir}/servers.json"
+echo "$config_dir/servers.json.template"
 python3 "${repo_dir}/process_servers.py" "${panel_dir}/servers.json" "$config_dir/servers.json.template"
 
 pushd "${config_dir}" || exit
