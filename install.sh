@@ -35,7 +35,7 @@ while getopts ":u:c:b:p:d" opt; do
   # The branch to check out for the config repo
     p) panel_port="$OPTARG"
     ;;
-  # Do not configure domain or Nginx
+  # Do not configure domain
     d)
       conf_cert="false"
     ;;
@@ -242,7 +242,7 @@ if [$conf_cert == "true"]
     then
     #=================================
     # Configure the new certificate
-    certbot --nginx --non-interactive --agree-tos --redirect --email "$email" --domains "$domain"
+    certbot --nginx --non-interactive --agree-tos --email "$email" --domains "$domain"
 fi
 
 #=================================
