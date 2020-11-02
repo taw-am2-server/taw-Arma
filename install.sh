@@ -36,7 +36,7 @@ while getopts ":u:c:b:p:d" opt; do
     p) panel_port="$OPTARG"
     ;;
   # Do not configure domain or Nginx
-    d) conf_nginx="false"
+    d)
       conf_cert="false"
     ;;
     \?)
