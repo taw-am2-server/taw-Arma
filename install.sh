@@ -221,7 +221,7 @@ sudoers_restart_string="$user  ALL=NOPASSWD: /bin/systemctl restart arma3-web-co
 if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
   echo "$sudoers_restart_string" >> /etc/sudoers
 fi
-
+echo "Configuring Nginx: ${conf_nginx}"
 if [$conf_nginx == "true"]
     then
     #=================================
@@ -240,6 +240,7 @@ if [$conf_nginx == "true"]
     # Ensure the nginx config file is valid
     nginx -t
 fi
+echo "Configuring cert: ${conf_cert}"
 if [$conf_cert == "true"]
     then
     #=================================
