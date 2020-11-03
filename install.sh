@@ -177,7 +177,7 @@ done
 #=================================
 rm -rf "$config_dir"
 sudo -H -u "$user" mkdir "$config_dir"
-sudo -H -u "$user" git clone "$config_repo" "$config_dir"
+sudo -H -u "$user" git clone "$config_repo" "$config_dir" -b "$config_branch"
 
 # Ensure the config settings.json file exists
 if [ ! -f "$settings_file" ]; then
