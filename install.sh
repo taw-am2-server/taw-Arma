@@ -222,7 +222,7 @@ if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
   echo "$sudoers_restart_string" >> /etc/sudoers
 fi
 echo "Configuring Nginx: ${conf_nginx}"
-if [$conf_nginx == "true"]
+if ["$conf_nginx" == "true"]
     then
     #=================================
     # Configure nginx
@@ -241,7 +241,7 @@ if [$conf_nginx == "true"]
     nginx -t
 fi
 echo "Configuring cert: ${conf_cert}"
-if [$conf_cert == "true"]
+if ["$conf_cert" == "true"]
     then
     #=================================
     # Configure the new certificate
