@@ -222,8 +222,8 @@ if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
   echo "$sudoers_restart_string" >> /etc/sudoers
 fi
 echo "Configuring Nginx: ${conf_nginx}"
-if ["${conf_nginx}" == "true"]
-    then
+
+if [ "$conf_nginx" == "true" ]; then
     #=================================
     # Configure nginx
     nginx_sites_enabled_dir="/etc/nginx/sites-enabled"
@@ -240,9 +240,10 @@ if ["${conf_nginx}" == "true"]
     # Ensure the nginx config file is valid
     nginx -t
 fi
+
 echo "Configuring cert: ${conf_cert}"
-if ["$conf_cert" == "true"]
-    then
+
+if [ "$conf_cert" == "true" ]; then
     #=================================
     # Configure the new certificate
     certbot --nginx --non-interactive --agree-tos --email "$email" --domains "$domain"
