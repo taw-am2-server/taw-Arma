@@ -538,7 +538,7 @@ for mod_id in "${server_mod_ids[@]}"; do
          # Create any sub-directories for the file
          mkdir -p "$(dirname "$output_file")"
          # Symlink the file
-         ln -s "$addon_dir/$file" "$output_file"
+         ln -s -f "$addon_dir/$file" "$output_file"
       done
 done
 
@@ -583,7 +583,7 @@ for mod_id in "${client_required_mod_ids[@]}"; do
             sed -i "s/^\(name\s*=\s*\).*$/\1\"$mod_id\";/" "$output_file"
          else
             # Otherwise, just symlink the file
-            ln -s "$mod_dir/$f" "$output_file"
+            ln -s -f "$mod_dir/$f" "$output_file"
          fi
       done
 done
