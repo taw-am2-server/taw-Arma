@@ -69,9 +69,10 @@ remove_old=false
 config_branch="master"
 beta_comand=""
 use_server_mods="false"
+force_profiles="false"
 #===========================================
 #get commandline options
-while getopts ":swvb:nprB:S" opt; do
+while getopts ":swvb:nprB:Sf" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -106,6 +107,10 @@ while getopts ":swvb:nprB:S" opt; do
     S) # remove mods no longer in modset
       use_server_mods="true"
       echo "Using server config for mods instead of central config."
+      ;;
+    f) # Force overwrite of profiles from config
+      force_profiles="true"
+      echo "Forcing profiles"
       ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
@@ -479,9 +484,12 @@ fi
 #===========================================
 #Copy arma3 profiles
 #maintain structure, -n: dont clobber existing files.
-cp -r -n ${repo_profiles_dir} ${web_console_profiles_dir}
-#rename  .arma3profile to .Arma3Profile as linux requires title case in this instance
-
+if [ "${force_profiles}" == "true"  ]; then
+  cp -r -n ${repo_profiles_dir} ${web_console_profiles_dir}
+  #rename  .arma3profile to .Arma3Profile as linux requires title case in this instance
+else
+  cp -r -nf ${repo_profiles_dir} ${web_console_profiles_dir}
+fi
 for f in **/*.arma3profile; do
     #mv  mv -- "$f" "$(basename -- "$f" .txt).Arma3Profile"
     echo "$f"
