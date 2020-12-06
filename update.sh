@@ -3,7 +3,8 @@
 
 # exit when any command fails
 set -e
-
+#===========================================
+#setup basic variables
 # Get the directory where this file is located
 script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
@@ -54,7 +55,9 @@ basic_cfg_file="$config_dir/basic.cfg"
 mod_download_attempts=6
 # How many times to try downloading ARMA before erroring out (multiple attempts required on slow connections due to timeouts)
 arma_download_attempts=6
+#===========================================
 
+#===========================================
 # Default values for switches/options
 force_new_steam_creds=false
 force_new_web_panel_creds=false
@@ -65,7 +68,10 @@ remove_old=false
 # The default branch/user
 config_branch="master"
 beta_comand=""
-while getopts ":swvb:nprB:" opt; do
+use_server_mods="false"
+#===========================================
+#get commandline options
+while getopts ":swvb:nprB:S" opt; do
   case $opt in
     s) # force new credentials for Steam
       force_new_steam_creds=true
@@ -97,6 +103,10 @@ while getopts ":swvb:nprB:" opt; do
       remove_old=true
       echo "Removing old mods after update"
       ;;
+    S) # remove mods no longer in modset
+      use_server_mods="true"
+      echo "Using server config for mods instead of central config."
+      ;;
     \?)
       echo "Invalid option: -$OPTARG" >&2
       exit 1
@@ -107,12 +117,23 @@ while getopts ":swvb:nprB:" opt; do
       ;;
   esac
 done
+
+#===========================================
+
+#debug check that commandline options are in place
 echo "$config_branch"
+
+#===========================================
+
+
+# ===========================================
 # A function for trimming strings
 trim() {
    echo "$(echo -e "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 }
+#===========================================
 
+#===========================================
 # A function for getting Steam username/password from the command line
 get_steam_creds () {
    printf "Steam username: "
@@ -129,7 +150,9 @@ get_steam_creds () {
       printf "$steam_username\n$steam_password" > $steam_creds_file
    fi
 }
+#===========================================
 
+#===========================================
 # A function that attempts to load stored Steam credentials if they exist, and
 # asks for new ones to be entered if they don't (or if the '-s' switch was used)
 load_steam_creds () {
@@ -154,7 +177,9 @@ load_steam_creds () {
       fi
    fi
 }
+#===========================================
 
+#===========================================
 # A function for getting web panel username/password from the command line
 get_web_panel_creds () {
    printf "Web panel username: "
@@ -167,7 +192,10 @@ get_web_panel_creds () {
    done
    set -e
 }
+#===========================================
 
+
+#===========================================
 # A function that attempts to load stored web panel credentials if they exist, and
 # asks for new ones to be entered if they don't (or if the '-w' switch was used)
 load_web_panel_creds () {
@@ -180,7 +208,12 @@ load_web_panel_creds () {
       get_web_panel_creds
    fi
 }
+#===========================================
 
+
+
+#===========================================
+#Function that run steamCMD for the given number of attempts to download a mod or game.
 run_steam_cmd() { # run_steam_cmd command attempts
    # Don't exit on errors
    set +e
@@ -210,6 +243,8 @@ run_steam_cmd() { # run_steam_cmd command attempts
    set -e
    return 1
 }
+#===========================================
+
 
 # Call the function for loading Steam credentials
 load_steam_creds
@@ -226,7 +261,7 @@ fi
 git -C "$config_dir" fetch --all
 git -C "$config_dir" reset --hard "origin/$config_branch"
 
-#---------------------------------------------
+#===========================================
 # Process the config repo 'settings.json' file
 
 # Ensure the file exists
@@ -260,8 +295,10 @@ if [ -z "$server_prefix" ]; then
 fi
 # Extract the server name suffix from the settings file
 server_suffix=$(echo "$settings_json" | jq -r ".server_suffix")
+#===========================================
 
-#---------------------------------------------
+
+#===========================================
 # Process the server repo 'config.json' file
 
 # Ensure the config.json file for the web panel config exists
@@ -289,14 +326,9 @@ if [ ! -f "$web_panel_servers_file" ]; then
    temp_password=$(tr -dc '[:alnum:]' < /dev/urandom | dd bs=4 count=4 2>/dev/null)
    sed -e "s#\${password}#$temp_password#g" "$web_panel_servers_template" >"$web_panel_servers_file"
 fi
+#===========================================
 
-# Names of output template files
-workshop_template_file_required="$workshop_template_dir/$battalion (Required).html"
-workshop_template_file_optional="$workshop_template_dir/$battalion (Optional).html"
-workshop_template_file_all="$workshop_template_dir/$battalion (All).html"
 
-# Regex for checking if a string is all digits
-number_regex='^[0-9]+$'
 # Mods to validate (have already been downloaded, just need to be checked for updates)
 validate_mod_ids=()
 # Mods to download (do not yet exist on the server)
@@ -310,6 +342,16 @@ client_optional_mod_ids=()
 
 #all mods (for download/verification)
 all_mods=()
+
+#===========================================
+#HTML output stuffs
+# Names of output template files
+workshop_template_file_required="$workshop_template_dir/$battalion (Required).html"
+workshop_template_file_optional="$workshop_template_dir/$battalion (Optional).html"
+workshop_template_file_all="$workshop_template_dir/$battalion (All).html"
+
+# Regex for checking if a string is all digits
+number_regex='^[0-9]+$'
 
 # Load the prefix of the template file
 workshop_template_prefix=$(sed -e "s#\${battalion}#$battalion#g" "$script_dir/workshop_template_prefix.html.template")
@@ -326,7 +368,10 @@ workshop_template_mod=$(<"$script_dir/workshop_template_mod.html.template")
 rm -rf "$workshop_template_dir"
 # Re-create the template directory
 mkdir -p "$workshop_template_dir"
+#===========================================
 
+
+#===========================================
 #process html files or mod.txt
 if ls $config_dir/*.html 1> /dev/null 2>&1; then
    printf "\e[32mHTML config files exist\e[0m\n"
@@ -407,27 +452,46 @@ elif [[ -f "$config_dir/mods.txt" ]]; then
 else
   printf "\e[31mERROR: Could not locate mod.txt or html files, please check configuration directory\e[0m\n" >&2; exit 1
 fi
+#===========================================
 
+
+#===========================================
 # Copy the ARMA profiles
-find "$repo_profiles_dir" -mindepth 1 -type f -print0 | 
-   while IFS= read -r -d '' profile_file; do
-      if [ ${profile_file: -13} != ".Arma3Profile" ]; then
-         echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
-      fi
-      profile_basename=$(basename "$profile_file")
-      profile_name=${profile_basename%.Arma3Profile}
-      if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
-         echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
-      fi
-      # Create the profile directory
-      mkdir -p "$arma_profiles_dir/$profile_name"
-      output_file="$arma_profiles_dir/$profile_name/$profile_basename"
-      # Copy over the profile file
-      cp "$profile_file" "$output_file"
-      # Convert any Windows line-ending issues
-      dos2unix "$output_file"
-   done
+#todo: change to copy entire structure over, so as to preserver .vars.Arma3Profile files, and allow additional pofile related settings to be carreid across
+#find "$repo_profiles_dir" -mindepth 1 -type f -print0 |
+#   while IFS= read -r -d '' profile_file; do
+#      if [ ${profile_file: -13} != ".Arma3Profile" ]; then
+#         echo "File '$profile_file' in profiles directory does not have a '.Arma3Profile' extension" >&2; exit 1
+#      fi
+#      profile_basename=$(basename "$profile_file")
+#      profile_name=${profile_basename%.Arma3Profile}
+#      if [[ ! $profile_name =~ ^[0-9a-zA-Z]+$ ]]; then
+#         echo "File '$profile_file' in profiles directory does not have an alphanumeric profile name" >&2; exit 1
+#      fi
+#      # Create the profile directory
+#      mkdir -p "$arma_profiles_dir/$profile_name"
+#      output_file="$arma_profiles_dir/$profile_name/$profile_basename"
+#      # Copy over the profile file
+#      cp "$profile_file" "$output_file"
+#      # Convert any Windows line-ending issues
+#      dos2unix "$output_file"
+#   done
+#===========================================
+#Copy arma3 profiles
+#maintain structure, -n: dont clobber existing files.
+cp -r -n ${repo_profiles_dir} ${web_console_profiles_dir}
+#rename  .arma3profile to .Arma3Profile as linux requires title case in this instance
 
+for f in **/*.arma3profile; do
+    #mv  mv -- "$f" "$(basename -- "$f" .txt).Arma3Profile"
+    echo "$f"
+done
+
+
+#===========================================
+
+
+#===========================================
 # check whether mod needs downloading or validating
 all_mods+=("${client_optional_mod_ids[@]}" "${client_required_mod_ids[@]}" "${server_mod_ids[@]}")
 for mod_id in "${all_mods[@]}"
@@ -587,6 +651,8 @@ for mod_id in "${client_required_mod_ids[@]}"; do
          fi
       done
 done
+#todo: add mod names to script output
+#todo: add modpack links for each html file
 
 # All mods that should have their bikeys copied to the Arma key directory
 key_mods+=( "${client_required_mod_ids[@]}" "${client_optional_mod_ids[@]}" )
@@ -610,9 +676,10 @@ for mod_id in "${key_mods[@]}"; do
       ln -sf "${found_keys[0]}" "$output_file"
    fi
 done
-
+#=====================
+# add mods to central config
 # If there's at least one client-side mod to load, add a startup parameter for it
-if [ ${#client_required_mod_ids[@]} -gt 0 ]; then
+if [ ${#client_required_mod_ids[@]} -gt 0 ] &&  [ ${use_server_mods} == "false" ] ; then
    panel_config_json=$(echo "$panel_config_json" | jq ".parameters |= . + [\"$mod_param\"]")
 fi
 # If there's at least one server-only mod to load, add the config value for it
@@ -623,6 +690,8 @@ fi
 if [ ! -z "$server_suffix" ]; then
    panel_config_json=$(echo "$panel_config_json" | jq ".suffix = \"$server_suffix\"")
 fi
+#======================
+
 #======================
 #remove old mods
 pushd "${mod_install_dir}"
@@ -636,6 +705,13 @@ for i in "${currently_downloaded_mods[@]}"; do
     rm $i -r
 done
 popd
+#======================
+
+#======================
+#use server config for mods
+if [ ${#client_required_mod_ids[@]} -gt 0 ] &&  [ ${use_server_mods} == "true" ] ; then
+     panel_config_json=$(echo "$panel_config_json" | jq ".parameters |= . + [\"$mod_param\"]")
+fi
 #======================
 
 # Add all other requried fields

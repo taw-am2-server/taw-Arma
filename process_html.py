@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 """Parses Arma 3 launcher mod list html
-
-
 """
 
 try:

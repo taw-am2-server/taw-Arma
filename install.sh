@@ -220,7 +220,7 @@ if ! grep -q "$sudoers_restart_string" /etc/sudoers; then
   echo "$sudoers_restart_string" >> /etc/sudoers
 fi
 
-if [$conf_nginx == "true"]
+if [ ${conf_nginx} == "true"]
     then
     #=================================
     # Configure nginx
@@ -259,6 +259,7 @@ logfile="$user_home/arma-cron.log"
 sed -e "s#\${email}#$email#g" -e "s#\${user}#$user#g" -e "s#\${repo_dir}#$repo_dir#g" -e "s#\${config_branch}#$config_branch#g" -e "s#\${logfile}#$logfile#g" "$repo_dir/update.cron.template" > "/etc/cron.d/arma3-$user-cron"
 
 # Enable and start the web console service
+systemctl enable "arma3-web-console-$user"
 systemctl enable "arma3-web-console-$user"
 
 # Set up nginx
