@@ -496,7 +496,12 @@ else
 fi
 
 wInfo "Renaming arma2profile files to mixed case for linux."
-for f in **.arma3profile; do mv "$f" "$(echo "$f" | sed s/.arma3profile/.Arma3Profile/)"; done
+for f in **.arma3profile; do
+  if [ "$f" == '**.arma3profile' ]; then
+    break;
+  fi
+  mv "$f" "$(echo "$f" | sed s/.arma3profile/.Arma3Profile/)";
+done
 
 
 #===========================================
