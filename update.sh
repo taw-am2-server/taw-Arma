@@ -498,6 +498,7 @@ fi
 wInfo "Renaming arma2profile files to mixed case for linux."
 for f in **.arma3profile; do
   if [ "$f" == '**.arma3profile' ]; then
+    wLow "No profiles to rename."
     break;
   fi
   mv "$f" "$(echo "$f" | sed s/.arma3profile/.Arma3Profile/)";
