@@ -1,3 +1,2 @@
 [submodule "arma-server-web-admin"]
-	path = arma-server-web-admin
 	url = https://github.com/Tirpitz93/arma-server-web-admin.git
