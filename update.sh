@@ -1,6 +1,6 @@
 #!/bin/bash
 #todo: add --purge -p option to clean up old mods not in current html modlists
-
+source "colours.sh"
 # exit when any command fails
 set -e
 #===========================================
@@ -75,45 +75,47 @@ force_profiles="false"
 while getopts ":swvb:nprB:Sf" opt; do
   case $opt in
     s) # force new credentials for Steam
+      wInfo "Updateing steam login credentials"
       force_new_steam_creds=true
       ;;
     w) # force new credentials for the web panel
+      wInfo "updating admin panel credentials"
       force_new_web_panel_creds=true
       ;;
     v) # validate ARMA/mod files that have been downloaded
       force_validate="validate"
-      echo "Forcing validation of Arma 3 and Workshop files"
+      wInfo "Forcing validation of Arma 3 and Workshop files"
       ;;
     b) # Set the config branch
       config_branch=$OPTARG
-      echo "Config Branch set to:$OPTARG"
+      wInfo "Config Branch set to:$OPTARG"
       ;;
     B) # Set the beta branch and pass
       beta_comand="$OPTARG"
-      echo "Beta build set to: $OPTARG"
+      wInfo "Beta build set to: $OPTARG"
       ;;
     n) # skip Steam file checks for Arma and existing mods
       skip_steam_check=true
-      echo "Skipping file checks for existing Arma 3 and Workshop files"
+      wInfo "Skipping file checks for existing Arma 3 and Workshop files"
       ;;
     p) # skip Steam file checks for Arma and existing mods
       passwords_only=true
-      echo "Running update script for passwords-only"
+      wInfo "Running update script for passwords-only"
       ;;
     r) # remove mods no longer in modset
       remove_old=true
-      echo "Removing old mods after update"
+      wInfo "Removing old mods after update"
       ;;
     S) # remove mods no longer in modset
       use_server_mods="true"
-      echo "Using server config for mods instead of central config."
+      wInfo "Using server config for mods instead of central config."
       ;;
     f) # Force overwrite of profiles from config
       force_profiles="true"
-      echo "Forcing profiles"
+      wInfo "Forcing profiles"
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+      wWarn "Invalid option: -$OPTARG" >&2
       exit 1
       ;;
     :)
@@ -485,15 +487,16 @@ fi
 #Copy arma3 profiles
 #maintain structure, -n: dont clobber existing files.
 if [ "${force_profiles}" == "true"  ]; then
+  wInfo "Overwriting profiles."
   cp -r -n ${repo_profiles_dir} ${web_console_profiles_dir}
   #rename  .arma3profile to .Arma3Profile as linux requires title case in this instance
 else
+  wInfo "Adding profiles not already present."
   cp -r -nf ${repo_profiles_dir} ${web_console_profiles_dir}
 fi
-for f in **/*.arma3profile; do
-    #mv  mv -- "$f" "$(basename -- "$f" .txt).Arma3Profile"
-    echo "$f"
-done
+
+wInfo "Renaming arma2profile files to mixed case for linux."
+for f in **.arma3profile; do mv "$f" "$(echo "$f" | sed s/.arma3profile/.Arma3Profile/)"; done
 
 
 #===========================================
@@ -527,7 +530,7 @@ fi
 
 # Next steps require the arma directory to exist
 if [ ! -d $arma_dir ]; then
-   echo "ERROR: Arma install directory does not exist, cannot continue (did you call this script with the '-n' option, thereby skipping Arma install?)" >&2; exit 1
+   wError "ERROR: Arma install directory does not exist, cannot continue (did you call this script with the '-n' option, thereby skipping Arma install?)" >&2; exit 1
 fi
 
 # Copy the userconfig files
@@ -685,6 +688,9 @@ for mod_id in "${key_mods[@]}"; do
    fi
 done
 #=====================
+
+
+#=====================
 # add mods to central config
 # If there's at least one client-side mod to load, add a startup parameter for it
 if [ ${#client_required_mod_ids[@]} -gt 0 ] &&  [ ${use_server_mods} == "false" ] ; then
@@ -709,9 +715,9 @@ for i in "${all_mods[@]}"; do
          currently_downloaded_mods=(${currently_downloaded_mods[@]//*$i*})
 done
 popd
-for i in "${currently_downloaded_mods[@]}"; do
-    rm $i -r
-done
+  for i in "${currently_downloaded_mods[@]}"; do
+      rm $i -r
+  done
 popd
 #======================
 
