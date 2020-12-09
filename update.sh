@@ -1,13 +1,13 @@
 #!/bin/bash
 #todo: add --purge -p option to clean up old mods not in current html modlists
-source "colours.sh"
+
 # exit when any command fails
 set -e
 #===========================================
 #setup basic variables
 # Get the directory where this file is located
 script_dir="$( pushd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-
+source "$script_dir/colours.sh"
 # The home directory for the user that launches the server
 home_dir=$(eval echo ~$USER)
 
