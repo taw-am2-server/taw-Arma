@@ -33,3 +33,4 @@ override.tf.json
 *.zip
 .idea/
 venv/
+.env
