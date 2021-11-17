@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import os.path
 import re
@@ -9,6 +10,7 @@ import ast
 
 from pathlib import Path
 from datetime import datetime
+import shlex
 from urllib import request
 from pprint import pprint
 from discord_webhook import DiscordWebhook, DiscordEmbed
@@ -31,7 +33,25 @@ DEPOTS = {"Arma 3 Server Creator DLC - GM": "233787", "Arma 3 Server Creator DLC
 ## works better
 os.system("{} {}".format("steamcmd",
                          "+@NoPromptForPassword 1 +login {} +force_install_dir {}  +download_depot  {}  {}  {} +quit".format(
-                             "taw_arma3_bat2", INSTALL_DIR, SERVER_ID, "233790", "673702058420372856" )))
+                             "taw_arma3_bat2", INSTALL_DIR, SERVER_ID, "233790", "673702058420372856")))
+
+
+def run_command(command):
+    """UNTESTED
+    Some code I found online to read the output from a subprocess live,
+    planning to use this to find the location of each DLC and then copy/link the files to the installation dir.
+    :param command:
+    :return:
+    """
+    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            print(output.strip())
+    rc = process.poll()
+    return rc
 
 
 def update_dlc():
