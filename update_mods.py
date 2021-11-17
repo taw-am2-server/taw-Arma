@@ -42,7 +42,7 @@ def my_handler(type, value, tb):
 
 
 # Install exception handler
-sys.excepthook = my_handler
+
 logger = logging.getLogger(__name__)
 _now = datetime.now().strftime("%Y%m%d-%H%M%S")
 logging.basicConfig(filename='Logs/log_{}.log'.format(_now), level=logging.DEBUG)
@@ -65,6 +65,7 @@ INSTALL_DIR = config["INSTALL_DIR"]  # "C:/HBTurpinTestArea/Mods/"
 CHECK_DIR = config["CHECK_DIR"]  # "C:/HBTurpinTestArea/Mods/steamapps/workshop/content/107410"
 CONFIG_FOLDER = config["CONFIG_FOLDER"]  # "C:/HBTurpinTestArea/Presets/" #change this
 ARMA_DIR = config["ARMA_DIR"]  # "C:/HBTurpinTestArea/Arma" #change this
+STEAMCMD_PATH = config["STEAMCMD_PATH"]  # "C:/HBTurpinTestArea/Arma" #change this
 
 DISCORD_WEBHOOK = config[
     "DISCORD_WEBHOOK"]  # 'https://discord.com/api/webhooks/909859742774611999/HcU7v8b0c5Ce9QKK9EGkAeDaVw7tp37ge5orFjWpxaNSdCid7ulABPxKDomWc13B11HO'
@@ -185,32 +186,45 @@ def clean_mods(modset):
     os.mkdir(_path)
 
 
-def symlink_mod(id: str, modpack: str):
-    _modPath = os.path.join(CHECK_DIR, id)
+def symlink_mod(id: str, modpack: str, _modPath:str= None):
+    if not _modPath:
+        _modPath = os.path.join(CHECK_DIR, id)
     _destPath = os.path.join(ARMA_DIR, modpack, id)
+    if os.path.exists(_destPath) and os.path.isdir(_destPath):
+        shutil.rmtree(_destPath)
+    symlink_from_to(_modPath, _destPath)
+def symlink_from_to(_modPath, _destPath):
+
     _addonsDir = os.path.join(_modPath, "Addons")
-    os.mkdir(_destPath)
-    os.mkdir(os.path.join(_destPath, "Addons"))
+    os.makedirs(os.path.join(_destPath, "Addons"), exist_ok=True)
     for root, dirs, files in os.walk(_modPath):
         for name in files:
-            print(name)
+
             if name.endswith(".dll") or name.endswith(".so"):
-                logger.info(os.path.join(root, name))
-                logger.info(os.path.join(_destPath, "Addons", name))
+                # print(os.path.join(root, name),os.path.join(_destPath, name))
+                # logger.info(os.path.join(root, name))
+                # logger.info(os.path.join(_destPath, "Addons", name))
                 os.symlink(os.path.join(root, name), os.path.join(_destPath, name))
-            if name.endswith(".bikey"):
+            elif name.endswith(".bikey"):
                 try:
                     os.symlink(os.path.join(root, name), os.path.join(ARMA_DIR, "keys", name))
                 except FileExistsError:
                     pass
-
-    for root, dirs, files in os.walk(_addonsDir):
-        for name in files:
-            print(name)
-            if name.endswith(".pbo") or name.endswith(".bisign"):
-                logger.info(os.path.join(root, name))
-                logger.info(os.path.join(_destPath, "Addons", name))
+            elif name.endswith(".pbo") or name.endswith(".ebo") or name.endswith(".bisign"):
+                # print(os.path.join(root, name), os.path.join(_destPath, name))
+                # logger.info(os.path.join(root, name))
+                # logger.info(os.path.join(_destPath, "Addons", name))
                 os.symlink(os.path.join(root, name), os.path.join(_destPath, "Addons", name))
+            else:
+                continue
+            logger.info("Processed {}".format(name))
+    # for root, dirs, files in os.walk(_addonsDir):
+    #     for name in files:
+    #         if name.endswith(".pbo") or name.endswith(".bisign"):
+    #             print(os.path.join(root, name), os.path.join(_destPath, name))
+    #             logger.info(os.path.join(root, name))
+    #             logger.info(os.path.join(_destPath, "Addons", name))
+    #             os.symlink(os.path.join(root, name), os.path.join(_destPath, "Addons", name))
 
 
 def modify_mod_and_meta(id: str, modpack: str, name: str):
@@ -272,6 +286,7 @@ def clean_logs():
 
 
 if __name__ == "__main__":
+    sys.excepthook = my_handler
     if not os.path.isfile(".running"):
         Path('.running').touch()
         clean_logs()
