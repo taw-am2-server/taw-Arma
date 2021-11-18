@@ -1,23 +1,11 @@
-import os
-import subprocess
-import sys
-import os.path
-import re
-import shutil
-import time
-import json
-import ast
-
-from pathlib import Path
-from datetime import datetime
-import shlex
-from urllib import request
-from pprint import pprint
-from discord_webhook import DiscordWebhook, DiscordEmbed
 import logging
+import os
+import os.path
+import shlex
+import subprocess
 
 logger = logging.getLogger(__name__)
-from update_mods import INSTALL_DIR, ARMA_DIR, SERVER_ID, WORKSHOP_ID, STEAMCMD_PATH, symlink_mod
+from update_mods import SERVER_ID, STEAMCMD_PATH, symlink_mod
 
 depot_rel_path = "SteamCMD/steamapps/content/app_{app}/depot_{depot}"
 depot_path = f"{STEAMCMD_PATH}{depot_rel_path}"
@@ -55,8 +43,47 @@ def run_command(command):
     rc = process.poll()
     return rc
 def run_command2(command):
-    return subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    _ret = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    logger.info(_ret.stdout)
+    logger.error(_ret.stderr)
+    return _ret
+def run_command3(command):
+    from subprocess import Popen, PIPE, STDOUT
 
+    proc = Popen(shlex.split(command),
+                 bufsize=1, stdout=PIPE, stderr=STDOUT, close_fds=True)
+    for line in iter(proc.stdout.readline, b''):
+        print(line.decode("utf-8"))
+    proc.stdout.close()
+    proc.wait()
+
+def run_command4(command):
+    """
+    Requires linux
+    :param command:
+    :return:
+    """
+
+    master_fd, slave_fd = pty.openpty()  # provide tty to enable
+    # line-buffering on ruby's side
+    proc = Popen(shlex.split(command),
+                 stdout=slave_fd, stderr=STDOUT, close_fds=True)
+    timeout = .04  # seconds
+    while 1:
+        ready, _, _ = select.select([master_fd], [], [], timeout)
+        if ready:
+            data = os.read(master_fd, 512)
+            if not data:
+                break
+            print("got " + repr(data))
+        elif proc.poll() is not None:  # select timeout
+            assert not select.select([master_fd], [], [], 0)[0]  # detect race condition
+            break  # proc exited
+    os.close(slave_fd)  # can't do it sooner: it leads to errno.EIO error
+    os.close(master_fd)
+    proc.wait()
+
+    print("This is reached!")
 
 def update_dlc(name, data):
     """
@@ -67,11 +94,11 @@ def update_dlc(name, data):
     """
     logger.info("Updating DLC: {}".format(name))
     command = "{} {}".format("steamcmd",
-                             "+@NoPromptForPassword 1 +login {}  +download_depot  {}  {}  {} +quit".format(
+                             "+@NoPromptForPassword 1 +login {}  +download_depot  {}  {}  {} -validate +quit".format(
                                  "taw_arma3_bat2",  SERVER_ID, data["depot"], data["manifest"]))
 
     logger.info(command)
-    run_command2(command)
+    run_command3(command)
     # run_command("{} {}".format("steamcmd",
     #                            "+@NoPromptForPassword 1 +login {} +quit  +download_depot  {}  {}  {} +quit".format(
     #                                "taw_arma3_bat2",  SERVER_ID, v["depot"], v["manifest"])))
